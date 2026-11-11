@@ -19,13 +19,17 @@ las skills `sf-*` (`.claude/skills/`); aquí va lo que es decisión del proyecto
 | Named Credential | `Sistema_Proposito` | `ERP_Stock` |
 | Platform Event | `Hecho_En_Pasado__e` | `Pedido_Confirmado__e` |
 
-Idioma de los nombres de API y del código: **<decidir: español | inglés>** — uno solo en todo el
-proyecto. Labels y textos de usuario, en Custom Labels.
+Idioma: **inglés** para nombres de API y código (objetos, campos, clases, métodos, flows);
+**español** para documentación, informes y comentarios. Los ejemplos de esta tabla y de las skills
+están en español solo para ilustrar el patrón. Labels y textos de usuario, en Custom Labels.
 
 ## Apex
 
 - Capas: selector (consultas) → service (negocio) → controller / trigger handler (entrada).
-- Framework de triggers: **<indicar el del proyecto>**. Un trigger por objeto, sin lógica.
+- Framework de triggers: **patrón Trigger Handler al estilo de Kevin O'Hara** — una clase base
+  `TriggerHandler` (enrutado por contexto, bypass y control de recursión) y un
+  `<Objeto>TriggerHandler` por objeto. Si el proyecto aún no la tiene, la primera feature con
+  trigger la incluye en su diseño. Un trigger por objeto, sin lógica.
 - Sharing declarado en toda clase; modo usuario por defecto.
 - `Assert.*` en tests; `TestDataFactory` como única fuente de datos de prueba.
 - ApexDoc en clases y métodos públicos.

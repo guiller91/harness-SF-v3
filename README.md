@@ -222,7 +222,6 @@ fases, puertas y traspasos · [`docs/security-model.md`](docs/security-model.md)
 
 <div align="center">
 
-Evolución de [harness-SF](https://github.com/guiller91/harness-SF) y
-[Harness-SF-eng-V2](https://github.com/guiller91/Harness-SF-eng-V2) · MIT
+Licencia MIT
 
 </div>
