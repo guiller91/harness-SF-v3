@@ -1,0 +1,6 @@
+.harness/
+.sf/
+.sfdx/
+node_modules/
+coverage/
+**/staticresources/**

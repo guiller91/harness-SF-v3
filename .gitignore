@@ -1,0 +1,39 @@
+# --- Salesforce CLI ---
+.sf/
+.sfdx/
+.localdevserver/
+deploy-options.json
+
+# --- Node ---
+node_modules/
+coverage/
+.npm/
+
+# --- Harness: se versiona el veredicto (JSON), no los volcados ---
+.harness/run/
+.harness/evidence/**/*.log
+.harness/evidence/**/*.summary
+.harness/evidence/**/changed-files.txt
+.harness/evidence/**/apex-tests/
+.harness/evidence/**/static-results.json
+.harness/evidence/_adhoc/
+progress/drafts/
+__pycache__/
+*.pyc
+
+# --- Secretos: nunca ---
+.env
+.env.*
+*.key
+*.pem
+authfile*
+sfdx-auth-url*
+
+# --- Claude Code: ajustes personales ---
+.claude/settings.local.json
+
+# --- Editor / SO ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

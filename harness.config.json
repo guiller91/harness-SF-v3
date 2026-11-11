@@ -1,0 +1,33 @@
+{
+  "project": "CHANGE_ME",
+  "org": {
+    "model": "scratch",
+    "devHubAlias": "DevHub",
+    "targetOrgAlias": "harness-dev",
+    "validationOrgAlias": "",
+    "protectedAliases": ["prod", "production", "produccion"],
+    "scratchDefFile": "config/project-scratch-def.json",
+    "scratchDurationDays": 7
+  },
+  "source": {
+    "packageDirs": ["force-app"]
+  },
+  "quality": {
+    "coverageGatePerClass": 85,
+    "apexTestLevel": "RunLocalTests",
+    "analyzer": {
+      "ruleSelector": ["Recommended"],
+      "severityThreshold": 3,
+      "configFile": "code-analyzer.yml",
+      "scope": "changed"
+    }
+  },
+  "workflow": {
+    "maxReworkLoops": 3,
+    "designApprovalForSizes": ["L"]
+  },
+  "git": {
+    "featureBranchPrefix": "feat/",
+    "protectedBranches": ["main", "master"]
+  }
+}

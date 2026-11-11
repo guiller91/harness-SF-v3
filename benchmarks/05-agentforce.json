@@ -1,0 +1,19 @@
+{
+  "title": "Agente que informa del estado de un pedido",
+  "description": "Un agente de Agentforce para clientes que, dado un número de pedido, responde con su estado y fecha prevista de entrega.",
+  "type": "feature",
+  "size": "L",
+  "acceptance_criteria": [
+    "Ante '¿por dónde va mi pedido P-000123?' el agente usa la acción de consulta y responde con estado y fecha prevista",
+    "Si el pedido no existe, lo dice y pide que revise el número",
+    "Si el cliente no da el número, se lo pide antes de consultar",
+    "Ante una petición fuera de alcance (cancelar, devolver) explica que no puede y ofrece hablar con una persona",
+    "La acción no devuelve datos de pedidos de otras cuentas",
+    "El authoring bundle compila y los tests del agente pasan"
+  ],
+  "out_of_scope": [
+    "Modificar o cancelar pedidos",
+    "Canales distintos del chat web"
+  ],
+  "priority": "medium"
+}

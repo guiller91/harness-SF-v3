@@ -1,0 +1,20 @@
+{
+  "name": "harness-sf",
+  "private": true,
+  "version": "3.0.0",
+  "description": "Harness de ingeniería multiagente para Salesforce sobre Claude Code",
+  "scripts": {
+    "test": "npm run test:unit",
+    "test:unit": "sfdx-lwc-jest",
+    "test:unit:coverage": "sfdx-lwc-jest --coverage",
+    "prettier": "prettier --write \"force-app/**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+    "prettier:verify": "prettier --check \"force-app/**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+    "harness:test": "python3 -m unittest discover -s harness/tests -t ."
+  },
+  "devDependencies": {
+    "@prettier/plugin-xml": "^3.4.2",
+    "@salesforce/sfdx-lwc-jest": "^7.9.0",
+    "prettier": "^3.10.0",
+    "prettier-plugin-apex": "^2.3.0"
+  }
+}

@@ -1,0 +1,22 @@
+# Configuración de Salesforce Code Analyzer v5 para el gate `static`.
+# Protegido: los agentes no pueden editar este fichero (relajar una regla es decisión humana).
+# Referencia completa:  sf code-analyzer config --rule-selector all --output-file ejemplo.yml
+#
+# Qué reglas se ejecutan y con qué umbral se decide en harness.config.json:
+#   quality.analyzer.ruleSelector       (por defecto: Recommended)
+#   quality.analyzer.severityThreshold  (1 crítica … 5 informativa; el gate falla en <= umbral)
+#   quality.analyzer.scope              ("changed": solo lo que toca la feature · "all": todo)
+
+ignores:
+  files:
+    - "**/node_modules/**"
+    - "**/staticresources/**"
+    - "**/__tests__/**"
+
+# Para endurecer o relajar una regla concreta, descomenta y ajusta:
+# rules:
+#   pmd:
+#     ApexCRUDViolation:
+#       severity: 1
+#     AvoidGlobalModifier:
+#       severity: 2

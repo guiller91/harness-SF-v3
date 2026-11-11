@@ -1,0 +1,20 @@
+{
+  "title": "Enviar pedidos confirmados al ERP",
+  "description": "Cuando un Pedido__c pasa a Estado__c = 'Confirmado', enviarlo al ERP por REST (POST /v1/pedidos) y guardar el identificador devuelto en Id_ERP__c.",
+  "type": "feature",
+  "size": "L",
+  "acceptance_criteria": [
+    "Al confirmar un pedido se envía una petición asíncrona al ERP con número, cuenta e importe",
+    "Con respuesta 201 se guarda Id_ERP__c y Estado_Sincronizacion__c = 'Sincronizado'",
+    "Con error 5xx o timeout se reintenta hasta 3 veces y, si persiste, queda Estado_Sincronizacion__c = 'Error' con el motivo",
+    "Un reintento no crea el pedido dos veces en el ERP (clave idempotente)",
+    "El endpoint y las credenciales están en Named/External Credentials, no en el código",
+    "Confirmar 200 pedidos a la vez no supera los límites"
+  ],
+  "out_of_scope": [
+    "Sincronizar cambios posteriores del pedido",
+    "Recibir actualizaciones desde el ERP"
+  ],
+  "notes": "El contrato del ERP debe confirmarse con el humano en el diseño. Sin entorno del ERP, la verificación contra el sistema real constará como NO VERIFICADO.",
+  "priority": "medium"
+}

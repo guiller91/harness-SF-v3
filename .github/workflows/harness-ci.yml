@@ -1,0 +1,34 @@
+name: Harness CI
+
+# Prueba el propio harness: tests de la CLI y de los hooks, coherencia interna y sintaxis.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  harness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Coherencia del harness (roles ↔ agentes ↔ pipeline ↔ gates ↔ hooks)
+        run: ./hx check
+      - name: Tests del harness
+        run: python3 -m unittest discover -s harness/tests -t . -v
+      - name: Sintaxis de los gates
+        run: |
+          for f in hx install.sh harness/gates/*.sh; do bash -n "$f"; done
+      - name: ShellCheck
+        run: shellcheck -x -e SC1091 hx install.sh harness/gates/*.sh
+      - name: JSON válidos
+        run: |
+          for f in harness.config.json feature_list.json harness/roles.json harness/pipeline.json \
+                   .claude/settings.json sfdx-project.json package.json benchmarks/*.json; do
+            python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f"
+          done

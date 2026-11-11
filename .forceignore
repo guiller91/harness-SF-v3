@@ -1,0 +1,7 @@
+# Lo que la CLI no debe desplegar ni recuperar
+package.xml
+**/jsconfig.json
+**/.eslintrc.json
+**/__tests__/**
+**/profiles/**
+**/*.profile-meta.xml

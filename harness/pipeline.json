@@ -1,0 +1,68 @@
+{
+  "_doc": "Pipeline derivado del cambio. 'when' es 'always', 'any-product' (hay metadata en un packageDir) o una lista de tipos: apex, apex-test, lwc, lwc-test, flow, data-model, permissions, integration, agentforce, ui-config. 'sizes' limita la regla a ciertos tamaños de feature. 'order' fija el orden canónico de ejecución.",
+
+  "order": {
+    "design": ["business-analyst", "org-analyst", "solution-architect"],
+    "build": [
+      "data-modeler",
+      "apex-developer",
+      "integration-developer",
+      "flow-developer",
+      "lwc-developer",
+      "agentforce-developer",
+      "admin-configurator",
+      "security-admin",
+      "test-engineer"
+    ],
+    "gates": ["static", "apex-tests", "lwc-tests", "agent-validate"],
+    "reviews": [
+      "qa-verifier",
+      "code-reviewer",
+      "security-reviewer",
+      "performance-reviewer",
+      "accessibility-reviewer"
+    ],
+    "release": ["release-manager", "docs-writer"],
+    "release_gates": ["deploy-validate"]
+  },
+
+  "design": [
+    { "when": "always", "use": ["solution-architect"] },
+    { "when": "always", "sizes": ["M", "L"], "use": ["business-analyst"] },
+    { "when": "any-product", "sizes": ["M", "L"], "use": ["org-analyst"] }
+  ],
+
+  "build": [
+    { "when": ["data-model"], "use": ["data-modeler"] },
+    { "when": ["apex"], "use": ["apex-developer", "test-engineer"] },
+    { "when": ["apex-test", "lwc-test"], "use": ["test-engineer"] },
+    { "when": ["integration"], "use": ["integration-developer", "test-engineer"] },
+    { "when": ["flow"], "use": ["flow-developer"] },
+    { "when": ["lwc"], "use": ["lwc-developer", "test-engineer"] },
+    { "when": ["agentforce"], "use": ["agentforce-developer"] },
+    { "when": ["ui-config"], "use": ["admin-configurator"] },
+    { "when": ["permissions", "data-model", "apex", "agentforce"], "use": ["security-admin"] }
+  ],
+
+  "gates": [
+    { "when": "any-product", "use": ["static"] },
+    { "when": ["apex", "apex-test", "flow", "integration"], "use": ["apex-tests"] },
+    { "when": ["lwc", "lwc-test"], "use": ["lwc-tests"] },
+    { "when": ["agentforce"], "use": ["agent-validate"] }
+  ],
+
+  "reviews": [
+    { "when": "always", "use": ["qa-verifier"] },
+    { "when": "any-product", "use": ["code-reviewer", "security-reviewer"] },
+    { "when": ["apex", "flow", "integration", "lwc"], "use": ["performance-reviewer"] },
+    { "when": ["lwc"], "use": ["accessibility-reviewer"] }
+  ],
+
+  "release": [
+    { "when": "always", "use": ["release-manager", "docs-writer"] }
+  ],
+
+  "release_gates": [
+    { "when": "any-product", "use": ["deploy-validate"] }
+  ]
+}

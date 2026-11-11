@@ -1,0 +1,18 @@
+{
+  "title": "Normalizar el teléfono de los contactos",
+  "description": "Al crear o modificar un Contact, guardar el teléfono en formato E.164 (+34…) en un campo nuevo Telefono_Normalizado__c para que las integraciones no reciban formatos distintos.",
+  "type": "feature",
+  "size": "S",
+  "acceptance_criteria": [
+    "Al guardar un Contact con Phone '612 34 56 78' y MailingCountry 'España', Telefono_Normalizado__c queda '+34612345678'",
+    "Si Phone está vacío, Telefono_Normalizado__c queda vacío",
+    "Si Phone no cambia en una actualización, no se recalcula",
+    "Una carga de 200 contactos se procesa en una sola transacción sin superar límites",
+    "Un teléfono imposible de normalizar no bloquea el guardado: el campo queda vacío"
+  ],
+  "out_of_scope": [
+    "Normalizar teléfonos de Lead o Account",
+    "Corregir datos históricos"
+  ],
+  "priority": "medium"
+}

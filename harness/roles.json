@@ -1,0 +1,318 @@
+{
+  "_doc": "Matriz de propiedad. La aplican los hooks, no la buena voluntad de los agentes. {pkg} = cada packageDir de harness.config.json; {fid} = id de la feature activa. Un patrón con '!' delante excluye.",
+  "protected": [
+    ".claude/**",
+    "harness/**",
+    "hx",
+    "install.sh",
+    "harness.config.json",
+    "feature_list.json",
+    ".harness/**",
+    "progress/current.md",
+    "progress/history.md",
+    "CLAUDE.md",
+    "AGENTS.md",
+    "CHECKPOINTS.md",
+    "code-analyzer.yml",
+    ".github/**",
+    ".forceignore",
+    ".gitignore"
+  ],
+  "sensitive": [
+    "sfdx-project.json",
+    "package.json",
+    "package-lock.json",
+    "config/**",
+    "jest.config.js",
+    ".eslintrc*",
+    "eslint.config.*"
+  ],
+  "restricted": [
+    "manifest/**"
+  ],
+  "reportHeadings": {
+    "design": [
+      "Resumen",
+      "Preguntas abiertas"
+    ],
+    "build": [
+      "Resumen",
+      "Archivos",
+      "Verificación",
+      "Pendiente"
+    ],
+    "review": [
+      "Veredicto",
+      "Hallazgos"
+    ],
+    "release": [
+      "Resumen",
+      "Archivos",
+      "Pendiente"
+    ]
+  },
+  "roles": {
+    "orchestrator": {
+      "class": "orchestrator",
+      "phases": [
+        "design",
+        "build",
+        "verify",
+        "release"
+      ],
+      "write": []
+    },
+    "business-analyst": {
+      "class": "design",
+      "phases": [
+        "design",
+        "build"
+      ],
+      "write": [],
+      "artifact": {
+        "path": "docs/specs/{fid}/requirements.md",
+        "headings": [
+          "Historia de usuario",
+          "Criterios de aceptación",
+          "Casos límite",
+          "Fuera de alcance"
+        ]
+      }
+    },
+    "org-analyst": {
+      "class": "design",
+      "phases": [
+        "design",
+        "build"
+      ],
+      "write": [],
+      "artifact": {
+        "path": "docs/specs/{fid}/org-context.md",
+        "headings": [
+          "Objetos afectados",
+          "Automatización existente",
+          "Riesgos de colisión"
+        ]
+      }
+    },
+    "solution-architect": {
+      "class": "design",
+      "phases": [
+        "design",
+        "build"
+      ],
+      "write": [],
+      "artifact": {
+        "path": "docs/specs/{fid}/design.md",
+        "headings": [
+          "Enfoque",
+          "Declarativo vs programático",
+          "Modelo de datos",
+          "Mapa de archivos",
+          "Seguridad",
+          "Plan de pruebas",
+          "Riesgos"
+        ]
+      }
+    },
+    "data-modeler": {
+      "class": "build",
+      "phases": [
+        "build"
+      ],
+      "write": [
+        "{pkg}/**/objects/**",
+        "!{pkg}/**/objects/*/listViews/**",
+        "!{pkg}/**/objects/*/compactLayouts/**",
+        "!{pkg}/**/objects/*/webLinks/**",
+        "!{pkg}/**/objects/*__e/**",
+        "{pkg}/**/customMetadata/**",
+        "{pkg}/**/globalValueSets/**",
+        "{pkg}/**/standardValueSets/**"
+      ]
+    },
+    "apex-developer": {
+      "class": "build",
+      "phases": [
+        "build"
+      ],
+      "write": [
+        "{pkg}/**/classes/**",
+        "{pkg}/**/triggers/**",
+        "!{pkg}/**/classes/*Test.cls",
+        "!{pkg}/**/classes/*Test.cls-meta.xml",
+        "!{pkg}/**/classes/TestDataFactory*"
+      ]
+    },
+    "integration-developer": {
+      "class": "build",
+      "phases": [
+        "build"
+      ],
+      "write": [
+        "{pkg}/**/classes/**",
+        "!{pkg}/**/classes/*Test.cls",
+        "!{pkg}/**/classes/*Test.cls-meta.xml",
+        "!{pkg}/**/classes/TestDataFactory*",
+        "{pkg}/**/namedCredentials/**",
+        "{pkg}/**/externalCredentials/**",
+        "{pkg}/**/externalServiceRegistrations/**",
+        "{pkg}/**/remoteSiteSettings/**",
+        "{pkg}/**/cspTrustedSites/**",
+        "{pkg}/**/platformEventChannels/**",
+        "{pkg}/**/platformEventChannelMembers/**",
+        "{pkg}/**/objects/*__e/**"
+      ]
+    },
+    "flow-developer": {
+      "class": "build",
+      "phases": [
+        "build"
+      ],
+      "write": [
+        "{pkg}/**/flows/**",
+        "{pkg}/**/flowDefinitions/**"
+      ]
+    },
+    "lwc-developer": {
+      "class": "build",
+      "phases": [
+        "build"
+      ],
+      "write": [
+        "{pkg}/**/lwc/**",
+        "!{pkg}/**/lwc/*/__tests__/**",
+        "{pkg}/**/staticresources/**",
+        "{pkg}/**/messageChannels/**"
+      ]
+    },
+    "agentforce-developer": {
+      "class": "build",
+      "phases": [
+        "build"
+      ],
+      "write": [
+        "{pkg}/**/aiAuthoringBundles/**",
+        "{pkg}/**/genAiPlugins/**",
+        "{pkg}/**/genAiFunctions/**",
+        "{pkg}/**/genAiPlannerBundles/**",
+        "{pkg}/**/genAiPromptTemplates/**",
+        "{pkg}/**/bots/**",
+        "{pkg}/**/aiEvaluationDefinitions/**"
+      ]
+    },
+    "admin-configurator": {
+      "class": "build",
+      "phases": [
+        "build"
+      ],
+      "write": [
+        "{pkg}/**/layouts/**",
+        "{pkg}/**/flexipages/**",
+        "{pkg}/**/tabs/**",
+        "{pkg}/**/applications/**",
+        "{pkg}/**/quickActions/**",
+        "{pkg}/**/labels/**",
+        "{pkg}/**/email/**",
+        "{pkg}/**/pathAssistants/**",
+        "{pkg}/**/objects/*/listViews/**",
+        "{pkg}/**/objects/*/compactLayouts/**",
+        "{pkg}/**/objects/*/webLinks/**"
+      ]
+    },
+    "security-admin": {
+      "class": "build",
+      "phases": [
+        "build"
+      ],
+      "write": [
+        "{pkg}/**/permissionsets/**",
+        "{pkg}/**/permissionsetgroups/**",
+        "{pkg}/**/customPermissions/**",
+        "{pkg}/**/sharingRules/**",
+        "{pkg}/**/queues/**",
+        "{pkg}/**/groups/**"
+      ]
+    },
+    "test-engineer": {
+      "class": "build",
+      "phases": [
+        "build"
+      ],
+      "write": [
+        "{pkg}/**/classes/*Test.cls",
+        "{pkg}/**/classes/*Test.cls-meta.xml",
+        "{pkg}/**/classes/TestDataFactory*",
+        "{pkg}/**/classes/*Mock.cls",
+        "{pkg}/**/classes/*Mock.cls-meta.xml",
+        "{pkg}/**/lwc/*/__tests__/**"
+      ]
+    },
+    "code-reviewer": {
+      "class": "review",
+      "phases": [
+        "verify"
+      ],
+      "write": []
+    },
+    "security-reviewer": {
+      "class": "review",
+      "phases": [
+        "verify"
+      ],
+      "write": []
+    },
+    "performance-reviewer": {
+      "class": "review",
+      "phases": [
+        "verify"
+      ],
+      "write": []
+    },
+    "accessibility-reviewer": {
+      "class": "review",
+      "phases": [
+        "verify"
+      ],
+      "write": []
+    },
+    "qa-verifier": {
+      "class": "review",
+      "phases": [
+        "verify"
+      ],
+      "write": [],
+      "artifact": {
+        "path": "docs/specs/{fid}/acceptance.md",
+        "headings": [
+          "Trazabilidad"
+        ]
+      }
+    },
+    "release-manager": {
+      "class": "release",
+      "phases": [
+        "release"
+      ],
+      "write": [
+        "manifest/{fid}/**"
+      ],
+      "artifact": {
+        "path": "docs/specs/{fid}/release.md",
+        "headings": [
+          "Contenido",
+          "Orden de despliegue",
+          "Pasos manuales",
+          "Rollback"
+        ]
+      }
+    },
+    "docs-writer": {
+      "class": "release",
+      "phases": [
+        "release"
+      ],
+      "write": []
+    }
+  }
+}

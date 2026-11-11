@@ -1,0 +1,76 @@
+name: Salesforce validate
+
+# Segunda línea de defensa, independiente de los agentes: en cada PR a main repite el análisis
+# estático y los tests Jest, y (si hay credenciales) una validación check-only con tests.
+#
+# Secreto opcional: SFDX_AUTH_URL — Sfdx Auth URL de una org de INTEGRACIÓN (nunca producción).
+#   sf org display --verbose --target-org <alias>   (ejecútalo tú, no un agente)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "force-app/**"
+      - "manifest/**"
+      - "sfdx-project.json"
+
+permissions:
+  contents: read
+
+jobs:
+  static-and-jest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Salesforce CLI + Code Analyzer
+        run: |
+          npm install --global @salesforce/cli
+          sf plugins install code-analyzer
+      - name: Análisis estático de lo que cambia el PR
+        run: |
+          mapfile -t files < <(git diff --name-only --diff-filter=AM "origin/${{ github.base_ref }}...HEAD" -- force-app)
+          if [ "${#files[@]}" -eq 0 ]; then echo "Sin cambios en force-app."; exit 0; fi
+          args=()
+          for f in "${files[@]}"; do args+=(--target "$f"); done
+          sf code-analyzer run --workspace force-app --rule-selector Recommended \
+            --severity-threshold 3 --view table "${args[@]}"
+      - name: Jest (LWC)
+        run: |
+          if ls force-app/main/default/lwc/*/__tests__/*.test.js >/dev/null 2>&1; then
+            npm ci || npm install
+            npx sfdx-lwc-jest -- --ci
+          else
+            echo "Sin tests Jest."
+          fi
+
+  deploy-validate:
+    runs-on: ubuntu-latest
+    needs: static-and-jest
+    env:
+      SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: ¿Hay credenciales?
+        id: creds
+        run: |
+          if [ -n "$SFDX_AUTH_URL" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"; else
+            echo "::notice::Sin SFDX_AUTH_URL: se omite la validación contra la org."; fi
+      - uses: actions/setup-node@v4
+        if: steps.creds.outputs.ok == 'true'
+        with:
+          node-version: 22
+      - name: Validación check-only con tests
+        if: steps.creds.outputs.ok == 'true'
+        run: |
+          npm install --global @salesforce/cli
+          echo "$SFDX_AUTH_URL" | sf org login sfdx-url --sfdx-url-stdin --alias ci-validate
+          sf project deploy validate --source-dir force-app --target-org ci-validate \
+            --test-level RunLocalTests --wait 60

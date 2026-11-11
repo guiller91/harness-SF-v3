@@ -1,0 +1,18 @@
+{
+  "title": "Tarjeta de contactos clave en la página de cuenta",
+  "description": "En la página de registro de Account, mostrar los 5 contactos marcados como clave con nombre, cargo y teléfono, para que el comercial no tenga que abrir la lista relacionada.",
+  "type": "feature",
+  "size": "M",
+  "acceptance_criteria": [
+    "La tarjeta muestra como máximo 5 contactos de la cuenta con Contacto_Clave__c = true, ordenados por nombre",
+    "Si no hay contactos clave, muestra un mensaje que lo dice",
+    "Mientras carga se ve un indicador; si falla, un mensaje legible",
+    "Un usuario sin acceso de lectura al campo Phone no ve el teléfono",
+    "Se puede recorrer con teclado y cada teléfono es un enlace con texto accesible"
+  ],
+  "out_of_scope": [
+    "Editar contactos desde la tarjeta",
+    "Versión móvil específica"
+  ],
+  "priority": "medium"
+}

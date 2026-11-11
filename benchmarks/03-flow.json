@@ -1,0 +1,18 @@
+{
+  "title": "Marcar casos urgentes de clientes premium",
+  "description": "Cuando se crea un Case de una cuenta con Segmento__c = 'Premium', poner Priority = 'High' y rellenar Motivo_Prioridad__c, para que soporte los atienda antes.",
+  "type": "feature",
+  "size": "M",
+  "acceptance_criteria": [
+    "Un Case nuevo de una cuenta Premium queda con Priority 'High' y Motivo_Prioridad__c 'Cliente premium'",
+    "Un Case de una cuenta no Premium, o sin cuenta, no se modifica",
+    "Si el usuario ya puso Priority 'High', no se toca Motivo_Prioridad__c",
+    "La creación de 200 casos a la vez funciona",
+    "La lógica es declarativa (Flow before-save) salvo justificación en el diseño"
+  ],
+  "out_of_scope": [
+    "Reasignar el propietario del caso",
+    "Notificaciones"
+  ],
+  "priority": "medium"
+}
