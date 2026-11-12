@@ -28,7 +28,33 @@
       "Bash(git diff *)",
       "Bash(git log *)",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "Bash(python3 *)",
+      "Bash(python *)",
+      "Bash(node *)",
+      "Bash(npm run *)",
+      "Bash(npm ci)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(mkdir *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(git branch *)",
+      "Bash(git checkout *)",
+      "Bash(git switch *)",
+      "Bash(git show *)",
+      "Bash(sf project *)",
+      "Bash(sf apex *)",
+      "Bash(sf lightning *)",
+      "Bash(sf flow *)"
     ],
     "ask": [
       "Bash(./hx approve *)",
@@ -44,7 +70,8 @@
       "Read(~/.sfdx/**)",
       "Bash(sf org login *)",
       "Bash(sf org display *)"
-    ]
+    ],
+    "defaultMode": "acceptEdits"
   },
   "hooks": {
     "SessionStart": [
