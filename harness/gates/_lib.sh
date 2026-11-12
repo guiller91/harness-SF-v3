@@ -4,6 +4,8 @@
 #   - termina con 0 (verde) o ≠0 (rojo)
 #   - deja una línea de resumen con `summary "..."`
 set -uo pipefail
+# HX_DEBUG=1 ./hx gate run <gate>  ->  traza de cada comando del gate (diagnóstico)
+if [ -n "${HX_DEBUG:-}" ]; then set -x; type -a sf >&2 || true; fi
 
 : "${HX_ROOT:?Ejecuta los gates con ./hx gate run <nombre>, no directamente}"
 cd "$HX_ROOT" || exit 1
