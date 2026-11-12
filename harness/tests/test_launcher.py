@@ -55,6 +55,16 @@ class LauncherCase(unittest.TestCase):
         r = subprocess.run(["sh", str(hooks / "run"), "eco.py"], input="hola", capture_output=True, text=True)
         self.assertEqual((r.returncode, r.stdout), (0, "HOLA"), r.stderr)
 
+    def test_el_hook_imprime_unicode_aunque_la_consola_sea_cp1252(self):
+        hooks = self.tmp / "u"
+        hooks.mkdir()
+        shutil.copy(RUN, hooks / "run")
+        (hooks / "uni.py").write_text("print('cobertura \u2265 85 % \u2192 ok')\n")
+        env = dict(os.environ, PYTHONIOENCODING="cp1252", PYTHONUTF8="0")
+        r = subprocess.run(["sh", str(hooks / "run"), "uni.py"], capture_output=True, env=env)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("\u2265".encode("utf-8"), r.stdout)
+
     def test_el_stub_de_la_store_no_cuenta_como_python(self):
         """Simula `python3` de WindowsApps: imprime un aviso y falla. Debe descartarse."""
         path = self._nopy()

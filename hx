@@ -53,4 +53,6 @@ find_working_python() {
 
 PY=$(find_working_python || true)
 [ -n "$PY" ] || { echo "hx: hace falta Python 3.8+ en el PATH (o instalado en C:\Program Files\Python)" >&2; exit 127; }
+# Salida UTF-8 aunque la consola de Windows sea cp1252 (símbolos como ≥ o →).
+export PYTHONIOENCODING=utf-8 PYTHONUTF8=1
 exec "$PY" "$HX_ROOT/harness/cli.py" "$@"

@@ -1190,7 +1190,17 @@ def build_parser() -> argparse.ArgumentParser:
     return ap
 
 
+def _force_utf8() -> None:
+    """En Windows la consola suele ser cp1252 y `≥`, `→`, `✓`… tumban el print. Salida siempre UTF-8."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+        except (AttributeError, ValueError):
+            pass
+
+
 def main(argv: Optional[List[str]] = None) -> int:
+    _force_utf8()
     args = build_parser().parse_args(argv)
     try:
         return int(args.fn(args) or 0)

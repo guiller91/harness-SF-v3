@@ -31,5 +31,8 @@ if [ -z "$PYBIN" ]; then
   esac
 fi
 
+# Salida UTF-8: un mensaje de guarda con ≥ o → no debe romper el hook en una consola cp1252
+# (un hook que revienta es un error "no bloqueante" y la acción pasaría sin guarda).
+export PYTHONIOENCODING=utf-8 PYTHONUTF8=1
 # shellcheck disable=SC2086  # PYARG vacío o "-3": debe expandirse sin comillas
 exec "$PYBIN" $PYARG "$here/$script"
