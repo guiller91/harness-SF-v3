@@ -3,8 +3,8 @@
 # Rojo si hay alguna violación de severidad <= HX_SEVERITY (1 = crítica ... 5 = info).
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 need sf "npm install -g @salesforce/cli"
-# Verifica ejecutando directamente el comando del plugin
-if ! sf code-analyzer --version >/dev/null 2>&1; then
+# Misma comprobación que `hx doctor`: el plugin figura instalado (`sf code-analyzer --version` no existe).
+if ! sf plugins 2>/dev/null | grep -qi "code-analyzer"; then
   echo "[X] Code Analyzer no accesible: sf plugins install code-analyzer"
   summary "falta el plugin code-analyzer"; exit 3
 fi

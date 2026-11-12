@@ -7,21 +7,22 @@ need sf "npm install -g @salesforce/cli"
 outdir="$HX_EVIDENCE_DIR/apex-tests"
 rm -rf "$outdir"; mkdir -p "$outdir"
 
-# Usa ruta relativa para evitar problemas con espacios en Windows
-rel_outdir="${outdir#"$(pwd)"/}"
-[ "$rel_outdir" = "$outdir" ] && rel_outdir=".harness/evidence/apex-tests"
-
-args=(apex run test --target-org "$HX_TARGET_ORG" --code-coverage --result-format json
-      --output-dir "$rel_outdir" --wait 60 --json)
+args=(apex run test --target-org "$HX_TARGET_ORG" --code-coverage --result-format json --wait 60 --json)
 if [ "$HX_TEST_LEVEL" = "RunSpecifiedTests" ]; then
-  read_items < <(local_test_classes)
+  read_items < <("$HX_PY" "$HX_LIB/sfutil.py" changed-apex "$HX_CHANGED_FILES")
   if [ "${#ITEMS[@]}" -eq 0 ]; then
-    echo "[X] apexTestLevel=RunSpecifiedTests pero no hay clases de test en los packageDirs."
-    summary "no hay clases de test"; exit 1
+    echo "Sin clases ni triggers Apex cambiados: no hay nada que probar."
+    summary "sin cambios Apex"; exit 0
+  fi
+  # shellcheck disable=SC2086  # HX_PKG_DIRS: varias rutas separadas por espacios
+  read_items < <("$HX_PY" "$HX_LIB/sfutil.py" test-classes --changed "$HX_CHANGED_FILES" $HX_PKG_DIRS)
+  if [ "${#ITEMS[@]}" -eq 0 ]; then
+    echo "[X] Ninguna clase de test cubre los cambios (ni por nombre ni por referencia): escribe sus tests."
+    summary "ningún test cubre los cambios Apex"; exit 1
   fi
   args+=(--test-level RunSpecifiedTests)
   for c in "${ITEMS[@]}"; do args+=(--class-names "$c"); done
-  echo "Ejecutando ${#ITEMS[@]} clase(s) de test del proyecto."
+  echo "Ejecutando ${#ITEMS[@]} clase(s) de test de la feature: ${ITEMS[*]}"
 else
   args+=(--test-level "$HX_TEST_LEVEL")
 fi
