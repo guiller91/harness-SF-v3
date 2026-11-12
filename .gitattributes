@@ -1,0 +1,9 @@
+# Los scripts del harness deben ser LF siempre: con CRLF (Git de Windows, autocrlf) el shell falla.
+* text=auto
+*.sh text eol=lf
+*.py text eol=lf
+hx text eol=lf
+.claude/hooks/run text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
