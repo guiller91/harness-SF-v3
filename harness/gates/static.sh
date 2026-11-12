@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # Gate: análisis estático con Salesforce Code Analyzer v5 (Apex, LWC/ESLint, Flows, CPD, RetireJS).
-# Rojo si hay alguna violación de severidad <= HX_SEVERITY (1 = crítica … 5 = info).
+# Rojo si hay alguna violación de severidad <= HX_SEVERITY (1 = crítica ... 5 = info).
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 need sf "npm install -g @salesforce/cli"
-if ! sf plugins 2>/dev/null | grep -q "code-analyzer"; then
-  echo "✗ Falta Code Analyzer v5: sf plugins install code-analyzer"
+# Verifica ejecutando directamente el comando del plugin
+if ! sf code-analyzer --version >/dev/null 2>&1; then
+  echo "[X] Code Analyzer no accesible: sf plugins install code-analyzer"
   summary "falta el plugin code-analyzer"; exit 3
 fi
+echo ". Verificando Code Analyzer..."
 
 args=(code-analyzer run --view table --severity-threshold "$HX_SEVERITY")
 for d in $HX_PKG_DIRS; do [ -d "$d" ] && args+=(--workspace "$d"); done
@@ -16,7 +18,7 @@ for sel in $HX_RULE_SELECTORS; do args+=(--rule-selector "$sel"); done
 if [ "${HX_ANALYZER_SCOPE:-changed}" = "changed" ]; then
   read_items < <(changed_existing)
   if [ "${#ITEMS[@]}" -eq 0 ]; then
-    echo "· No hay ficheros de producto cambiados que analizar."
+    echo ". No hay ficheros de producto cambiados que analizar."
     summary "sin ficheros que analizar"; exit 0
   fi
   for t in "${ITEMS[@]}"; do args+=(--target "$t"); done
@@ -50,7 +52,7 @@ open(summary, "w").write(f"{len(viols)} violación(es), {len(bad)} de severidad 
 for v in bad[:40]:
     loc = v.get("locations") or [{}]
     loc = loc[v.get("primaryLocationIndex", 0)] if loc else {}
-    print(f"  ✗ [sev {sev(v)}] {v.get('engine','?')}:{v.get('rule','?')}  "
+    print(f"  [X] [sev {sev(v)}] {v.get('engine','?')}:{v.get('rule','?')}  "
           f"{loc.get('file','?')}:{loc.get('startLine','?')}  {str(v.get('message',''))[:160]}")
 PY
 exit "$rc"

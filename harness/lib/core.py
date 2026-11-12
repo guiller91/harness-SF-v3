@@ -368,7 +368,7 @@ _KIND_RULES: List[Tuple[str, str]] = [
     (r"/(objects|customMetadata|globalValueSets|standardValueSets)/", "data-model"),
     (r"/(layouts|flexipages|tabs|applications|quickActions|labels|email|staticresources|"
      r"messageChannels|pathAssistants|reports|dashboards)/", "ui-config"),
-    # Respaldo por carpeta: sirve para globs de scope sin extensión ("…/classes/Pedido*").
+    # Respaldo por carpeta: sirve para globs de scope sin extensión (".../classes/Pedido*").
     (r"/classes/[^/]*Test[^/]*$", "apex-test"),
     (r"/classes/|/triggers/", "apex"),
 ]

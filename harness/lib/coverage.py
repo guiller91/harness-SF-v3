@@ -114,8 +114,8 @@ def main() -> int:
 
     summ = result.get("summary") or {}
     ran, failing = int(summ.get("testsRan") or 0), int(summ.get("failing") or 0)
-    print(f"Tests: {ran} ejecutados · {summ.get('passing', 0)} en verde · {failing} en rojo · "
-          f"outcome={summ.get('outcome')} · cobertura de la ejecución {summ.get('testRunCoverage', '?')}")
+    print(f"Tests: {ran} ejecutados . {summ.get('passing', 0)} en verde . {failing} en rojo . "
+          f"outcome={summ.get('outcome')} . cobertura de la ejecución {summ.get('testRunCoverage', '?')}")
     problems: List[str] = []
     for t in result.get("tests") or []:
         outcome = t.get("Outcome") or t.get("outcome")
@@ -136,7 +136,7 @@ def main() -> int:
     under: List[str] = []
     print(f"Cobertura por clase de lo que toca la feature (gate {args.gate:g}%):")
     if not units:
-        print("  · la feature no cambia clases ni triggers con líneas ejecutables")
+        print("  . la feature no cambia clases ni triggers con líneas ejecutables")
     for name, _path in sorted(units):
         if name not in rows:
             print(f"  ✗ {name}: sin cobertura registrada (0%)")

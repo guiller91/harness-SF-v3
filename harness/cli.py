@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""hx — CLI del harness.
+"""hx - CLI del harness.
 
 Es la ÚNICA vía para cambiar el estado de una feature. Los agentes no editan
 `feature_list.json` ni la evidencia: piden la transición aquí y la CLI la concede
@@ -36,7 +36,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib import core  # noqa: E402
 from lib.core import HarnessError  # noqa: E402
 
-OK, KO, WARN, DOT = "✓", "✗", "!", "·"
+OK, KO, WARN, DOT = "[OK]", "[X]", "[!]", "."
 FEATURE_TYPES = ["feature", "bugfix", "refactor", "chore"]
 SIZES = ["S", "M", "L"]
 
@@ -128,7 +128,7 @@ def check_role_output(role: str, fid: str, roles: Dict[str, Any]) -> List[str]:
 
 
 # --------------------------------------------------------------------------- #
-# progress/current.md — lo regenera la CLI; es estado, no prosa
+# progress/current.md - lo regenera la CLI; es estado, no prosa
 # --------------------------------------------------------------------------- #
 
 def render_current(features: List[Dict[str, Any]], cfg: Dict[str, Any]) -> None:
@@ -156,9 +156,9 @@ def status_lines(feat: Dict[str, Any], cfg: Dict[str, Any], markdown: bool = Fal
     tree = core.tree_hash(cfg)
     plan, kinds = plan_for(feat, cfg)
     h = "## " if markdown else ""
-    lines = [f"{h}Feature activa: {fid} — {feat['title']}",
-             f"- Fase: **{phase}** · tamaño {feat.get('size', 'M')} · rework {feat.get('rework_count', 0)}"
-             f" · árbol `{tree}`",
+    lines = [f"{h}Feature activa: {fid} - {feat['title']}",
+             f"- Fase: **{phase}** . tamaño {feat.get('size', 'M')} . rework {feat.get('rework_count', 0)}"
+             f" . árbol `{tree}`",
              f"- Tipos de cambio: {', '.join(sorted(kinds)) or '(sin metadata de producto)'}"]
 
     def mark(problems: List[str]) -> str:
@@ -168,7 +168,7 @@ def status_lines(feat: Dict[str, Any], cfg: Dict[str, Any], markdown: bool = Fal
         lines.append("- Diseño:")
         for role in plan["design"]:
             probs = check_role_output(role, fid, roles)
-            lines.append(f"  - {mark(probs)} {role}" + (f" — {'; '.join(probs)}" if probs else ""))
+            lines.append(f"  - {mark(probs)} {role}" + (f" - {'; '.join(probs)}" if probs else ""))
         scope = feat.get("scope", {}).get("files", [])
         lines.append(f"  - {OK if scope else KO} scope.files ({len(scope)} patrones)")
         if needs_design_approval(feat, cfg):
@@ -177,7 +177,7 @@ def status_lines(feat: Dict[str, Any], cfg: Dict[str, Any], markdown: bool = Fal
         lines.append("- Construcción (en serie, en este orden):")
         for role in plan["build"]:
             probs = check_role_output(role, fid, roles)
-            lines.append(f"  - {mark(probs)} {role}" + (f" — {'; '.join(probs)}" if probs else ""))
+            lines.append(f"  - {mark(probs)} {role}" + (f" - {'; '.join(probs)}" if probs else ""))
         stray = out_of_scope(feat, cfg)
         if stray:
             lines.append(f"  - {KO} fuera de scope: {', '.join(stray[:8])}")
@@ -185,19 +185,19 @@ def status_lines(feat: Dict[str, Any], cfg: Dict[str, Any], markdown: bool = Fal
         lines.append("- Gates:")
         for gate in plan["gates"]:
             st, det = core.evidence_status(fid, f"gate-{gate}", tree)
-            lines.append(f"  - {OK if st == 'pass' else KO} {gate}: {st}" + (f" — {det}" if det else ""))
+            lines.append(f"  - {OK if st == 'pass' else KO} {gate}: {st}" + (f" - {det}" if det else ""))
         lines.append("- Reviews (solo lectura, en paralelo):")
         for role in plan["reviews"]:
             st, det = core.evidence_status(fid, f"review-{role}", tree)
-            lines.append(f"  - {OK if st == 'pass' else KO} {role}: {st}" + (f" — {det}" if det else ""))
+            lines.append(f"  - {OK if st == 'pass' else KO} {role}: {st}" + (f" - {det}" if det else ""))
     if phase == "release":
         lines.append("- Entrega:")
         for role in plan["release"]:
             probs = check_role_output(role, fid, roles)
-            lines.append(f"  - {mark(probs)} {role}" + (f" — {'; '.join(probs)}" if probs else ""))
+            lines.append(f"  - {mark(probs)} {role}" + (f" - {'; '.join(probs)}" if probs else ""))
         for gate in plan["release_gates"]:
             st, det = core.evidence_status(fid, f"gate-{gate}", tree)
-            lines.append(f"  - {OK if st == 'pass' else KO} {gate}: {st}" + (f" — {det}" if det else ""))
+            lines.append(f"  - {OK if st == 'pass' else KO} {gate}: {st}" + (f" - {det}" if det else ""))
     lines.append(f"- Siguiente paso: {next_step(feat, cfg, plan)}")
     return lines
 
@@ -214,14 +214,14 @@ def next_step(feat: Dict[str, Any], cfg: Dict[str, Any], plan: Dict[str, List[st
             return f"fijar el scope con `./hx scope {fid} set <globs del mapa de archivos>`"
         if needs_design_approval(feat, cfg) and not feat.get("design_approved_at"):
             return f"enseñar el diseño al humano y pedir `./hx approve {fid}`"
-        return f"`./hx advance {fid}` (→ build)"
+        return f"`./hx advance {fid}` (> build)"
     if phase == "build":
         for role in plan["build"]:
             if check_role_output(role, fid, roles):
                 return f"delegar en `{role}` (uno cada vez)"
         if out_of_scope(feat, cfg):
             return "resolver los cambios fuera de scope (revertir o `./hx scope add` justificado)"
-        return f"`./hx advance {fid}` (→ verify)"
+        return f"`./hx advance {fid}` (> verify)"
     if phase == "verify":
         bad_gates = [g for g in plan["gates"] if core.evidence_status(fid, f"gate-{g}", tree)[0] != "pass"]
         failed = [g for g in bad_gates if core.evidence_status(fid, f"gate-{g}", tree)[0] == "fail"]
@@ -235,7 +235,7 @@ def next_step(feat: Dict[str, Any], cfg: Dict[str, Any], plan: Dict[str, List[st
             return f"review rechazada ({', '.join(rejected)}): `./hx rework {fid} --reason ...`"
         if bad_rev:
             return f"lanzar EN PARALELO: {', '.join(bad_rev)}"
-        return f"`./hx advance {fid}` (→ release)"
+        return f"`./hx advance {fid}` (> release)"
     if phase == "release":
         for role in plan["release"]:
             if check_role_output(role, fid, roles):
@@ -244,7 +244,7 @@ def next_step(feat: Dict[str, Any], cfg: Dict[str, Any], plan: Dict[str, List[st
         if bad:
             return f"`./hx gate run {bad[0]}`"
         return f"resumir al humano y pedir `./hx close {fid}`"
-    return "—"
+    return "-"
 
 
 def needs_design_approval(feat: Dict[str, Any], cfg: Dict[str, Any]) -> bool:
@@ -275,7 +275,7 @@ def cmd_status(args: argparse.Namespace) -> int:
         out(json.dumps(payload, indent=2, ensure_ascii=False))
         return 0
     org = cfg["org"]
-    out(f"Proyecto: {cfg['project']} · org {org['model']} → '{org['targetOrgAlias']}'")
+    out(f"Proyecto: {cfg['project']} . org {org['model']} > '{org['targetOrgAlias']}'")
     if act:
         out("\n".join(status_lines(act, cfg)))
     else:
@@ -284,7 +284,7 @@ def cmd_status(args: argparse.Namespace) -> int:
     if rest and not args.brief:
         out("Otras features:")
         for f in rest:
-            extra = f" — {f.get('blocked_reason')}" if f["status"] == "blocked" else ""
+            extra = f" - {f.get('blocked_reason')}" if f["status"] == "blocked" else ""
             out(f"  {f['id']} [{f['status']}] {f['title']}{extra}")
     return 0
 
@@ -339,7 +339,7 @@ def cmd_propose(args: argparse.Namespace) -> int:
     core.log_event("propose", feature=fid, size=size, type=ftype)
     render_current(features, core.load_config())
     out(f"{OK} Registrada {fid} como BORRADOR. Enséñasela al humano tal cual:\n")
-    out(f"  {fid} — {feat['title']}  [{ftype}, tamaño {size}]")
+    out(f"  {fid} - {feat['title']}  [{ftype}, tamaño {size}]")
     out(f"  {feat['description']}")
     for ac in acs:
         out(f"    {ac['id']}: {ac['text']}")
@@ -400,7 +400,7 @@ def cmd_start(args: argparse.Namespace) -> int:
     core.spec_dir(feat["id"]).mkdir(parents=True, exist_ok=True)
     notes = core.root() / "progress" / feat["id"] / "notes.md"
     if not notes.exists():
-        notes.write_text(f"# Notas — {feat['id']} {feat['title']}\n\n"
+        notes.write_text(f"# Notas - {feat['id']} {feat['title']}\n\n"
                          "Decisiones, contexto y próximo paso. Lo mantiene el orquestador.\n", encoding="utf-8")
     render_current(features, cfg)
     out(f"{OK} {feat['id']} en fase design" + (f" (rama {feat['branch']})" if feat.get("branch") else ""))
@@ -459,7 +459,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
               ("gates", "Gates de verificación"), ("reviews", "Reviews (solo lectura, EN PARALELO)"),
               ("release", "Entrega"), ("release_gates", "Gates de entrega")]
     for key, label in labels:
-        out(f"  {label}: {' → '.join(plan[key]) if key == 'build' else ', '.join(plan[key]) or '—'}")
+        out(f"  {label}: {' > '.join(plan[key]) if key == 'build' else ', '.join(plan[key]) or '-'}")
     return 0
 
 
@@ -530,7 +530,7 @@ def cmd_advance(args: argparse.Namespace) -> int:
     transition(feat, target, "criterios de salida cumplidos")
     core.save_features(features)
     render_current(features, cfg)
-    out(f"{OK} {fid}: {phase} → {target}")
+    out(f"{OK} {fid}: {phase} > {target}")
     out("\n".join(status_lines(feat, cfg)))
     return 0
 
@@ -644,7 +644,7 @@ def run_gate(name: str, feat: Optional[Dict[str, Any]], cfg: Dict[str, Any]) -> 
     })
     tree_before = core.tree_hash(cfg)
     started, t0 = core.now(), time.time()
-    out(f"━━ gate {name} · {fid} · árbol {tree_before} ━━")
+    out(f"-- gate {name} . {fid} . árbol {tree_before} --")
     with open(log_path, "w", encoding="utf-8") as log:
         proc = subprocess.Popen(["bash", str(script)], cwd=str(core.root()), env=env,
                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
@@ -666,8 +666,8 @@ def run_gate(name: str, feat: Optional[Dict[str, Any]], cfg: Dict[str, Any]) -> 
     }
     core.write_evidence(fid, f"gate-{name}", evidence)
     core.log_event("gate", feature=fid, gate=name, status=status, duration_s=evidence["duration_s"])
-    out(f"━━ {OK if status == 'pass' else KO} gate {name}: {status.upper()}"
-        + (f" — {summary}" if summary else "") + f" · log: {evidence['log']} ━━")
+    out(f"-- {OK if status == 'pass' else KO} gate {name}: {status.upper()}"
+        + (f" - {summary}" if summary else "") + f" . log: {evidence['log']} --")
     return 0 if status == "pass" else 1
 
 
@@ -772,7 +772,7 @@ def cmd_close(args: argparse.Namespace) -> int:
     core.save_features(features)
     append_history(feat, plan, tree, cfg)
     render_current(features, cfg)
-    out(f"{OK} {fid} cerrada (done). Evidencia en .harness/evidence/{fid}/ · bitácora actualizada.")
+    out(f"{OK} {fid} cerrada (done). Evidencia en .harness/evidence/{fid}/ . bitácora actualizada.")
     out("   Promoción a entornos superiores: por pipeline/humano con manifest/" + fid + "/ (ver docs/specs/"
         + fid + "/release.md). Los agentes no despliegan fuera de la org de desarrollo.")
     return 0
@@ -783,10 +783,10 @@ def append_history(feat: Dict[str, Any], plan: Dict[str, List[str]], tree: str, 
     path = core.root() / "progress" / "history.md"
     if not path.exists():
         path.write_text("# Bitácora (append-only)\n\nLa escribe `./hx close`. No se reescribe.\n", encoding="utf-8")
-    lines = ["", "---", "", f"## [{fid}] {feat['title']} — {feat['closed_at']}",
-             f"- **Tipo/tamaño:** {feat.get('type')} / {feat.get('size')} · **rework:** {feat.get('rework_count', 0)}"
-             f" · **árbol verificado:** `{tree}`",
-             f"- **Rama:** {feat.get('branch', '—')} · **base:** {feat.get('base_commit') or '—'}",
+    lines = ["", "---", "", f"## [{fid}] {feat['title']} - {feat['closed_at']}",
+             f"- **Tipo/tamaño:** {feat.get('type')} / {feat.get('size')} . **rework:** {feat.get('rework_count', 0)}"
+             f" . **árbol verificado:** `{tree}`",
+             f"- **Rama:** {feat.get('branch', '-')} . **base:** {feat.get('base_commit') or '-'}",
              "- **Criterios de aceptación:**"]
     lines += [f"  - {ac['id']}: {ac['text']}" for ac in feat.get("acceptance_criteria", [])]
     lines.append("- **Archivos de producto:**")
@@ -794,10 +794,10 @@ def append_history(feat: Dict[str, Any], plan: Dict[str, List[str]], tree: str, 
     lines.append("- **Evidencia:**")
     for gate in plan["gates"] + plan["release_gates"]:
         ev = core.read_evidence(fid, f"gate-{gate}") or {}
-        lines.append(f"  - gate `{gate}`: {ev.get('status', '?')} — {ev.get('summary', '')} (`{ev.get('log', '')}`)")
+        lines.append(f"  - gate `{gate}`: {ev.get('status', '?')} - {ev.get('summary', '')} (`{ev.get('log', '')}`)")
     for role in plan["reviews"]:
         ev = core.read_evidence(fid, f"review-{role}") or {}
-        lines.append(f"  - review `{role}`: {ev.get('status', '?')} — `{ev.get('report', '')}`")
+        lines.append(f"  - review `{role}`: {ev.get('status', '?')} - `{ev.get('report', '')}`")
     lines.append(f"- **Diseño y entrega:** `docs/specs/{fid}/`")
     with open(path, "a", encoding="utf-8") as fh:
         fh.write("\n".join(lines) + "\n")
@@ -871,8 +871,8 @@ def cmd_metrics(args: argparse.Namespace) -> int:
     out(f"{'ID':<7}{'Estado':<9}{'Tam':<4}{'Lead':<8}{'Gates(rojos)':<14}{'1ª pasada':<11}"
         f"{'Reviews(rech.)':<16}{'Rework':<8}{'Scope+':<7}Título")
     for r in rows:
-        lead = _fmt(r["lead_time_s"]) if r["lead_time_s"] else "—"
-        fp = f"{r['first_pass_gates']}%" if r["first_pass_gates"] is not None else "—"
+        lead = _fmt(r["lead_time_s"]) if r["lead_time_s"] else "-"
+        fp = f"{r['first_pass_gates']}%" if r["first_pass_gates"] is not None else "-"
         out(f"{r['id']:<7}{r['status']:<9}{r['size'] or '':<4}{lead:<8}"
             f"{str(r['gate_runs']) + ' (' + str(r['gate_failures']) + ')':<14}{fp:<11}"
             f"{str(r['reviews']) + ' (' + str(r['review_rejections']) + ')':<16}"
@@ -880,7 +880,7 @@ def cmd_metrics(args: argparse.Namespace) -> int:
     done = [r for r in rows if r["status"] == "done" and r["lead_time_s"]]
     if done:
         avg = sum(r["lead_time_s"] for r in done) / len(done)
-        out(f"\nCerradas: {len(done)} · lead time medio {_fmt(avg)} · "
+        out(f"\nCerradas: {len(done)} . lead time medio {_fmt(avg)} . "
             f"rework medio {sum(r['rework_loops'] for r in done) / len(done):.1f}")
     out(f"Acciones bloqueadas por los guardas (total): {blocks}")
     return 0
@@ -892,6 +892,11 @@ def cmd_metrics(args: argparse.Namespace) -> int:
 
 def _run(cmd: List[str], timeout: int = 90) -> Tuple[int, str]:
     try:
+        # Resuelve "sf" a su ruta completa para evitar problemas de PATH en Windows
+        if cmd and cmd[0] == "sf":
+            sf_path = shutil.which("sf")
+            if sf_path:
+                cmd = [sf_path] + cmd[1:]
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, cwd=str(core.root()))
         return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
     except (OSError, subprocess.TimeoutExpired) as exc:
@@ -918,7 +923,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     out("[1] Herramientas")
     for tool, hint in (("git", "instala git"), ("node", "instala Node.js LTS"),
                        ("sf", "npm install -g @salesforce/cli")):
-        ok(f"{tool} → {shutil.which(tool)}") if shutil.which(tool) else bad(f"falta {tool} ({hint})")
+        ok(f"{tool} > {shutil.which(tool)}") if shutil.which(tool) else bad(f"falta {tool} ({hint})")
     if shutil.which("sf"):
         rc, txt = _run(["sf", "plugins"])
         ok("plugin code-analyzer") if "code-analyzer" in txt else bad(
@@ -932,11 +937,11 @@ def cmd_doctor(args: argparse.Namespace) -> int:
 
     out("[2] Configuración")
     if cfg.get("project") in ("", "CHANGE_ME"):
-        note("harness.config.json → 'project' sigue en CHANGE_ME")
+        note("harness.config.json > 'project' sigue en CHANGE_ME")
     if org["model"] not in ("scratch", "sandbox"):
         bad(f"org.model inválido: {org['model']}")
     else:
-        ok(f"org.model = {org['model']} · target '{org['targetOrgAlias']}'")
+        ok(f"org.model = {org['model']} . target '{org['targetOrgAlias']}'")
     if org["targetOrgAlias"] in org.get("protectedAliases", []):
         bad("targetOrgAlias está en protectedAliases")
     (ok if (core.root() / "sfdx-project.json").exists() else bad)("sfdx-project.json")
@@ -983,7 +988,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
             except (ValueError, KeyError, IndexError):
                 note("no pude comprobar IsSandbox; verifícalo a mano")
     out("==============")
-    out("doctor: FALLOS — corrige antes de operar." if failed else "doctor: OK.")
+    out("doctor: FALLOS - corrige antes de operar." if failed else "doctor: OK.")
     return 1 if failed else 0
 
 

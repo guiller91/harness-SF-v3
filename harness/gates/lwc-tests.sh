@@ -5,11 +5,11 @@ need node "Instala Node.js LTS"
 need npm "Instala Node.js LTS"
 
 if [ ! -f package.json ] || ! grep -q "sfdx-lwc-jest" package.json; then
-  echo "✗ package.json no declara @salesforce/sfdx-lwc-jest."
+  echo "[X] package.json no declara @salesforce/sfdx-lwc-jest."
   summary "Jest de LWC sin configurar"; exit 1
 fi
 if [ ! -d node_modules/@salesforce/sfdx-lwc-jest ]; then
-  echo "✗ Dependencias sin instalar. Ejecuta: npm ci   (o npm install)"
+  echo "[X] Dependencias sin instalar. Ejecuta: npm ci   (o npm install)"
   summary "faltan node_modules"; exit 3
 fi
 
@@ -18,7 +18,7 @@ while IFS= read -r comp; do
   [ -n "$comp" ] || continue
   total=$((total + 1))
   if ! ls "$comp"/__tests__/*.test.js >/dev/null 2>&1; then
-    echo "  ✗ sin tests Jest: $comp"
+    echo "  [X] sin tests Jest: $comp"
     missing=$((missing + 1))
   fi
 done < <(changed_existing | grep -E '/lwc/[^/]+/[^/]+\.(js|html)$' | grep -v '/__tests__/' \

@@ -6,7 +6,7 @@ need sf "npm install -g @salesforce/cli"
 read_items < <(changed_existing | grep -E '/aiAuthoringBundles/[^/]+/' \
                          | sed -E 's#.*/aiAuthoringBundles/([^/]+)/.*#\1#' | sort -u)
 if [ "${#ITEMS[@]}" -eq 0 ]; then
-  echo "· La feature no toca authoring bundles (aiAuthoringBundles/)."
+  echo ". La feature no toca authoring bundles (aiAuthoringBundles/)."
   summary "sin authoring bundles que validar"; exit 0
 fi
 

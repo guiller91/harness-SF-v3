@@ -14,7 +14,7 @@ summary() { printf '%s\n' "$*" > "$HX_SUMMARY_FILE"; }
 
 need() { # need <binario> <pista>
   if ! command -v "$1" >/dev/null 2>&1; then
-    echo "✗ Falta '$1'. $2"
+    echo "[X] Falta '$1'. $2"
     summary "falta la herramienta $1"
     exit 3
   fi

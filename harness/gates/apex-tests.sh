@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
 # Gate: tests Apex en la org de desarrollo + cobertura POR CLASE de lo que toca la feature.
-# Rojo si falla algún test o alguna clase/trigger cambiado queda por debajo de HX_COVERAGE_GATE.
+# Rojo si falla algun test o alguna clase/trigger cambiado queda por debajo de HX_COVERAGE_GATE.
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 need sf "npm install -g @salesforce/cli"
 
 outdir="$HX_EVIDENCE_DIR/apex-tests"
 rm -rf "$outdir"; mkdir -p "$outdir"
 
+# Usa ruta relativa para evitar problemas con espacios en Windows
+rel_outdir=$(echo "$outdir" | sed "s|^$(pwd)/||")
+[ "$rel_outdir" = "$outdir" ] && rel_outdir=".harness/evidence/apex-tests"
+
 args=(apex run test --target-org "$HX_TARGET_ORG" --code-coverage --result-format json
-      --output-dir "$outdir" --wait 60 --json)
+      --output-dir "$rel_outdir" --wait 60 --json)
 if [ "$HX_TEST_LEVEL" = "RunSpecifiedTests" ]; then
   read_items < <(local_test_classes)
   if [ "${#ITEMS[@]}" -eq 0 ]; then
-    echo "✗ apexTestLevel=RunSpecifiedTests pero no hay clases de test en los packageDirs."
+    echo "[X] apexTestLevel=RunSpecifiedTests pero no hay clases de test en los packageDirs."
     summary "no hay clases de test"; exit 1
   fi
   args+=(--test-level RunSpecifiedTests)
@@ -27,5 +31,11 @@ sf "${args[@]}" > "$outdir/run.json" 2> "$outdir/run.stderr"
 rc=$?
 [ -s "$outdir/run.stderr" ] && cat "$outdir/run.stderr"
 
-"$HX_PY" "$HX_LIB/coverage.py" --result "$outdir/run.json" --changed "$HX_CHANGED_FILES" \
+# Buscar el JSON en diferentes ubicaciones (salida directa o carpeta de salida)
+result_file="$outdir/run.json"
+if [ ! -s "$result_file" ] && [ -f "$outdir/test-result.json" ]; then
+  result_file="$outdir/test-result.json"
+fi
+
+"$HX_PY" "$HX_LIB/coverage.py" --result "$result_file" --changed "$HX_CHANGED_FILES" \
   --gate "$HX_COVERAGE_GATE" --summary "$HX_SUMMARY_FILE" --cli-exit "$rc"
