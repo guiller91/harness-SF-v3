@@ -69,7 +69,8 @@
       "Read(~/.sf/**)",
       "Read(~/.sfdx/**)",
       "Bash(sf org login *)",
-      "Bash(sf org display *)"
+      "Bash(sf org display *)",
+      "PowerShell"
     ],
     "defaultMode": "acceptEdits"
   },
@@ -87,7 +88,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash|PowerShell",
         "hooks": [
           {
             "type": "command",

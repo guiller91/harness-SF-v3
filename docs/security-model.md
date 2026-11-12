@@ -75,3 +75,11 @@ Los hooks se lanzan con `.claude/hooks/run`, que busca un Python 3.8+ que realme
 **bloquean** la acción (exit 2): sin guardas no se trabaja. El resto (contexto, métricas, checks)
 se omite con un aviso para no tumbar la sesión. Antes, un hook roto era un error "no bloqueante" y
 la acción se ejecutaba sin ninguna guarda.
+
+## PowerShell (Windows)
+
+Claude Code en Windows trae una herramienta **PowerShell** además de Bash. Las guardas se escribieron para
+Bash, así que PowerShell queda **denegada** en `settings.json` (los agentes usan Bash, que en Windows es Git
+Bash) y, como segunda capa, `guard_bash` también está enganchada a `PowerShell`. Sin esto, un agente podía
+ejecutar `sf` o escribir ficheros sin pasar por ownership ni por la lista de orgs.
+
