@@ -8,7 +8,7 @@ outdir="$HX_EVIDENCE_DIR/apex-tests"
 rm -rf "$outdir"; mkdir -p "$outdir"
 
 # Usa ruta relativa para evitar problemas con espacios en Windows
-rel_outdir=$(echo "$outdir" | sed "s|^$(pwd)/||")
+rel_outdir="${outdir#"$(pwd)"/}"
 [ "$rel_outdir" = "$outdir" ] && rel_outdir=".harness/evidence/apex-tests"
 
 args=(apex run test --target-org "$HX_TARGET_ORG" --code-coverage --result-format json
