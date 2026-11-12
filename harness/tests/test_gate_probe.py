@@ -32,6 +32,28 @@ class GateProbeCase(unittest.TestCase):
             self.assertNotIn("no accesible", r.stdout + r.stderr)
             self.assertIn("Verificando Code Analyzer", r.stdout)
 
+    def test_lista_de_cambiados_con_crlf_se_analiza(self):
+        """En Windows la lista puede traer CRLF: no debe dar 'sin ficheros que analizar'."""
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            (tmp / "bin").mkdir()
+            (tmp / "force-app" / "classes").mkdir(parents=True)
+            (tmp / "force-app" / "classes" / "A.cls").write_text("public class A {}")
+            sf = tmp / "bin" / "sf"
+            sf.write_text('#!/bin/sh\nif [ "$1" = plugins ]; then echo "code-analyzer 5.16.0"; exit 0; fi\n'
+                          'echo "SF_CALLED $*"; exit 0\n')
+            sf.chmod(0o755)
+            ev = tmp / "ev"
+            ev.mkdir()
+            (ev / "c.txt").write_bytes(b"force-app/classes/A.cls\r\n")
+            env = dict(os.environ, PATH=f"{tmp / 'bin'}:{os.environ['PATH']}", HX_ROOT=str(tmp),
+                       HX_SUMMARY_FILE=str(ev / "summary"), HX_EVIDENCE_DIR=str(ev), HX_CHANGED_FILES=str(ev / "c.txt"),
+                       HX_PY=shutil.which("python3"), HX_LIB=str(LIB), HX_PKG_DIRS="force-app", HX_SEVERITY="3",
+                       HX_RULE_SELECTORS="Recommended", HX_ANALYZER_CONFIG="", HX_ANALYZER_SCOPE="changed")
+            r = subprocess.run(["bash", str(GATE)], cwd=tmp, env=env, capture_output=True, text=True)
+            self.assertNotIn("No hay ficheros", r.stdout)
+            self.assertIn("--target force-app/classes/A.cls", r.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

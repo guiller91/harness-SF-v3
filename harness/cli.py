@@ -618,7 +618,20 @@ def run_gate(name: str, feat: Optional[Dict[str, Any]], cfg: Dict[str, Any]) -> 
     if summary_path.exists():
         summary_path.unlink()
     changed = core.product_changes(feat, cfg) if feat else []
-    changed_path.write_text("\n".join(changed) + ("\n" if changed else ""), encoding="utf-8")
+    with open(changed_path, "w", encoding="utf-8", newline="\n") as fh:  # LF siempre: en Windows write_text daría CRLF y bash leería "ruta\r"
+        fh.write("\n".join(changed) + ("\n" if changed else ""))
+
+    if feat and not changed and name in ("static", "apex-tests"):
+        _, kinds = plan_for(feat, cfg)
+        if kinds & {"apex", "apex-test", "lwc", "lwc-test"}:
+            msg = ("la feature declara cambios de código pero no se detecta ningún fichero de producto "
+                   "cambiado (¿base_commit, packageDirs o ficheros sin guardar?)")
+            out(f"-- {KO} gate {name}: FAIL - {msg} --")
+            core.write_evidence(fid, f"gate-{name}", {
+                "kind": "gate", "name": name, "feature": fid, "status": "fail", "exit_code": 1,
+                "tree_hash": core.tree_hash(cfg), "started_at": core.now(), "finished_at": core.now(),
+                "duration_s": 0, "summary": msg, "log": "", "actor": actor()})
+            return 1
 
     org, quality = cfg["org"], cfg["quality"]
     env = dict(os.environ)

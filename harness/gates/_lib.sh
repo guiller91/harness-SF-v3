@@ -24,6 +24,7 @@ need() { # need <binario> <pista>
 changed_existing() {
   [ -f "$HX_CHANGED_FILES" ] || return 0
   while IFS= read -r f; do
+    f="${f%$'\r'}"
     [ -n "$f" ] && [ -f "$f" ] && printf '%s\n' "$f"
   done < "$HX_CHANGED_FILES"
 }
@@ -39,6 +40,7 @@ read_items() {
   ITEMS=()
   local line
   while IFS= read -r line; do
+    line="${line%$'\r'}"
     [ -n "$line" ] && ITEMS+=("$line")
   done
   return 0
