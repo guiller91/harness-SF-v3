@@ -79,7 +79,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_context.py\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/run\" session_context.py",
             "timeout": 20
           }
         ]
@@ -91,7 +91,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard_bash.py\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/run\" guard_bash.py",
             "timeout": 15
           }
         ]
@@ -101,7 +101,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard_write.py\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/run\" guard_write.py",
             "timeout": 15
           }
         ]
@@ -113,7 +113,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/post_edit_checks.py\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/run\" post_edit_checks.py",
             "timeout": 20
           }
         ]
@@ -124,7 +124,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/subagent_start.py\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/run\" subagent_start.py",
             "timeout": 15
           }
         ]
@@ -135,7 +135,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/subagent_stop.py\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/run\" subagent_stop.py",
             "timeout": 15
           }
         ]
@@ -146,7 +146,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop_guard.py\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/run\" stop_guard.py",
             "timeout": 20
           }
         ]

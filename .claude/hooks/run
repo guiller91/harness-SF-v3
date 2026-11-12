@@ -1,0 +1,35 @@
+#!/bin/sh
+# Lanzador de hooks: .claude/hooks/run <script.py>
+# Busca un Python 3.8+ que FUNCIONE (descarta el stub de la Microsoft Store de Windows) y
+# ejecuta el hook con él. Si no lo encuentra:
+#   - guard_*  -> exit 2 (FALLA CERRADO: sin Python no hay guardas, así que no se deja pasar)
+#   - el resto -> exit 0 con aviso (contexto, métricas y checks no deben tumbar la sesión)
+script="$1"
+[ -n "$script" ] || { echo "[harness] uso: run <script.py>" >&2; exit 2; }
+here=$(cd "$(dirname "$0")" && pwd)
+
+works() { "$@" -c "import sys; sys.exit(0 if sys.version_info >= (3, 8) else 1)" >/dev/null 2>&1; }
+
+PYBIN=""; PYARG=""
+for c in python3 python; do
+  if command -v "$c" >/dev/null 2>&1 && works "$c"; then PYBIN="$c"; break; fi
+done
+if [ -z "$PYBIN" ] && command -v py >/dev/null 2>&1 && works py -3; then PYBIN="py"; PYARG="-3"; fi
+if [ -z "$PYBIN" ]; then
+  user="${USERNAME:-$(whoami 2>/dev/null)}"
+  for c in "/c/Users/$user/AppData/Local/Programs/Python"/Python3*/python.exe \
+           "/c/Program Files"/Python3*/python.exe "/c/Program Files (x86)"/Python3*/python.exe; do
+    if [ -f "$c" ] && works "$c"; then PYBIN="$c"; break; fi
+  done
+fi
+
+if [ -z "$PYBIN" ]; then
+  msg="[harness] No se encontró un Python 3.8+ que funcione (¿el alias de la Microsoft Store?). Instala Python desde python.org y reinicia Claude Code."
+  case "$script" in
+    guard_*) echo "$msg Se bloquea la acción: sin Python las guardas no pueden ejecutarse." >&2; exit 2 ;;
+    *)       echo "$msg (hook $script omitido)" >&2; exit 0 ;;
+  esac
+fi
+
+# shellcheck disable=SC2086  # PYARG vacío o "-3": debe expandirse sin comillas
+exec "$PYBIN" $PYARG "$here/$script"

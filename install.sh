@@ -53,6 +53,15 @@ for f in .claude/settings.json harness.config.json feature_list.json code-analyz
          .github/workflows/salesforce-validate.yml; do copy_new "$f"; done
 mkdir -p "$DEST/docs/specs" "$DEST/docs/adr" "$DEST/manifest"
 
+# Migración: los hooks ya no llaman a `python3` directo (en Windows es el stub de la Store y los
+# guardas no se ejecutaban). Ahora pasan por .claude/hooks/run, que busca un Python que funcione.
+# shellcheck disable=SC2016  # los $ son literales del JSON, no deben expandirse
+if [ -f "$DEST/.claude/settings.json" ] && grep -qF 'python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/' "$DEST/.claude/settings.json"; then
+  sed -i.bak 's#python3 \\"\$CLAUDE_PROJECT_DIR/\.claude/hooks/\([A-Za-z0-9_.-]*\)\\"#sh \\"$CLAUDE_PROJECT_DIR/.claude/hooks/run\\" \1#' "$DEST/.claude/settings.json"
+  rm -f "$DEST/.claude/settings.json.bak"
+  echo "  ✓ .claude/settings.json (hooks migrados al lanzador .claude/hooks/run)"
+fi
+
 if ! grep -q "^\.harness/run/" "$DEST/.gitignore" 2>/dev/null; then
   { echo; sed -n '/^# --- Harness/,/^$/p' "$SRC/.gitignore"; echo ".claude/settings.local.json"; } >> "$DEST/.gitignore"
   echo "  ✓ .gitignore (entradas del harness)"

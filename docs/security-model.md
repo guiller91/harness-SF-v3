@@ -67,3 +67,11 @@ Para trabajar sobre el propio harness, un humano lanza Claude Code con `HARNESS_
 Si una guarda bloquea algo legítimo, el mensaje indica la regla (`[harness:<regla>]`). Lo habitual:
 un texto que solo *menciona* un comando (usa Write/Edit para ese fichero) o un tipo de metadata sin
 dueño asignado (añádelo a `harness/roles.json`). Todos los bloqueos quedan en `.harness/events.jsonl`.
+
+## Los hooks necesitan Python (y fallan cerrado)
+
+Los hooks se lanzan con `.claude/hooks/run`, que busca un Python 3.8+ que realmente funcione
+(descarta el alias de la Microsoft Store de Windows). Si no hay Python, los hooks `guard_*`
+**bloquean** la acción (exit 2): sin guardas no se trabaja. El resto (contexto, métricas, checks)
+se omite con un aviso para no tumbar la sesión. Antes, un hook roto era un error "no bloqueante" y
+la acción se ejecutaba sin ninguna guarda.

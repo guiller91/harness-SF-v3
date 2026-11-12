@@ -23,9 +23,9 @@ jobs:
         run: python3 -m unittest discover -s harness/tests -t . -v
       - name: Sintaxis de los gates
         run: |
-          for f in hx install.sh harness/gates/*.sh; do bash -n "$f"; done
+          for f in hx install.sh .claude/hooks/run harness/gates/*.sh; do bash -n "$f"; done
       - name: ShellCheck
-        run: shellcheck -x -e SC1091 hx install.sh harness/gates/*.sh
+        run: shellcheck -x -e SC1091 hx install.sh .claude/hooks/run harness/gates/*.sh
       - name: JSON válidos
         run: |
           for f in harness.config.json feature_list.json harness/roles.json harness/pipeline.json \

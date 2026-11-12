@@ -1047,6 +1047,9 @@ def integrity_problems() -> List[str]:
                         for ref in re.findall(r"\.claude/hooks/[\w.-]+", hook.get("command", "")):
                             if not (base / ref).exists():
                                 problems.append(f"settings.json referencia {ref}, que no existe")
+                        for scr in re.findall(r"hooks/run\"?\s+([\w.-]+)", hook.get("command", "")):
+                            if not (base / ".claude" / "hooks" / scr).exists():
+                                problems.append(f"settings.json lanza .claude/hooks/{scr}, que no existe")
         except HarnessError as exc:
             problems.append(str(exc))
     else:
