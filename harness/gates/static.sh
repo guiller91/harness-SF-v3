@@ -4,7 +4,9 @@
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 need sf "npm install -g @salesforce/cli"
 # Misma comprobación que `hx doctor`: el plugin figura instalado (`sf code-analyzer --version` no existe).
-if ! sf plugins 2>/dev/null | grep -qi "code-analyzer"; then
+# (sin tubería: con `set -o pipefail`, `grep -q` cierra antes y `sf` muere por SIGPIPE aunque el plugin exista)
+plugins_out=$(sf plugins 2>/dev/null || true)
+if ! grep -qi "code-analyzer" <<<"$plugins_out"; then
   echo "[X] Code Analyzer no accesible: sf plugins install code-analyzer"
   summary "falta el plugin code-analyzer"; exit 3
 fi
