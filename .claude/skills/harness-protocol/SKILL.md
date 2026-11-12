@@ -85,7 +85,18 @@ salvo decisión explícita del humano. **MENOR** = mejora; no bloquea.
 Con algún BLOQUEANTE el veredicto es FAIL (la CLI lo comprueba). Después:
 `./hx verdict <tu-rol> pass|fail --note "resumen en una línea"`.
 
-## 6. Cuando algo no encaja
+## 6. Cómo lanzar comandos (menos interrupciones al humano)
+
+Cada comando "raro" le abre al humano un prompt de permiso. Para no hacerlo perder tiempo:
+
+- **Nunca antepongas `cd`.** El directorio de trabajo ya es la raíz del proyecto; `cd "…" && comando` dispara
+  una confirmación de seguridad de Claude Code.
+- **Un comando por llamada**, sin cadenas largas con `;` o `&&` que mezclen lecturas y listados.
+- **Para leer ficheros usa la herramienta Read**, no `cat`/`head`/`grep` en Bash. Para buscar, Grep y Glob.
+- **Usa solo Bash.** La herramienta PowerShell está denegada en este proyecto.
+- **No hagas `sf`/`git` "por curiosidad"**: lo que necesitas saber del estado sale de `./hx status` y `./hx plan`.
+
+## 7. Cuando algo no encaja
 
 - **Bloqueado por un hook** → lee el motivo; suele decir qué hacer. No lo esquives.
 - **El diseño es imposible o está mal** → para, explícalo en tu informe (Pendiente) y termina. No
