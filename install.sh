@@ -64,7 +64,8 @@ fi
 
 # Finales de línea: los scripts deben ser LF aunque Git (Windows) convierta a CRLF.
 if ! grep -q "hooks/run text eol=lf" "$DEST/.gitattributes" 2>/dev/null; then
-  { [ -s "$DEST/.gitattributes" ] && echo; cat "$SRC/.gitattributes"; } >> "$DEST/.gitattributes"
+  if [ -s "$DEST/.gitattributes" ]; then echo >> "$DEST/.gitattributes"; fi
+  cat "$SRC/.gitattributes" >> "$DEST/.gitattributes"
   echo "  ✓ .gitattributes (scripts del harness siempre en LF)"
 fi
 
