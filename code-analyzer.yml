@@ -13,10 +13,21 @@ ignores:
     - "**/staticresources/**"
     - "**/__tests__/**"
 
-# Para endurecer o relajar una regla concreta, descomenta y ajusta:
-# rules:
+rules:
+  pmd:
+    # Nuestra convención de tests (docs/conventions.md) es `metodo_condicion_resultado`; la regla por
+    # defecto de PMD exige camelCase sin guiones bajos y chocaría con todos los tests.
+    MethodNamingConventions:
+      severity: 4
+
+# El motor `flow` necesita Python 3.10+. Si `sf` no lo encuentra (en Windows suele ser el stub de la
+# Store), indica tu Python aquí, o desactiva el motor si el proyecto no usa Flows:
+# engines:
+#   flow:
+#     python_command: "C:/Users/<tu-usuario>/AppData/Local/Programs/Python/Python312/python.exe"
+#     # disable_engine: true
+
+# Para endurecer o relajar otra regla concreta, descomenta y ajusta:
 #   pmd:
 #     ApexCRUDViolation:
 #       severity: 1
-#     AvoidGlobalModifier:
-#       severity: 2

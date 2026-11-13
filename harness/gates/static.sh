@@ -49,8 +49,15 @@ viols = data.get("violations") or []
 def sev(v):
     try: return int(v.get("severity"))
     except Exception: return 99
-bad = [v for v in viols if sev(v) <= thr]
-open(summary, "w").write(f"{len(viols)} violación(es), {len(bad)} de severidad <= {thr}")
+env_bad = [v for v in viols if str(v.get("rule", "")).endswith("UninstantiableEngineError")]
+bad = [v for v in viols if sev(v) <= thr and v not in env_bad]
+msg = f"{len(viols)} violación(es), {len(bad)} de severidad <= {thr}"
+if env_bad:
+    engines = ", ".join(sorted({str(v.get("rule", "")).split(":")[0] for v in env_bad}))
+    msg += f"; ENTORNO: motor(es) no disponible(s): {engines} (no es un fallo del código: configura code-analyzer.yml, ver su cabecera)"
+open(summary, "w").write(msg)
+for v in env_bad:
+    print(f"  [ENTORNO] motor '{str(v.get('rule','')).split(':')[0]}' no se pudo iniciar: arréglalo en code-analyzer.yml (engines.<motor>), no es trabajo del implementer.")
 for v in bad[:40]:
     loc = v.get("locations") or [{}]
     loc = loc[v.get("primaryLocationIndex", 0)] if loc else {}
