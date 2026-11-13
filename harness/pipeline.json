@@ -14,7 +14,7 @@
       "security-admin",
       "test-engineer"
     ],
-    "gates": ["static", "apex-tests", "lwc-tests", "agent-validate"],
+    "gates": ["format", "static", "apex-tests", "lwc-tests", "agent-validate"],
     "reviews": [
       "qa-verifier",
       "code-reviewer",
@@ -45,7 +45,7 @@
   ],
 
   "gates": [
-    { "when": "any-product", "use": ["static"] },
+    { "when": "any-product", "use": ["format", "static"] },
     { "when": ["apex", "apex-test", "flow", "integration"], "use": ["apex-tests"] },
     { "when": ["lwc", "lwc-test"], "use": ["lwc-tests"] },
     { "when": ["agentforce"], "use": ["agent-validate"] }

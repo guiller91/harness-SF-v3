@@ -7,6 +7,7 @@ Reinyecta el estado del harness desde disco. Es lo que hace que una sesión nuev
 from __future__ import annotations
 
 import io
+import os
 import contextlib
 import sys
 
@@ -14,11 +15,26 @@ import _hx
 from _hx import core
 
 
+def _export_bin_on_path() -> None:
+    """bin/sf (shim) al principio del PATH de la sesión: `sf` funciona igual en gates y agentes."""
+    env_file = os.environ.get("CLAUDE_ENV_FILE")
+    shim = _hx.PROJECT / "bin" / "sf"
+    if not env_file or not shim.exists():
+        return
+    try:
+        posix = str(shim.parent).replace("\\", "/")
+        with open(env_file, "a", encoding="utf-8", newline="\n") as fh:
+            fh.write(f'export PATH="{posix}:$PATH"\n')
+    except OSError:
+        pass
+
+
 def main() -> None:
     _hx.read_event()
     sys.path.insert(0, str(_hx.PROJECT / "harness"))
     import cli  # noqa: WPS433
 
+    _export_bin_on_path()
     cfg = core.load_config(_hx.PROJECT)
     features = core.load_features(_hx.PROJECT)
     feat = core.active_feature(features)

@@ -74,6 +74,41 @@ class GateProbeCase(unittest.TestCase):
             r = subprocess.run(["bash", str(script)], cwd=tmp, env=env, capture_output=True, text=True)
             self.assertIn("BUENO --version", r.stdout)
 
+    def _run_script(self, script, tmp, extra_env):
+        env = dict(os.environ, **extra_env)
+        return subprocess.run(["bash", str(script)], cwd=tmp, env=env, capture_output=True, text=True)
+
+    def test_shim_bin_sf_elige_el_sf_sano_y_no_se_llama_a_si_mismo(self):
+        shim = Path(__file__).resolve().parents[2] / "bin" / "sf"
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            for d in ("a", "b"):
+                (tmp / d).mkdir()
+            (tmp / "a" / "sf").write_text('#!/bin/sh\n"$(dirname "$0")/../client/bin/sf.cmd" "$@"\n')
+            (tmp / "b" / "sf").write_text('#!/bin/sh\necho BUENO "$@"\n')
+            for f in (tmp / "a" / "sf", tmp / "b" / "sf"):
+                f.chmod(0o755)
+            sh_dir = shim.parent
+            r = self._run_script(shim, tmp, {"PATH": f"{sh_dir}:{tmp / 'a'}:{tmp / 'b'}:{os.environ['PATH']}"})
+            self.assertEqual(r.stdout.strip(), "BUENO", r.stderr)
+
+    def test_gate_format_falla_si_prettier_no_esta_y_pasa_sin_ficheros(self):
+        gate = GATE.parent / "format.sh"
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            ev = tmp / "ev"
+            ev.mkdir()
+            (tmp / "force-app").mkdir()
+            (tmp / "force-app" / "A.cls").write_text("public class A {}")
+            base = {"HX_ROOT": str(tmp), "HX_SUMMARY_FILE": str(ev / "s"), "HX_PY": shutil.which("python3"),
+                    "HX_LIB": str(LIB), "HX_CHANGED_FILES": str(ev / "c.txt")}
+            (ev / "c.txt").write_text("")
+            self.assertEqual(self._run_script(gate, tmp, base).returncode, 0)
+            (ev / "c.txt").write_text("force-app/A.cls\n")
+            r = self._run_script(gate, tmp, base)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("prettier", (ev / "s").read_text())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -29,6 +29,7 @@ _pick_sf() {
   if [ -n "${HX_SF:-}" ]; then printf '%s\n' "$HX_SF"; return; fi
   local first="" c
   while IFS= read -r c; do
+    [ "$c" -ef "$HX_ROOT/bin/sf" ] && continue
     [ -n "$first" ] || first="$c"
     if [ -f "$c" ] && ! grep -qs 'sf\.cmd' "$c" 2>/dev/null; then printf '%s\n' "$c"; return; fi
   done < <(type -ap sf 2>/dev/null)

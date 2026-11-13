@@ -224,6 +224,27 @@ class GuardBashOrgTest(HookCase):
         self.assertDenied(self.b("sf apex run test --code-coverage", "test-engineer"), "explicit-target")
         self.assertDenied(self.b('sf data query -q "SELECT Id FROM Account"', "org-analyst"), "explicit-target")
 
+    def test_sf_invocado_por_ruta_completa_se_clasifica(self):
+        deploy = f"project deploy start -d {CLS} --target-org harness-dev"
+        self.assertDenied(self.b(f"/c/Users/x/AppData/Roaming/npm/sf {deploy}", "code-reviewer"), "mutate-role")
+        self.assertDenied(self.b(f"npx sf {deploy}", "code-reviewer"), "mutate-role")
+        self.assertAllowed(self.b("npx sf org list", "code-reviewer"))
+
+    def test_sf_directo_node_runjs_y_sf_cmd_se_bloquean(self):
+        for cmd in ('"/c/Program Files/sf/client/bin/node.exe" "C:/Program Files/sf/client/bin/run.js" '
+                    'project deploy start --target-org harness-dev',
+                    'node ./node_modules/@salesforce/cli/bin/run.js org list',
+                    '"C:/Program Files/sf/bin/sf.cmd" data update record -o harness-dev',
+                    'X=1 sf.cmd org list'):
+            self.assertDenied(self.b(cmd, "apex-developer"), "sf-direct")
+        # solo mencionarlo en texto o en una lectura no es lanzarlo
+        self.assertAllowed(self.b("grep -n sf.cmd harness/gates/_lib.sh", "code-reviewer"))
+        self.assertAllowed(self.b("node scripts/build.js", "apex-developer"))
+
+    def test_hx_directo_solo_con_interprete(self):
+        self.assertDenied(self.b("python harness/cli.py status", "apex-developer"), "hx-direct")
+        self.assertAllowed(self.b("wc -l harness/cli.py", "code-reviewer"))
+
     def test_only_implementers_mutate_the_org(self):
         cmd = f"sf project deploy start -d {CLS} -o harness-dev"
         self.assertDenied(self.b(cmd), "mutate-role")

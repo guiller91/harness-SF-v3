@@ -941,6 +941,14 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         rc, txt = _run(["sf", "plugins"])
         ok("plugin code-analyzer") if "code-analyzer" in txt else bad(
             "falta Code Analyzer v5: sf plugins install code-analyzer")
+    shim, bash = core.root() / "bin" / "sf", shutil.which("bash")
+    if shim.exists() and bash:
+        rc, txt = _run([bash, str(shim), "--version"])
+        if rc == 0 and txt.strip():
+            ok(f"sf desde bash (shim del harness): {txt.strip().splitlines()[-1][:70]}")
+        else:
+            bad("`sf` no funciona desde bash (bin/sf): " + (txt.strip().splitlines() or ['sin salida'])[-1][:100]
+                + ". Instala la CLI con npm: npm install -g @salesforce/cli")
     ok("java (motores PMD/CPD/SFGE del analyzer)") if shutil.which("java") else note(
         "sin java: Code Analyzer no podrá ejecutar PMD/SFGE")
     rc, _ = core.git(["rev-parse", "--git-dir"])

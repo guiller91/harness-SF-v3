@@ -42,8 +42,8 @@ copy_new() { # solo si no existe: es tuyo
 }
 
 echo "Instalando el harness en $DEST"
-for d in harness .claude/agents .claude/skills .claude/hooks benchmarks; do copy_tree "$d"; done
-cp "$SRC/hx" "$DEST/hx"; chmod +x "$DEST/hx" "$DEST"/harness/gates/*.sh; echo "  ✓ hx"
+for d in harness .claude/agents .claude/skills .claude/hooks benchmarks bin; do copy_tree "$d"; done
+cp "$SRC/hx" "$DEST/hx"; chmod +x "$DEST/hx" "$DEST"/harness/gates/*.sh "$DEST/bin/sf"; echo "  ✓ hx"
 for f in CLAUDE.md AGENTS.md CHECKPOINTS.md docs/workflow.md docs/security-model.md; do
   if [ "$FORCE" -eq 1 ] || [ ! -e "$DEST/$f" ]; then mkdir -p "$(dirname "$DEST/$f")"; cp "$SRC/$f" "$DEST/$f"; echo "  ✓ $f"
   else echo "  · $f (ya existe: revisa y fusiona a mano con el del harness)"; fi

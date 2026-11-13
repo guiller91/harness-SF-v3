@@ -70,7 +70,7 @@ HUMAN_GATES = {"approve", "close"}
 
 
 def guard_hx(cmd: str, role: str, event: Dict) -> Optional[Tuple[str, str]]:
-    if re.search(r"harness/cli\.py|harness\.cli\b", cmd):
+    if re.search(r"(?:^|[\s;&|(])(?:python3?|py)(?:\.exe)?\s+(?:-\S+\s+)*[^;&|\n]*harness/cli\.py|-m\s+harness\.cli\b", cmd):
         _hx.deny("No invoques harness/cli.py directamente: usa `./hx <comando>`.", "hx-direct", event)
     pending_ask = None
     for match in HX_CALL.finditer(cmd):
@@ -96,7 +96,28 @@ def guard_hx(cmd: str, role: str, event: Dict) -> Optional[Tuple[str, str]]:
 # 2. sf — seguridad de orgs
 # --------------------------------------------------------------------------- #
 
-SF_CALL = re.compile(r"(?:^|[\s;&|(`'\"])(?:npx\s+)?(?:sf|sfdx)\s+([^;&|\n`]*)")
+# `sf`, `sfdx`, `npx sf` y rutas completas (/c/Users/x/npm/sf): se llame como se llame, es la CLI.
+SF_CALL = re.compile(r"(?:^|[\s;&|(`'\"])(?:npx\s+)?(?:[^\s;&|`'\"]*[/\\])?(?:sf|sfdx)['\"]?\s+([^;&|\n`]*)")
+
+_ASSIGN = re.compile(r"^[A-Za-z_]\w*=")
+_NODE_BIN = re.compile(r"(?:^|[/\\])node(?:\.exe)?$", re.I)
+_CLI_ENTRY = re.compile(r"(?:sf[/\\]client[/\\]bin[/\\]\w+\.js|@salesforce[/\\]cli[/\\](?:bin|lib)[/\\][\w./\\-]*\.js)$", re.I)
+
+
+def guard_sf_direct(cmd: str, event: Dict) -> None:
+    """Lanzar la CLI saltándose `sf` (node run.js, sf.cmd) esquiva la clasificación de comandos."""
+    for seg in SEP.split(cmd):
+        toks = tokens(seg)
+        while toks and (_ASSIGN.match(toks[0]) or toks[0] in ("exec", "command", "env")):
+            toks = toks[1:]
+        if not toks:
+            continue
+        head = toks[0].replace("\\", "/").rsplit("/", 1)[-1].lower()
+        direct = head in ("sf.cmd", "sfdx.cmd") or (
+            _NODE_BIN.search(toks[0]) and any(_CLI_ENTRY.search(t) for t in toks[1:4]))
+        if direct:
+            _hx.deny("No lances la CLI de Salesforce saltándote `sf` (node run.js, sf.cmd): los guardas no podrían "
+                     "clasificar el comando. Usa `sf ...`; si `sf` falla, díselo al humano.", "sf-direct", event)
 
 HUMAN_ONLY = [
     (("org", "login"), "Las credenciales las gestiona el humano."),
@@ -407,6 +428,7 @@ def main() -> None:
     policy = _hx.Policy()
     cleaned = strip_commit_messages(cmd)
 
+    guard_sf_direct(cleaned, event)
     asks = [guard_hx(cleaned, role, event),
             guard_sf(cleaned, role, policy, event),
             guard_git(cleaned, role, policy, event),

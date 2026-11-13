@@ -16,9 +16,19 @@ else
 fi
 
 if [ "$HX_TEST_LEVEL" = "RunSpecifiedTests" ]; then
-  read_items < <(local_test_classes)
-  args+=(--test-level RunSpecifiedTests)
-  for c in "${ITEMS[@]}"; do args+=(--tests "$c"); done
+  # Solo los tests que cubren lo que cambia la feature (mismo criterio que el gate apex-tests).
+  # shellcheck disable=SC2086  # HX_PKG_DIRS: varias rutas separadas por espacios
+  read_items < <("$HX_PY" "$HX_LIB/sfutil.py" test-classes --changed "$HX_CHANGED_FILES" $HX_PKG_DIRS)
+  changed_apex=$("$HX_PY" "$HX_LIB/sfutil.py" changed-apex "$HX_CHANGED_FILES")
+  if [ -z "$changed_apex" ]; then
+    args+=(--test-level NoTestRun)   # sin Apex en el cambio: se valida la metadata sin tests
+  elif [ "${#ITEMS[@]}" -eq 0 ]; then
+    echo "[X] Ninguna clase de test cubre los cambios Apex: escribe sus tests."
+    summary "ningún test cubre los cambios Apex"; exit 1
+  else
+    args+=(--test-level RunSpecifiedTests)
+    for c in "${ITEMS[@]}"; do args+=(--tests "$c"); done
+  fi
 else
   args+=(--test-level "$HX_TEST_LEVEL")
 fi

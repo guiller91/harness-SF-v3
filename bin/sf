@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# bin/sf — shim del harness: el mismo binario `sf` que usan los gates (ver harness/gates/_lib.sh).
+# En Windows el instalador oficial deja un `sf` que pasa por sf.cmd y se rompe con rutas con espacios.
+# Sin rodeos para los agentes: siempre `sf ...`, nunca `node run.js` ni `sf.cmd`.
+self="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/sf"
+first=""
+while IFS= read -r c; do
+  [ "$c" -ef "$self" ] && continue
+  [ -n "$first" ] || first="$c"
+  if [ -f "$c" ] && ! grep -qs 'sf\.cmd' "$c" 2>/dev/null; then exec "$c" "$@"; fi
+done < <(type -ap sf 2>/dev/null)
+if [ -n "$first" ]; then exec "$first" "$@"; fi
+echo "[X] No hay una CLI 'sf' utilizable desde bash. Instálala: npm install -g @salesforce/cli" >&2
+exit 3

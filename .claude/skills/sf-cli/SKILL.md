@@ -83,3 +83,9 @@ sf project deploy validate --manifest manifest/<id>/package.xml --test-level Run
 - Cualquier org que no sea la de desarrollo (y la de validación, solo en check-only). Alias de producción: nunca.
 - Modificar la org fuera de build o desde un rol que no sea implementer.
 - Instalar paquetes o plugins, crear o refrescar sandboxes, crear usuarios.
+
+## Windows: una sola forma de llamar a la CLI
+
+Usa siempre `sf ...`. La sesión pone `bin/sf` (el shim del harness) al principio del `PATH`, y elige una CLI
+que funcione desde bash. Nunca `node .../run.js` ni `sf.cmd`: los guardas los bloquean (`sf-direct`) porque así
+no pueden clasificar el comando. Si `sf` falla, díselo al humano en vez de buscar un rodeo.
