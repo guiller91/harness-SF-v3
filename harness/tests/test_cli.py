@@ -129,7 +129,7 @@ class VerifyGateTest(Base):
         rc, out = self.p.hx("advance", fid)
         self.assertEqual(rc, 1)
         for needle in ("gate static: missing", "gate apex-tests: missing", "review qa-verifier: missing",
-                       "review security-reviewer: missing", "review performance-reviewer: missing"):
+                       "review security-reviewer: missing"):
             self.assertIn(needle, out)
 
     def test_red_gate_blocks(self):
@@ -195,6 +195,18 @@ class VerifyGateTest(Base):
         self.assertIn("Escala al humano", out)
 
 
+class EnvErrorTest(Base):
+    def test_fallo_de_entorno_no_pide_rework(self):
+        fid = self.p.to_verify()
+        self.p.write(".gate-env-static", "")
+        rc, out = self.p.hx("gate", "run", "static")
+        self.assertNotEqual(rc, 0)
+        self.assertIn("ERROR", out)
+        status = self.p.hx("status")[1]
+        self.assertIn("ENTORNO", status)
+        self.assertNotIn(f"./hx rework {fid}", status)
+
+
 class ReleaseGateTest(Base):
     def finish_release(self, fid):
         self.p.write(f"manifest/{fid}/package.xml", "<Package/>")
@@ -207,8 +219,22 @@ class ReleaseGateTest(Base):
         fid = self.p.to_release()
         rc, out = self.p.hx("close", fid)
         self.assertEqual(rc, 1)
-        for needle in ("release.md", "package.xml", "gate deploy-validate: missing", "docs-writer.md"):
+        for needle in ("release.md", "package.xml", "gate deploy-validate: missing"):
             self.assertIn(needle, out)
+
+    def test_reverify_vuelve_a_verify_sin_gastar_rework(self):
+        fid = self.p.to_release()
+        rc, out = self.p.hx("reverify", fid, "--reason", "nada caducado")
+        self.assertNotEqual(rc, 0)
+        self.assertIn("No hay evidencia caducada", out)
+        self.p.write("force-app/main/default/classes/TerritorioService.cls",
+                     "public with sharing class TerritorioService {  }\n")  # solo formato
+        self.assertIn("reverify", self.p.hx("status")[1])
+        rc, out = self.p.hx("reverify", fid, "--reason", "prettier en el commit")
+        self.assertEqual(rc, 0, out)
+        feat = self.p.feature(fid)
+        self.assertEqual(feat["status"], "verify")
+        self.assertEqual(feat.get("rework_count", 0), 0)
 
     def test_full_cycle_closes_and_writes_history(self):
         fid = self.p.to_release()

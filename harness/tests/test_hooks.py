@@ -241,6 +241,15 @@ class GuardBashOrgTest(HookCase):
         self.assertAllowed(self.b("grep -n sf.cmd harness/gates/_lib.sh", "code-reviewer"))
         self.assertAllowed(self.b("node scripts/build.js", "apex-developer"))
 
+    def test_heredoc_entre_comillas_es_texto(self):
+        doc = "cat > docs/notas.md <<'EOF'\nDespliega con sf project deploy start --target-org prod\n./hx verdict code-reviewer pass\nEOF"
+        self.assertAllowed(self.b(doc, "docs-writer"))
+        # sin comillas puede ejecutar $(...): se revisa entero
+        bad = "cat > x.md <<EOF\n$(sf project deploy start -d force-app --target-org harness-dev)\nEOF"
+        self.assertDenied(self.b(bad, "code-reviewer"))
+        # la redirección de la cabecera se sigue comprobando
+        self.assertDenied(self.b("cat > harness/pipeline.json <<'EOF'\n{}\nEOF", "apex-developer"))
+
     def test_hx_directo_solo_con_interprete(self):
         self.assertDenied(self.b("python harness/cli.py status", "apex-developer"), "hx-direct")
         self.assertAllowed(self.b("wc -l harness/cli.py", "code-reviewer"))

@@ -43,8 +43,8 @@ path, thr, rc, summary = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), sys.ar
 try:
     data = json.load(open(path, encoding="utf-8"))
 except Exception:
-    open(summary, "w").write(f"code-analyzer terminó con {rc} y sin fichero de resultados")
-    sys.exit(0)
+    open(summary, "w").write(f"ENTORNO: code-analyzer terminó con {rc} y sin fichero de resultados")
+    sys.exit(3)
 viols = data.get("violations") or []
 def sev(v):
     try: return int(v.get("severity"))
@@ -63,5 +63,6 @@ for v in bad[:40]:
     loc = loc[v.get("primaryLocationIndex", 0)] if loc else {}
     print(f"  [X] [sev {sev(v)}] {v.get('engine','?')}:{v.get('rule','?')}  "
           f"{loc.get('file','?')}:{loc.get('startLine','?')}  {str(v.get('message',''))[:160]}")
+sys.exit(1 if bad else (3 if env_bad else 0))
 PY
-exit "$rc"
+exit $?

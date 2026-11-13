@@ -110,7 +110,7 @@ def main() -> int:
     result, err = load_result(args.result)
     if result is None:
         print(f"✗ {err}")
-        return finish(1, f"la ejecución de tests no produjo resultado ({err})")
+        return finish(3, f"ENTORNO: la ejecución de tests no produjo resultado ({err})")
 
     summ = result.get("summary") or {}
     ran, failing = int(summ.get("testsRan") or 0), int(summ.get("failing") or 0)

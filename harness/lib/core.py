@@ -457,7 +457,7 @@ def read_evidence(fid: str, name: str, base: Optional[Path] = None) -> Optional[
 
 def evidence_status(fid: str, name: str, current_tree: str,
                     base: Optional[Path] = None) -> Tuple[str, str]:
-    """('pass'|'fail'|'stale'|'missing', detalle)."""
+    """('pass'|'fail'|'error'|'stale'|'missing', detalle). 'error' = fallo del entorno, no del código."""
     ev = read_evidence(fid, name, base)
     if ev is None:
         return "missing", "sin evidencia"
@@ -465,6 +465,8 @@ def evidence_status(fid: str, name: str, current_tree: str,
         return "stale", f"evidencia de otro árbol ({ev.get('tree_hash')} ≠ {current_tree}); hay que repetir"
     if ev.get("status") == "pass":
         return "pass", ev.get("summary", "")
+    if ev.get("status") == "error":
+        return "error", ev.get("summary", "")
     return "fail", ev.get("summary", "")
 
 

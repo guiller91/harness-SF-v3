@@ -69,7 +69,8 @@ Mínimos de producto que los revisores exigen siempre:
 
 ## Rework
 
-Un gate en rojo o una review rechazada devuelven la feature a `build` (`./hx rework`). Tras la
+Un gate en rojo o una review rechazada devuelven la feature a `build` (`./hx rework`). Un gate en
+`error` (entorno) o una evidencia caducada en release sin nada en rojo (`./hx reverify`) no. Tras la
 corrección **se repiten gates y reviews**: la evidencia está atada al código exacto que se verificó.
 Al superar `workflow.maxReworkLoops` la feature se bloquea y se escala al humano: iterar más no
 arregla un diseño o unos criterios equivocados.

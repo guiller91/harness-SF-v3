@@ -58,9 +58,17 @@ class PlanTest(unittest.TestCase):
     def test_apex_change_requires_tests_security_and_performance(self):
         plan = core.derive_plan({"apex"}, "M", PIPELINE)
         self.assertEqual(plan["build"], ["apex-developer", "security-admin", "test-engineer"])
-        self.assertEqual(plan["gates"], ["format", "static", "apex-tests"])
+        self.assertEqual(plan["gates"], ["format", "secrets", "static", "apex-tests"])
         self.assertEqual(plan["reviews"], ["qa-verifier", "code-reviewer", "security-reviewer", "performance-reviewer"])
+        self.assertEqual(plan["release"], ["release-manager", "docs-writer"])
+        self.assertEqual(plan["release_gates"], ["deploy-validate", "regression"])
+
+    def test_size_s_is_lighter_but_keeps_security(self):
+        plan = core.derive_plan({"apex"}, "S", PIPELINE)
+        self.assertEqual(plan["reviews"], ["qa-verifier", "code-reviewer", "security-reviewer"])
+        self.assertEqual(plan["release"], ["release-manager"])
         self.assertEqual(plan["release_gates"], ["deploy-validate"])
+        self.assertIn("secrets", plan["gates"])
 
     def test_lwc_adds_accessibility_and_jest(self):
         plan = core.derive_plan({"lwc"}, "M", PIPELINE)

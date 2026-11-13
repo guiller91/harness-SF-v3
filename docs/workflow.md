@@ -26,17 +26,25 @@ metadata (del scope, antes de construir; de los ficheros realmente cambiados, de
 
 | Si la feature toca… | Construyen | Gates | Revisan |
 |---|---|---|---|
-| Apex | apex-developer, security-admin, test-engineer | static, apex-tests | qa, code, security, performance |
-| LWC | lwc-developer, test-engineer | static, lwc-tests | qa, code, security, performance, accessibility |
-| Flows | flow-developer | static, apex-tests | qa, code, security, performance |
-| Modelo de datos | data-modeler, security-admin | static | qa, code, security |
-| Integraciones | integration-developer, test-engineer | static, apex-tests | qa, code, security, performance |
-| Agentforce | agentforce-developer, security-admin | static, agent-validate | qa, code, security |
-| UI declarativa | admin-configurator | static | qa, code, security |
-| Permisos | security-admin | static | qa, code, security |
+| Apex | apex-developer, security-admin, test-engineer | apex-tests | qa, code, security, performance* |
+| LWC | lwc-developer, test-engineer | lwc-tests | qa, code, security, performance*, accessibility |
+| Flows | flow-developer | apex-tests | qa, code, security, performance* |
+| Modelo de datos | data-modeler, security-admin | — | qa, code, security |
+| Integraciones | integration-developer, test-engineer | apex-tests | qa, code, security, performance* |
+| Agentforce | agentforce-developer, security-admin | agent-validate | qa, code, security |
+| UI declarativa | admin-configurator | — | qa, code, security |
+| Permisos | security-admin | — | qa, code, security |
 
-El tamaño (`S`/`M`/`L`) ajusta el diseño: S solo arquitecto; M y L añaden analista de negocio y de
-org; L exige aprobar el diseño.
+Todo cambio de producto pasa además por `format` (prettier), `secrets` (credenciales en el código) y
+`static` (Code Analyzer). En release: `deploy-validate` siempre y `regression` (tests locales contra una
+línea base de fallos conocidos) en M/L.
+
+El tamaño (`S`/`M`/`L`) ajusta el coste: S solo arquitecto en diseño, sin `performance-reviewer`(*),
+sin `docs-writer` y sin `regression`; M y L añaden analista de negocio y de org; L exige aprobar el
+diseño. La seguridad (gate `secrets` y `security-reviewer`) no se recorta nunca.
+
+`./hx advance` de build a verify formatea con prettier los ficheros cambiados **antes** de generar
+evidencia, para que el commit (lint-staged) no cambie el árbol después.
 
 ## Evidencia atada al código
 
@@ -53,6 +61,13 @@ pasa a `stale` y la CLI no deja avanzar hasta repetirla. Consecuencias:
 `./hx rework <id> --reason "…"` devuelve la feature a `build`. Corrige el **dueño** del fichero con
 el hallazgo exacto. Al tercer ciclo (configurable) la feature se bloquea sola y se escala al humano:
 si tres vueltas no bastan, el problema está en el diseño o en los criterios.
+
+No todo lo rojo es un rework:
+
+- **Gate en `error`** (exit 3): el entorno impidió comprobar (falta prettier, la CLI no devuelve JSON,
+  un motor del analyzer no arranca). Se arregla el entorno y se repite el gate. No consume ciclo.
+- **Evidencia caducada en release** sin nada en rojo: `./hx reverify <id> --reason "…"` vuelve a
+  verify sin consumir ciclo; `./hx metrics` lo cuenta aparte.
 
 ## Traspasos
 

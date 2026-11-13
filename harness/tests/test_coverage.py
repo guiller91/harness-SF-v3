@@ -95,9 +95,9 @@ class CoverageGateTest(unittest.TestCase):
     def test_cli_error_without_result_fails(self):
         rc, out, summary = self.run_gate({"status": 1, "name": "NoOrgFound", "message": "No authorization found"},
                                          [], cli_exit=1)
-        self.assertEqual(rc, 1)
+        self.assertEqual(rc, 3)  # entorno: sin resultado no hay nada que juzgar del código
         self.assertIn("No authorization found", summary)
-        self.assertEqual(self.run_gate("not json at all", [])[0], 1)
+        self.assertEqual(self.run_gate("not json at all", [])[0], 3)
 
     def test_no_tests_run_is_a_failure(self):
         result = self.cli_json([])

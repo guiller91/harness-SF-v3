@@ -6,6 +6,7 @@
     "hx",
     "install.sh",
     "harness.config.json",
+    "secrets-allowlist.txt",
     "feature_list.json",
     ".harness/**",
     "progress/current.md",

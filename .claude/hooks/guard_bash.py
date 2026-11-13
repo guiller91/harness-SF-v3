@@ -39,6 +39,16 @@ def strip_commit_messages(cmd: str) -> str:
     return cmd
 
 
+_HEREDOC = re.compile(r"(<<-?\s*(['\"])(\w+)\2[^\n]*\n).*?\n[ \t]*\3[ \t]*(?=\n|$)", re.S)
+
+
+def strip_quoted_heredocs(cmd: str) -> str:
+    """El cuerpo de un heredoc con delimitador entre comillas (<<'EOF') es texto literal: bash no expande
+    nada dentro. Se conserva la cabecera (y con ella la redirección, que se sigue comprobando) y se quita
+    el cuerpo. Un heredoc sin comillas (<<EOF) puede ejecutar $(...) y se revisa entero."""
+    return _HEREDOC.sub(lambda m: m.group(1) + m.group(3), cmd)
+
+
 def tokens(text: str) -> List[str]:
     try:
         return shlex.split(text, posix=True)
@@ -65,7 +75,7 @@ def flag_value(toks: List[str], *names: str) -> Optional[str]:
 # --------------------------------------------------------------------------- #
 
 HX_CALL = re.compile(r"(?:^|[\s;&|(`])(?:\./|\S*/)?hx\s+([a-z][\w-]*)([^;&|\n]*)")
-ORCHESTRATOR_ONLY = {"propose", "start", "advance", "rework", "scope", "block", "unblock", "org"}
+ORCHESTRATOR_ONLY = {"propose", "start", "advance", "rework", "reverify", "scope", "block", "unblock", "org"}
 HUMAN_GATES = {"approve", "close"}
 
 
@@ -426,7 +436,7 @@ def main() -> None:
         return
     role = _hx.role_of(event)
     policy = _hx.Policy()
-    cleaned = strip_commit_messages(cmd)
+    cleaned = strip_quoted_heredocs(strip_commit_messages(cmd))
 
     guard_sf_direct(cleaned, event)
     asks = [guard_hx(cleaned, role, event),

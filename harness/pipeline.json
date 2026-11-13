@@ -14,7 +14,7 @@
       "security-admin",
       "test-engineer"
     ],
-    "gates": ["format", "static", "apex-tests", "lwc-tests", "agent-validate"],
+    "gates": ["format", "secrets", "static", "apex-tests", "lwc-tests", "agent-validate"],
     "reviews": [
       "qa-verifier",
       "code-reviewer",
@@ -23,7 +23,7 @@
       "accessibility-reviewer"
     ],
     "release": ["release-manager", "docs-writer"],
-    "release_gates": ["deploy-validate"]
+    "release_gates": ["deploy-validate", "regression"]
   },
 
   "design": [
@@ -45,7 +45,7 @@
   ],
 
   "gates": [
-    { "when": "any-product", "use": ["format", "static"] },
+    { "when": "any-product", "use": ["format", "secrets", "static"] },
     { "when": ["apex", "apex-test", "flow", "integration"], "use": ["apex-tests"] },
     { "when": ["lwc", "lwc-test"], "use": ["lwc-tests"] },
     { "when": ["agentforce"], "use": ["agent-validate"] }
@@ -54,15 +54,17 @@
   "reviews": [
     { "when": "always", "use": ["qa-verifier"] },
     { "when": "any-product", "use": ["code-reviewer", "security-reviewer"] },
-    { "when": ["apex", "flow", "integration", "lwc"], "use": ["performance-reviewer"] },
+    { "when": ["apex", "flow", "integration", "lwc"], "sizes": ["M", "L"], "use": ["performance-reviewer"] },
     { "when": ["lwc"], "use": ["accessibility-reviewer"] }
   ],
 
   "release": [
-    { "when": "always", "use": ["release-manager", "docs-writer"] }
+    { "when": "always", "use": ["release-manager"] },
+    { "when": "always", "sizes": ["M", "L"], "use": ["docs-writer"] }
   ],
 
   "release_gates": [
-    { "when": "any-product", "use": ["deploy-validate"] }
+    { "when": "any-product", "use": ["deploy-validate"] },
+    { "when": ["apex", "apex-test", "flow", "integration", "data-model"], "sizes": ["M", "L"], "use": ["regression"] }
   ]
 }

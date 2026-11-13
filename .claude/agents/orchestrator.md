@@ -45,11 +45,15 @@ dos a la vez: comparten una org y un deploy es global. Tras cada uno, lee su inf
 en *Pendiente* para otro rol se lo pasas a ese rol. Si alguien pide más alcance, decide tú:
 `./hx scope <id> add <glob> --reason "…"` (queda registrado) o no. `./hx advance`.
 
-**3. Verificación** — `./hx gate run all`. Si un gate está en rojo, no lances revisores todavía:
-`./hx rework <id> --reason "…"` y de vuelta al dueño del fichero. Con los gates en verde, lanza
+**3. Verificación** — `./hx gate run all`. Si un gate está en rojo (`fail`), no lances revisores
+todavía: `./hx rework <id> --reason "…"` y de vuelta al dueño del fichero. Si está en `error`, es el
+**entorno** (falta una herramienta, la CLI no responde): eso **no es un rework**; díselo al humano con
+la línea del log y repite el gate cuando esté arreglado. Con los gates en verde, lanza
 **en paralelo, en un mismo turno**, todos los revisores del plan (son de solo lectura). Lee los
 veredictos. Cualquier FAIL → `./hx rework`, corrige quien corresponda, y **se repiten gates y
 reviews** (la evidencia va atada al código exacto: si cambia, caduca). `./hx advance`.
+Si ya en *release* la evidencia caduca sin que nada esté en rojo (p. ej. un commit que solo formatea),
+usa `./hx reverify <id> --reason "…"`: vuelve a verify **sin gastar rework**; repites lo caducado.
 
 **4. Entrega** — `release-manager` y `docs-writer` (pueden ir en paralelo), luego
 `./hx gate run deploy-validate`. Resume al humano: qué se ha hecho, evidencia, pasos manuales y

@@ -15,6 +15,7 @@ solo si las precondiciones se cumplen con evidencia del árbol de fuente actual.
     ./hx gate run <gate|all>
     ./hx verdict <rol> pass|fail [--note ...]
     ./hx rework <id> --reason ...
+    ./hx reverify <id> --reason ...   (release > verify sin gastar rework)
     ./hx block <id> --reason ... | ./hx unblock <id>
     ./hx close <id>        [HUMANO] cierra la feature (done)
     ./hx metrics | doctor | check | tree-hash
@@ -224,7 +225,11 @@ def next_step(feat: Dict[str, Any], cfg: Dict[str, Any], plan: Dict[str, List[st
         return f"`./hx advance {fid}` (> verify)"
     if phase == "verify":
         bad_gates = [g for g in plan["gates"] if core.evidence_status(fid, f"gate-{g}", tree)[0] != "pass"]
+        env = [g for g in bad_gates if core.evidence_status(fid, f"gate-{g}", tree)[0] == "error"]
         failed = [g for g in bad_gates if core.evidence_status(fid, f"gate-{g}", tree)[0] == "fail"]
+        if env:
+            return (f"gate con error de ENTORNO ({', '.join(env)}): arregla la herramienta/config (ver su log) y "
+                    f"repite `./hx gate run {env[0]}`. No es un rework")
         if failed:
             return f"gate en rojo ({', '.join(failed)}): `./hx rework {fid} --reason ...` y volver al implementer"
         if bad_gates:
@@ -237,6 +242,11 @@ def next_step(feat: Dict[str, Any], cfg: Dict[str, Any], plan: Dict[str, List[st
             return f"lanzar EN PARALELO: {', '.join(bad_rev)}"
         return f"`./hx advance {fid}` (> release)"
     if phase == "release":
+        old = [n for n in [f"gate-{g}" for g in plan["gates"]] + [f"review-{r}" for r in plan["reviews"]]
+               if core.evidence_status(fid, n, tree)[0] == "stale"]
+        if old:
+            return (f"la evidencia de verify caducó ({', '.join(old[:4])}): `./hx reverify {fid} --reason ...` "
+                    "(no gasta rework)")
         for role in plan["release"]:
             if check_role_output(role, fid, roles):
                 return f"delegar en `{role}`"
@@ -527,12 +537,32 @@ def cmd_advance(args: argparse.Namespace) -> int:
         for p in dict.fromkeys(problems):
             out(f"   - {p}")
         return 1
+    if target == "verify":
+        autoformat(feat, cfg)
     transition(feat, target, "criterios de salida cumplidos")
     core.save_features(features)
     render_current(features, cfg)
     out(f"{OK} {fid}: {phase} > {target}")
     out("\n".join(status_lines(feat, cfg)))
     return 0
+
+
+def autoformat(feat: Dict[str, Any], cfg: Dict[str, Any]) -> None:
+    """Fija el formato ANTES de generar evidencia: así el commit (lint-staged) no cambia el árbol después."""
+    sys.path.insert(0, str(core.root() / "harness" / "lib"))
+    import fmt  # noqa: WPS433
+
+    files = fmt.formattable(core.product_changes(feat, cfg))
+    if not files:
+        return
+    before = core.tree_hash(cfg)
+    rc = fmt.run("write", files, core.root())
+    changed = core.tree_hash(cfg) != before
+    core.log_event("autoformat", feature=feat["id"], files=len(files), rc=rc, changed=changed)
+    if rc == 0:
+        out(f"{DOT} prettier aplicado a {len(files)} fichero(s)" + (" (había cambios de formato)" if changed else ""))
+    else:
+        out(f"{DOT} no se pudo formatear automáticamente (rc={rc}); el gate format lo señalará")
 
 
 def cmd_rework(args: argparse.Namespace) -> int:
@@ -558,6 +588,32 @@ def cmd_rework(args: argparse.Namespace) -> int:
     render_current(features, cfg)
     out(f"{OK} {feat['id']} vuelve a build (rework {feat['rework_count']}/{limit}). "
         "Delega la corrección en el implementer dueño del fichero; después repite gates y reviews.")
+    return 0
+
+
+def cmd_reverify(args: argparse.Namespace) -> int:
+    """release > verify SIN gastar rework: solo cuando la evidencia caducó (p. ej. un cambio de formato)
+    y no hay nada en rojo. Si algo está en rojo, eso sí es un rework."""
+    cfg = core.load_config()
+    features = core.load_features()
+    feat = core.find_feature(features, args.id)
+    if feat["status"] != "release":
+        raise HarnessError(f"reverify solo aplica en release (ahora: {feat['status']}).")
+    tree = core.tree_hash(cfg)
+    plan, _ = plan_for(feat, cfg)
+    names = [f"gate-{g}" for g in plan["gates"]] + [f"review-{r}" for r in plan["reviews"]]
+    states = {n: core.evidence_status(feat["id"], n, tree)[0] for n in names}
+    red = [n for n, s in states.items() if s == "fail"]
+    if red:
+        raise HarnessError(f"Hay evidencia en rojo ({', '.join(red)}): eso es un rework, no un reverify.")
+    stale = [n for n, s in states.items() if s in ("stale", "missing", "error")]
+    if not stale:
+        raise HarnessError("No hay evidencia caducada: no hace falta reverify.")
+    core.log_event("reverify", feature=feat["id"], reason=args.reason, tree=tree, stale=stale)
+    transition(feat, "verify", f"reverify: {args.reason}")
+    core.save_features(features)
+    render_current(features, cfg)
+    out(f"{OK} {feat['id']} vuelve a verify sin consumir rework. Repite: {', '.join(stale)}.")
     return 0
 
 
@@ -626,9 +682,9 @@ def run_gate(name: str, feat: Optional[Dict[str, Any]], cfg: Dict[str, Any]) -> 
         if kinds & {"apex", "apex-test", "lwc", "lwc-test"}:
             msg = ("la feature declara cambios de código pero no se detecta ningún fichero de producto "
                    "cambiado (¿base_commit, packageDirs o ficheros sin guardar?)")
-            out(f"-- {KO} gate {name}: FAIL - {msg} --")
+            out(f"-- {KO} gate {name}: ERROR - {msg} --")
             core.write_evidence(fid, f"gate-{name}", {
-                "kind": "gate", "name": name, "feature": fid, "status": "fail", "exit_code": 1,
+                "kind": "gate", "name": name, "feature": fid, "status": "error", "exit_code": 3,
                 "tree_hash": core.tree_hash(cfg), "started_at": core.now(), "finished_at": core.now(),
                 "duration_s": 0, "summary": msg, "log": "", "actor": actor()})
             return 1
@@ -668,7 +724,8 @@ def run_gate(name: str, feat: Optional[Dict[str, Any]], cfg: Dict[str, Any]) -> 
         rc = proc.wait()
     tree_after = core.tree_hash(cfg)
     summary = summary_path.read_text(encoding="utf-8").strip() if summary_path.exists() else ""
-    status = "pass" if rc == 0 else "fail"
+    # exit 3 = el entorno impidió comprobar (herramienta ausente, CLI rota): no es un fallo del código
+    status = "pass" if rc == 0 else ("error" if rc == 3 else "fail")
     if tree_after != tree_before:
         status, summary = "fail", "el árbol de fuente cambió durante el gate; repítelo"
     evidence = {
@@ -679,6 +736,8 @@ def run_gate(name: str, feat: Optional[Dict[str, Any]], cfg: Dict[str, Any]) -> 
     }
     core.write_evidence(fid, f"gate-{name}", evidence)
     core.log_event("gate", feature=fid, gate=name, status=status, duration_s=evidence["duration_s"])
+    if status == "error":
+        out("   (ENTORNO: arregla la herramienta o la config y repite el gate; no es un rework)")
     out(f"-- {OK if status == 'pass' else KO} gate {name}: {status.upper()}"
         + (f" - {summary}" if summary else "") + f" . log: {evidence['log']} --")
     return 0 if status == "pass" else 1
@@ -851,7 +910,9 @@ def feature_metrics(feat: Dict[str, Any], events: List[Dict[str, Any]]) -> Dict[
     return {
         "id": fid, "title": feat["title"], "status": feat["status"], "size": feat.get("size"),
         "lead_time_s": lead, "phase_time_s": {k: round(v) for k, v in phase_time.items()},
-        "gate_runs": len(gates), "gate_failures": sum(1 for g in gates if g["status"] != "pass"),
+        "gate_runs": len(gates), "gate_failures": sum(1 for g in gates if g["status"] == "fail"),
+        "gate_env_errors": sum(1 for g in gates if g["status"] == "error"),
+        "reverify": sum(1 for e in evs if e["event"] == "reverify"),
         "first_pass_gates": _first_pass(gates, "gate"),
         "reviews": len(verdicts), "review_rejections": sum(1 for v in verdicts if v["status"] != "pass"),
         "rework_loops": feat.get("rework_count", 0),
@@ -1164,6 +1225,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("id")
     p.add_argument("--reason", required=True)
     p.set_defaults(fn=cmd_rework)
+
+    p = sub.add_parser("reverify", help="volver a verify sin rework (evidencia caducada)")
+    p.add_argument("id")
+    p.add_argument("--reason", required=True)
+    p.set_defaults(fn=cmd_reverify)
 
     p = sub.add_parser("block", help="bloquear una feature")
     p.add_argument("id")

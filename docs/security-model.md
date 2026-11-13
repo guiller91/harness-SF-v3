@@ -83,3 +83,18 @@ Bash, así que PowerShell queda **denegada** en `settings.json` (los agentes usa
 Bash) y, como segunda capa, `guard_bash` también está enganchada a `PowerShell`. Sin esto, un agente podía
 ejecutar `sf` o escribir ficheros sin pasar por ownership ni por la lista de orgs.
 
+## Invocar la CLI de Salesforce
+
+Los guardas clasifican cada `sf …` (lectura, test, validación, mutación) y lo cruzan con el rol, la
+fase y el alias de org. Por eso solo hay una forma de llamar a la CLI: `sf` (o `sfdx`, `npx sf`, o una
+ruta que termine en `/sf`). Lanzarla saltándose ese nombre —`node …/run.js`, `sf.cmd`— se bloquea
+(`sf-direct`): fue lo que, en una prueba real, dejó a un orquestador desplegar sin pasar por los
+guardas. En Windows, `bin/sf` (shim del harness, en el PATH de la sesión) elige una CLI que funcione
+desde bash, así que nadie necesita el rodeo.
+
+## Secretos
+
+El gate `secrets` busca credenciales literales en los ficheros que cambia la feature (contraseñas y
+tokens en variables, cabeceras `Authorization` con valor, `Blob.valueOf('usuario:clave')`, claves
+privadas, JWT, IDs de sesión). La deuda existente fuera de la feature no la bloquea. Las excepciones
+las aprueba el humano en `secrets-allowlist.txt` (`<ruta> <huella>`), ruta protegida.

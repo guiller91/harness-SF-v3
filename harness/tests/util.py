@@ -17,6 +17,7 @@ COPY = [".claude", "harness", "hx", "harness.config.json", "sfdx-project.json", 
 STUB_GATE = """#!/usr/bin/env bash
 # gate de pruebas: verde salvo que exista .gate-fail-<nombre>
 name="$(basename "$0" .sh)"
+if [ -f "$HX_ROOT/.gate-env-$name" ]; then echo "ENTORNO" > "$HX_SUMMARY_FILE"; exit 3; fi
 if [ -f "$HX_ROOT/.gate-fail-$name" ]; then echo "rojo" > "$HX_SUMMARY_FILE"; echo "gate $name ROJO"; exit 1; fi
 echo "verde" > "$HX_SUMMARY_FILE"; echo "gate $name verde"
 """
