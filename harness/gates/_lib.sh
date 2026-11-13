@@ -22,6 +22,25 @@ need() { # need <binario> <pista>
   fi
 }
 
+# En Windows el instalador oficial deja un `sf` (script sh) que llama a sf.cmd; desde bash eso rompe con rutas con
+# espacios ("C:\Program" no se reconoce) y devuelve rc=1 aunque todo vaya bien. Si hay otro `sf` que no pasa por
+# sf.cmd (p. ej. el de npm, que lanza node directo), se usa ese. HX_SF fuerza un binario concreto.
+_pick_sf() {
+  if [ -n "${HX_SF:-}" ]; then printf '%s\n' "$HX_SF"; return; fi
+  local first="" c
+  while IFS= read -r c; do
+    [ -n "$first" ] || first="$c"
+    if [ -f "$c" ] && ! grep -qs 'sf\.cmd' "$c" 2>/dev/null; then printf '%s\n' "$c"; return; fi
+  done < <(type -ap sf 2>/dev/null)
+  printf '%s\n' "$first"
+}
+if command -v sf >/dev/null 2>&1; then
+  HX_SF_BIN="$(_pick_sf)"
+  if [ -n "$HX_SF_BIN" ] && [ "$HX_SF_BIN" != "$(command -v sf)" ]; then
+    sf() { "$HX_SF_BIN" "$@"; }
+  fi
+fi
+
 # Ficheros de producto cambiados que siguen existiendo (uno por línea).
 changed_existing() {
   [ -f "$HX_CHANGED_FILES" ] || return 0

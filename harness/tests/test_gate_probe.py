@@ -54,6 +54,26 @@ class GateProbeCase(unittest.TestCase):
             self.assertNotIn("No hay ficheros", r.stdout)
             self.assertIn("--target force-app/classes/A.cls", r.stdout)
 
+    def test_prefiere_sf_que_no_pasa_por_sf_cmd(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            for d in ("a", "b"):
+                (tmp / d).mkdir()
+            bad, good = tmp / "a" / "sf", tmp / "b" / "sf"
+            bad.write_text('#!/bin/sh\n"$(dirname "$0")/../client/bin/sf.cmd" "$@"\n')
+            good.write_text('#!/bin/sh\necho BUENO "$@"\n')
+            for f in (bad, good):
+                f.chmod(0o755)
+            ev = tmp / "ev"
+            ev.mkdir()
+            (ev / "c.txt").write_text("")
+            script = tmp / "g.sh"
+            script.write_text('source "%s/gates/_lib.sh"\nsf --version\n' % LIB.parent)
+            env = dict(os.environ, PATH=f"{tmp / 'a'}:{tmp / 'b'}:{os.environ['PATH']}", HX_ROOT=str(tmp),
+                       HX_SUMMARY_FILE=str(ev / "s"), HX_CHANGED_FILES=str(ev / "c.txt"))
+            r = subprocess.run(["bash", str(script)], cwd=tmp, env=env, capture_output=True, text=True)
+            self.assertIn("BUENO --version", r.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
