@@ -18,6 +18,9 @@ coverage/
 .harness/evidence/**/static-results.json
 .harness/evidence/_adhoc/
 progress/drafts/
+.harness/config-history/
+.harness/console/
+.claude/agents/*.upstream
 __pycache__/
 *.pyc
 

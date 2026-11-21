@@ -42,17 +42,8 @@ copy_new() { # solo si no existe: es tuyo
 }
 
 echo "Instalando el harness en $DEST"
-for d in harness .claude/agents .claude/skills .claude/hooks benchmarks bin; do copy_tree "$d"; done
-cp "$SRC/hx" "$DEST/hx"; chmod +x "$DEST/hx" "$DEST"/harness/gates/*.sh "$DEST/bin/sf"; echo "  ✓ hx"
-for f in CLAUDE.md AGENTS.md CHECKPOINTS.md docs/workflow.md docs/security-model.md; do
-  if [ "$FORCE" -eq 1 ] || [ ! -e "$DEST/$f" ]; then mkdir -p "$(dirname "$DEST/$f")"; cp "$SRC/$f" "$DEST/$f"; echo "  ✓ $f"
-  else echo "  · $f (ya existe: revisa y fusiona a mano con el del harness)"; fi
-done
-for f in .claude/settings.json harness.config.json feature_list.json code-analyzer.yml docs/architecture.md \
-         docs/conventions.md progress/current.md progress/history.md CHANGELOG.md jest.config.js .prettierrc \
-         .github/workflows/salesforce-validate.yml; do copy_new "$f"; done
-mkdir -p "$DEST/docs/specs" "$DEST/docs/adr" "$DEST/manifest"
-
+for d in harness .claude/skills .claude/hooks benchmarks bin; do copy_tree "$d"; done
+if [ ! -f "$DEST/.claude/settings.json" ]; then mkdir -p "$DEST/.claude"; cp "$SRC/.claude/settings.json" "$DEST/.claude/settings.json"; echo "  ✓ .claude/settings.json"; fi
 # Migración: los hooks ya no llaman a `python3` directo (en Windows es el stub de la Store y los
 # guardas no se ejecutaban). Ahora pasan por .claude/hooks/run, que busca un Python que funcione.
 # shellcheck disable=SC2016  # los $ son literales del JSON, no deben expandirse
@@ -62,6 +53,19 @@ if [ -f "$DEST/.claude/settings.json" ] && grep -qF 'python3 \"$CLAUDE_PROJECT_D
   echo "  ✓ .claude/settings.json (hooks migrados al lanzador .claude/hooks/run)"
 fi
 
+# Agentes, hooks nuevos en settings.json y .gitignore: sin pisar lo personalizado (harness/lib/upgrade.py).
+HX_SRC="$SRC" HX_DEST="$DEST" sh "$DEST/.claude/hooks/run" ../../harness/lib/upgrade.py \
+  || { echo "  ✗ no se pudo completar la actualización de agentes/hooks (¿Python 3.8+?)" >&2; exit 1; }
+cp "$SRC/hx" "$DEST/hx"; chmod +x "$DEST/hx" "$DEST"/harness/gates/*.sh "$DEST/bin/sf"; echo "  ✓ hx"
+for f in CLAUDE.md AGENTS.md CHECKPOINTS.md docs/workflow.md docs/security-model.md; do
+  if [ "$FORCE" -eq 1 ] || [ ! -e "$DEST/$f" ]; then mkdir -p "$(dirname "$DEST/$f")"; cp "$SRC/$f" "$DEST/$f"; echo "  ✓ $f"
+  else echo "  · $f (ya existe: revisa y fusiona a mano con el del harness)"; fi
+done
+for f in harness.config.json feature_list.json code-analyzer.yml docs/architecture.md \
+         docs/conventions.md progress/current.md progress/history.md CHANGELOG.md jest.config.js .prettierrc \
+         .github/workflows/salesforce-validate.yml; do copy_new "$f"; done
+mkdir -p "$DEST/docs/specs" "$DEST/docs/adr" "$DEST/manifest"
+
 # Finales de línea: los scripts deben ser LF aunque Git (Windows) convierta a CRLF.
 if ! grep -q "hooks/run text eol=lf" "$DEST/.gitattributes" 2>/dev/null; then
   if [ -s "$DEST/.gitattributes" ]; then echo >> "$DEST/.gitattributes"; fi
@@ -69,9 +73,8 @@ if ! grep -q "hooks/run text eol=lf" "$DEST/.gitattributes" 2>/dev/null; then
   echo "  ✓ .gitattributes (scripts del harness siempre en LF)"
 fi
 
-if ! grep -q "^\.harness/run/" "$DEST/.gitignore" 2>/dev/null; then
-  { echo; sed -n '/^# --- Harness/,/^$/p' "$SRC/.gitignore"; echo ".claude/settings.local.json"; } >> "$DEST/.gitignore"
-  echo "  ✓ .gitignore (entradas del harness)"
+if ! grep -qx "\.claude/settings\.local\.json" "$DEST/.gitignore" 2>/dev/null; then
+  echo ".claude/settings.local.json" >> "$DEST/.gitignore"
 fi
 
 cat <<MSG

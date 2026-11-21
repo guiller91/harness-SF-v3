@@ -158,6 +158,12 @@ diseño).
 git clone https://github.com/guiller91/harness-SF-v3.git && ./harness-SF-v3/install.sh /ruta/a/tu-proyecto
 ```
 
+**Para actualizar** el harness en ese proyecto: `git pull` en el harness y
+`./harness-SF-v3/install.sh /ruta/a/tu-proyecto --force`. Se actualiza el motor sin tocar lo tuyo:
+`harness.config.json`, `feature_list.json` y tu estado se quedan como están. Los agentes que hayas
+personalizado se conservan, y la versión nueva queda al lado como `<rol>.md.upstream` para que
+compares. Los hooks nuevos se añaden a tu `.claude/settings.json` sin quitar nada.
+
 ## La CLI
 
 ```
@@ -170,6 +176,7 @@ git clone https://github.com/guiller91/harness-SF-v3.git && ./harness-SF-v3/inst
 ./hx rework <id> --reason …                             ./hx block|unblock <id>
 ./hx metrics           lead time, gates a la primera, rework, bloqueos
 ./hx doctor · ./hx check                                entorno · coherencia interna
+./hx report [ID]        informe de evidencia de la feature (HTML → PDF)
 ./hx watch             centro de control en el navegador (127.0.0.1; --read-only = solo visor)
 ```
 
@@ -188,6 +195,20 @@ git clone https://github.com/guiller91/harness-SF-v3.git && ./harness-SF-v3/inst
   está trabajando: su encargo, qué hace en este momento («despliega en la org», «escribe
   EmailDomainUtils.cls») y, al terminar, el resumen de su informe. A la derecha, la historia contada en
   lenguaje normal. Haz clic en cualquier agente para ver su ficha.
+- **Lo configuras sin tocar ficheros** (pestaña *Configuración*):
+  - **Entornos y orgs**: ves tus orgs de Salesforce, conectas una nueva con login web (la sesión la
+    guarda la CLI de Salesforce, nunca el harness) y eliges cuál es la de desarrollo, cuál la de
+    validación y cuáles están protegidas. Una org de producción queda protegida al conectarla.
+  - **Políticas de calidad**: cobertura mínima, qué tests se ejecutan, severidad que bloquea en el
+    análisis estático, correcciones antes de bloquear y qué tamaños necesitan tu aprobación del diseño.
+  - **Agentes**: descripción, modelo, skills e instrucciones de cada uno.
+  - Cada cambio se previsualiza como diff, pasa `./hx check` (si el harness dejara de ser coherente no
+    se guarda) y queda en un historial con *Deshacer*. **Las guardas no se editan desde aquí.**
+- **Mides** (pestaña *Métricas*): features cerradas, tiempo por fase, comprobaciones a la primera,
+  correcciones, acciones impedidas por las guardas y coste del orquestador lanzado desde el panel.
+- **Entregas evidencia**: `./hx report F-001` (o el botón *Informe de evidencia*) genera un informe
+  imprimible a PDF con lo que se pidió, el diseño, las aprobaciones, los cambios, los gates con su hash,
+  las revisiones, el trabajo de cada agente y lo que impidieron las guardas.
 - **Un robot 3D protagonista** en la frase de «ahora»: toma el color del departamento de quien trabaja,
   hace malabares cuando trabaja, piensa cuando lee, pone cara de susto si una guarda lo frena y celebra
   al cerrar. Modelo «Robot Playground» de Hadrien59 (CC BY 4.0, modificado; ver

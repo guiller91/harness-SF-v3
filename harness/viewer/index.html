@@ -249,6 +249,49 @@ details summary{cursor:pointer;color:var(--muted);font-size:12px;margin:14px 0 8
 .dlg pre.bad{border-color:var(--poppy)} .dlg pre.good{border-color:var(--ok)}
 .toast{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:12px;padding:9px 16px;z-index:70;font-size:12.5px;animation:swap .25s}
 .toast.bad{background:#c22c40}
+/* configuración y métricas */
+.drawer.wide{width:min(780px,100vw)}
+.sec{border:1px solid var(--line);border-radius:15px;margin-bottom:12px;overflow:hidden}
+.sec>summary{list-style:none;cursor:pointer;padding:12px 16px;display:flex;gap:10px;align-items:center;font:600 13.5px var(--sans);margin:0;color:var(--ink)}
+.sec>summary::-webkit-details-marker{display:none}
+.sec>summary::after{content:"▾";margin-left:auto;color:var(--muted);transition:transform .2s}
+.sec[open]>summary::after{transform:rotate(180deg)}
+.sec>summary small{font:400 12px var(--sans);color:var(--muted)}
+.sec .body{padding:2px 16px 16px;display:grid;gap:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;align-items:start}
+.field{display:grid;gap:4px;font-size:12px;color:var(--muted)}
+.field b{color:var(--ink);font-weight:600;font-size:12.5px}
+.field select,.field input[type=number]{font:inherit;color:var(--ink);background:var(--card);border:1px solid #d6d4cf;border-radius:12px;padding:8px 10px;width:100%}
+.checks2{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--ink)}
+.checks2 label{display:flex;gap:5px;align-items:center}
+.acts2{display:flex;gap:8px;justify-content:flex-end;align-items:center}
+.acts2 .hint{margin:0 auto 0 0}
+.otable{width:100%;border-collapse:collapse;font-size:12px}
+.otable th{text-align:left;font:700 10px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:6px 6px;border-bottom:1px solid var(--line)}
+.otable td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.otable tr:last-child td{border-bottom:0}
+.tag{display:inline-block;padding:2px 8px;border-radius:12px;font:700 10px var(--sans);letter-spacing:.04em;text-transform:uppercase;background:var(--soft);color:var(--muted);white-space:nowrap}
+.tag.prod{background:var(--poppy);color:#fff} .tag.sandbox{background:#e2edf7;color:#2c5f91} .tag.scratch{background:#fdf1d6;color:#8a6110} .tag.devhub{background:var(--aqua);color:#2f6b5f}
+.tag.role-dev{background:var(--ink);color:#fff} .tag.role-val{background:#e3f3ec;color:#2f7d5b} .tag.role-prot{background:var(--poppy-l);color:#b5293d}
+.agents{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.agent{border:1px solid var(--line);border-radius:12px;padding:9px 11px;cursor:pointer;display:grid;gap:3px;background:var(--card);text-align:left;font:inherit}
+.agent:hover{border-color:var(--ink)}
+.agent b{font-size:12.5px} .agent span{font-size:11.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.agent i{font-style:normal;font-size:10.5px;color:var(--muted)}
+.dlg.wide{width:min(940px,95vw)}
+.dlg textarea.code{font:12px/1.55 var(--mono);min-height:320px}
+.diff{font:11.5px/1.5 var(--mono);background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px;max-height:46vh;overflow:auto;white-space:pre}
+.diff span{display:block;min-height:1.5em}
+.diff .a{background:#e3f3ec;color:#1f5e43} .diff .d{background:#fddade;color:#8e1f30} .diff .h{color:var(--muted);margin-top:6px}
+.lock{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted)}
+.mkpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.mkpi{background:var(--soft);border-radius:15px;padding:12px 14px}
+.mkpi b{display:block;font:600 22px/1.2 var(--sans);font-variant-numeric:tabular-nums}
+.mkpi span{font-size:11.5px;color:var(--muted)}
+.phbar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--soft);min-width:120px}
+.phbar i{display:block;height:100%}
+.legend{display:flex;gap:12px;font-size:11px;color:var(--muted);margin:6px 0 10px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:1100px){main{grid-template-columns:1fr}.right{display:none}body{overflow:auto}}
 </style>
@@ -297,6 +340,8 @@ details summary{cursor:pointer;color:var(--muted);font-size:12px;margin:14px 0 8
     <button data-tab="orch" class="on">Orquestador</button>
     <button data-tab="feats">Features</button>
     <button data-tab="new">Nueva feature</button>
+    <button data-tab="cfg">Configuración</button>
+    <button data-tab="met">Métricas</button>
     <button class="x" id="ctlClose" aria-label="Cerrar panel">✕</button>
   </div>
   <section class="pane on" id="p-orch">
@@ -321,6 +366,8 @@ details summary{cursor:pointer;color:var(--muted);font-size:12px;margin:14px 0 8
       </div>
     </details>
   </section>
+  <section class="pane" id="p-cfg"><div id="cfgBox"><div class="hint">Cargando configuración…</div></div></section>
+  <section class="pane" id="p-met"><div id="metBox"><div class="hint">Cargando métricas…</div></div></section>
 </div>
 <div id="modal" role="dialog" aria-modal="true"><div class="dlg" id="dlg"></div></div>
 
@@ -475,6 +522,8 @@ function apply(b,anim){
   case"human_action":if(b.rc===0)S.wait=null;
     story(b,"🙋",`Tú, desde el centro de control: <b>${esc(ACTION_ES[b.action]||b.action)}</b> ${esc(b.feature||"")}${b.rc===0?"":"<small>la CLI lo rechazó</small>"}`,"human");break;
   case"console_message":story(b,"💬","Le escribes al orquestador","human");break;
+  case"config_change":story(b,"⚙️",`Cambias la configuración: <b>${esc({environments:"entornos y orgs",policies:"políticas de calidad",agent:"un agente",undo:"deshaces un cambio",protect:"org protegida"}[b.what]||b.what||"")}</b><small>${esc(b.note||b.file||"")}</small>`,"human");break;
+  case"org_login":story(b,b.ok?"🔑":"⚠️",b.ok?`Conectas la org <b>${esc(b.alias)}</b>${b.production?" <small>producción: queda protegida</small>":""}`:`No se completó el login en <b>${esc(b.alias)}</b>`,b.ok?"human":"warn");break;
   case"advance_denied":case"close_denied":story(b,"🚧","Aún no se puede avanzar: faltan requisitos","warn");break;
   }
   if(anim)render(true);
@@ -596,7 +645,7 @@ function showWho(id){
   if(files.length)body+=`<div class="k">Ficheros que ha escrito</div><ul>${files.slice(0,8).map(f=>`<li><code>${esc(f)}</code></li>`).join("")}</ul>`;
   body+=`<div class="k">Lo que ha hecho</div>${h.length?`<ul>${h.slice(0,12).map(x=>`<li><span style="color:var(--muted)">${fmtT(x.t-S.t0)}</span> · ${esc(x.text)}</li>`).join("")}</ul>`:`<div class="hint">Aún no ha participado en esta feature.</div>`}`;
   body+=`<div class="acts"><button id="mCancel">Cerrar</button></div>`;
-  $("#dlg").innerHTML=body;$("#modal").classList.add("on");$("#mCancel").onclick=()=>$("#modal").classList.remove("on");$("#mCancel").focus();
+  $("#dlg").className="dlg";$("#dlg").innerHTML=body;$("#modal").classList.add("on");$("#mCancel").onclick=()=>$("#modal").classList.remove("on");$("#mCancel").focus();
 }
 document.addEventListener("click",e=>{if(e.target.id==="modal")$("#modal").classList.remove("on")});
 
@@ -608,7 +657,7 @@ function makeBeats(evs,f){
   const all=evs.filter(e=>e.at&&!isNaN(Date.parse(e.at))).map(e=>({...e,t:Date.parse(e.at)/1000}));
   const mine=all.filter(e=>e.feature===f);if(!mine.length)return[];
   const t0=Math.min(...mine.map(e=>e.t)),t1=Math.max(...mine.map(e=>e.t));
-  const extra=all.filter(e=>!e.feature&&["guard_block","guard_ask","hook_error","console_message"].includes(e.event)&&e.t>=t0&&e.t<=t1);
+  const extra=all.filter(e=>!e.feature&&["guard_block","guard_ask","hook_error","console_message","config_change","org_login"].includes(e.event)&&e.t>=t0&&e.t<=t1);
   const sorted=mine.concat(extra).sort((a,b)=>a.t-b.t),out=[],open=new Set();
   sorted.forEach(b=>{
     if(b.event==="gate_start")open.add(b.gate);
@@ -776,7 +825,7 @@ function md(s){return esc(s).replace(/`([^`\n]+)`/g,"<code>$1</code>").replace(/
 function sizeDrawer(){const d=$("#ctl");d.style.setProperty("--top",$("header").offsetHeight+"px");d.style.setProperty("--bot",$("footer").offsetHeight+"px")}
 function openCtl(tab){CTL.open=true;sizeDrawer();$("#ctl").classList.add("open");$("#ctl").setAttribute("aria-hidden","false");$("#btnCtl").classList.add("on");if(tab)showTab(tab);pollOrch()}
 function closeCtl(){CTL.open=false;$("#ctl").classList.remove("open");$("#ctl").setAttribute("aria-hidden","true");$("#btnCtl").classList.remove("on")}
-function showTab(t){CTL.tab=t;document.querySelectorAll(".tabs [data-tab]").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("on",p.id==="p-"+t));if(t==="orch")setTimeout(()=>$("#oMsg").focus(),50)}
+function showTab(t){CTL.tab=t;$("#ctl").classList.toggle("wide",t==="cfg"||t==="met");if(t==="cfg")loadCfg();if(t==="met")loadMetrics();document.querySelectorAll(".tabs [data-tab]").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("on",p.id==="p-"+t));if(t==="orch")setTimeout(()=>$("#oMsg").focus(),50)}
 
 /* estado y tareas pendientes */
 async function pollState(){
@@ -798,6 +847,7 @@ function renderState(){
   wrap.innerHTML=(s.active?`<div class="hint">Proyecto ${esc(s.project||"")} · org <b>${esc(s.org||"")}</b></div>`:"")+fs.map(f=>{
     const act=f.id===s.active,pend=s.pending.filter(p=>p.id===f.id),btn=[];
     pend.forEach(p=>btn.push(`<button class="go" data-a="${p.action}" data-id="${f.id}" data-k="${p.kind}">${esc(p.label.replace(" "+f.id,""))}</button>`));
+    if(!["draft","approved"].includes(f.status))btn.push(`<button data-rep="${f.id}">Informe de evidencia</button>`);
     if(["verify","release"].includes(f.status))btn.push(`<button data-a="rework" data-id="${f.id}">Rework</button>`);
     if(f.status==="release")btn.push(`<button data-a="reverify" data-id="${f.id}">Reverify</button>`);
     if(!["done","blocked"].includes(f.status))btn.push(`<button class="danger" data-a="block" data-id="${f.id}">Bloquear</button>`);
@@ -806,6 +856,7 @@ function renderState(){
       ${act&&s.next?`<div class="next">Siguiente: ${md(s.next)}</div>`:""}
       ${btn.length?`<div class="row">${btn.join("")}</div>`:""}</div>`}).join("");
   wrap.querySelectorAll("button[data-a]").forEach(b=>b.onclick=()=>doAction(b.dataset.a,b.dataset.id,b.dataset.k));
+  wrap.querySelectorAll("button[data-rep]").forEach(b=>b.onclick=()=>openReport(b.dataset.rep));
 }
 
 /* acciones humanas */
@@ -827,7 +878,7 @@ function doAction(action,id,kind){
   if(action==="unblock")body+=`<label style="display:flex;gap:6px;margin-top:10px;font-size:12px;color:var(--muted)"><input type="checkbox" id="mReset"> Poner a cero los ciclos de rework</label>`;
   const notify=CTL.orch.available&&CTL.orch.session;
   body+=`<div id="mOut"></div><div class="acts">${notify?`<label><input type="checkbox" id="mNotify" checked> Avisar al orquestador para que siga</label>`:""}<button id="mCancel">Cancelar</button><button id="mGo" class="${action==="block"?"danger":"go"}">${gate?"Confirmo: ":""}${esc(VERB[action])}</button></div>`;
-  $("#dlg").innerHTML=body;$("#modal").classList.add("on");
+  $("#dlg").className="dlg";$("#dlg").innerHTML=body;$("#modal").classList.add("on");
   $("#mCancel").onclick=()=>$("#modal").classList.remove("on");
   $("#mGo").onclick=async()=>{
     const payload={action,id};
@@ -899,12 +950,161 @@ async function initCtl(){
     if(r.rc===0){toast("Borrador registrado","good");["#fTitle","#fDesc","#fAc","#fOut"].forEach(x=>$(x).value="");await pollState();showTab("feats")}
     else{$("#dlg").innerHTML=`<h3>No se pudo registrar</h3><pre class="bad">${esc(r.output)}</pre><div class="acts"><button id="mCancel">Cerrar</button></div>`;$("#modal").classList.add("on");$("#mCancel").onclick=()=>$("#modal").classList.remove("on")}
   };
-  addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#modal").classList.contains("on"))$("#modal").classList.remove("on");else if(CTL.open)closeCtl()}});
+  addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#modal").classList.contains("on"))closeDlg();else if(CTL.open)closeCtl()}});
   addEventListener("resize",sizeDrawer);
   CTL.timer=setInterval(pollState,2000);
   CTL.otimer=setInterval(()=>{if(CTL.open||CTL.orch.running)pollOrch()},1000);
   pollOrch();
   return true;
+}
+
+
+/* ---------- configuración ---------- */
+const CFG={data:null,orgs:null,loginJob:null};
+const DEPT_OF={orchestrator:"Dirección",design:"Análisis",build:"Desarrollo",review:"Calidad",release:"Entrega"};
+const SEV_ES={1:"1 · solo críticas",2:"2 · críticas y altas",3:"3 · hasta moderadas (recomendado)",4:"4 · hasta bajas",5:"5 · todo, incluidas informativas"};
+const LEVEL_ES={RunSpecifiedTests:"Solo los tests de la feature (más rápido)",RunLocalTests:"Todos los tests locales (recomendado)",RunAllTestsInOrg:"Todos, también los de paquetes (lento)"};
+function diffHtml(d){return d.split("\n").map(l=>`<span class="${l.startsWith("+")&&!l.startsWith("+++")?"a":l.startsWith("-")&&!l.startsWith("---")?"d":l.startsWith("@@")?"h":""}">${esc(l)||" "}</span>`).join("")}
+function dialog(html,wide){$("#dlg").className="dlg"+(wide?" wide":"");$("#dlg").innerHTML=html;$("#modal").classList.add("on");const c=$("#dlg").querySelector("[data-close]");if(c)c.onclick=closeDlg}
+function closeDlg(){$("#modal").classList.remove("on");$("#dlg").className="dlg"}
+/* Previsualiza el diff y, si el humano confirma, guarda (con ./hx check y deshacer automático). */
+async function previewSave(endpoint,payload,title,after){
+  let r;try{r=await api(endpoint,{...payload,preview:true})}catch(e){r={rc:9,output:String(e)}}
+  if(r.rc!==0){toast(r.output,"bad");return}
+  if(!r.diff){toast("No hay cambios que guardar");return}
+  dialog(`<h3>${esc(title)}</h3><div class="sub">Esto es lo que cambiará. Al guardar se pasa <code>./hx check</code>; si el harness dejara de ser coherente, no se guarda nada.</div>
+    <div class="diff">${diffHtml(r.diff)}</div><div id="mOut"></div><div class="acts"><button data-close>Cancelar</button><button id="mGo" class="go">Guardar</button></div>`,true);
+  $("#mGo").onclick=async()=>{$("#mGo").disabled=true;$("#mGo").textContent="Guardando…";
+    let s;try{s=await api(endpoint,payload)}catch(e){s={rc:9,output:String(e)}}
+    if(s.rc===0){closeDlg();toast(s.output||"Guardado","good");await loadCfg();after&&after()}
+    else{$("#mOut").innerHTML=`<pre class="bad">${esc(s.output)}</pre>`;$("#mGo").disabled=false;$("#mGo").textContent="Reintentar"}};
+}
+async function loadCfg(){
+  try{CFG.data=await api("/api/config")}catch(e){$("#cfgBox").innerHTML=`<div class="hint">No pude leer la configuración: ${esc(e)}</div>`;return}
+  renderCfg();if(!CFG.orgs)loadOrgs();
+}
+async function loadOrgs(){
+  $("#orgTable")&&($("#orgTable").innerHTML=`<tr><td class="hint"><span class="spin"></span> Consultando <code>sf org list</code>…</td></tr>`);
+  try{CFG.orgs=await api("/api/orgs")}catch(e){CFG.orgs={orgs:[],error:String(e)}}
+  renderOrgs();
+}
+function opened(id){const d=document.getElementById(id);return d?d.open:id==="secEnv"}
+function renderCfg(){
+  const d=CFG.data,env=d.environments,pol=d.policies,keep={secEnv:opened("secEnv"),secPol:opened("secPol"),secAg:opened("secAg"),secHist:opened("secHist")};
+  const byClass={};d.agents.forEach(a=>(byClass[a.class||"orchestrator"]=byClass[a.class||"orchestrator"]||[]).push(a));
+  $("#cfgBox").innerHTML=`
+  <details class="sec" id="secEnv" ${keep.secEnv?"open":""}><summary>🌐 Entornos y orgs <small>dónde puede trabajar cada agente</small></summary><div class="body">
+    <div class="lock">🔒<div>Los agentes <b>solo escriben en la org de desarrollo</b>. En la de validación solo hacen comprobaciones sin cambios (<code>deploy validate</code>). Las <b>protegidas</b> (producción) no se tocan nunca: ni leer. Lo aplican las guardas en cada comando.</div></div>
+    <table class="otable" id="orgTable"></table>
+    <div class="acts2"><span class="hint">Las credenciales las guarda la CLI de Salesforce; el harness nunca las ve.</span><button id="orgRefresh">Actualizar</button><button id="orgLogin" class="primary">Conectar una org</button></div>
+    <div class="grid2">
+      <label class="field"><b>Tipo de org de desarrollo</b><select id="eModel"><option value="scratch">Scratch orgs (desechables)</option><option value="sandbox">Sandbox</option></select></label>
+      <label class="field"><b>Org de desarrollo</b> (escriben los agentes)<input type="text" id="eTarget" list="orgAliases" value="${esc(env.target)}"></label>
+      <label class="field"><b>Org de validación</b> (solo comprobaciones)<input type="text" id="eVal" list="orgAliases" value="${esc(env.validation)}" placeholder="la misma de desarrollo"></label>
+      <label class="field"><b>DevHub</b> (crea scratch orgs)<input type="text" id="eHub" list="orgAliases" value="${esc(env.devhub)}"></label>
+    </div>
+    <label class="field"><b>Alias protegidos</b> (producción u orgs del cliente; separados por comas)<input type="text" id="eProt" value="${esc(env.protected.join(", "))}"></label>
+    <datalist id="orgAliases"></datalist>
+    <div class="acts2"><button id="envSave" class="primary">Revisar y guardar</button></div>
+  </div></details>
+  <details class="sec" id="secPol" ${keep.secPol?"open":""}><summary>✅ Políticas de calidad <small>umbrales que deciden si algo pasa</small></summary><div class="body">
+    <div class="grid2">
+      <label class="field"><b>Cobertura mínima por clase</b><input type="number" id="pCov" min="75" max="100" value="${pol.coverage}"></label>
+      <label class="field"><b>Tests Apex que se ejecutan</b><select id="pLevel">${d.choices.testLevels.map(l=>`<option value="${l}" ${l===pol.testLevel?"selected":""}>${esc(LEVEL_ES[l]||l)}</option>`).join("")}</select></label>
+      <label class="field"><b>Severidad que bloquea en el análisis estático</b><select id="pSev">${[1,2,3,4,5].map(n=>`<option value="${n}" ${n===pol.severity?"selected":""}>${SEV_ES[n]}</option>`).join("")}</select></label>
+      <label class="field"><b>Correcciones (rework) antes de bloquear</b><input type="number" id="pRew" min="1" max="10" value="${pol.maxRework}"></label>
+    </div>
+    <div class="field"><b>Tamaños que necesitan tu aprobación del diseño</b><div class="checks2">${d.choices.sizes.map(z=>`<label><input type="checkbox" class="pDes" value="${z}" ${pol.designApproval.includes(z)?"checked":""}> ${z}</label>`).join("")}</div></div>
+    <div class="acts2"><button id="polSave" class="primary">Revisar y guardar</button></div>
+  </div></details>
+  <details class="sec" id="secAg" ${keep.secAg?"open":""}><summary>🤖 Agentes <small>${d.agents.length} · qué hace cada uno y cómo</small></summary><div class="body">
+    ${["orchestrator","design","build","review","release"].filter(k=>byClass[k]).map(k=>`<div><p class="eyebrow" style="margin-bottom:6px">${DEPT_OF[k]}</p><div class="agents">${byClass[k].map(a=>`<button class="agent" data-ag="${esc(a.name)}"><b>${esc(roleInfo(a.name).name||a.name)}</b><span>${esc(a.description)}</span><i>${esc(a.model)} · ${a.skills.length} skills</i></button>`).join("")}</div></div>`).join("")}
+  </div></details>
+  <details class="sec" id="secGuard"><summary>🛡️ Guardas <small>no se editan desde aquí</small></summary><div class="body">
+    <div class="lock">🔒<div>Las guardas son la frontera de seguridad: deciden qué puede hacer cada agente en cada momento. Si se pudieran cambiar con un clic, la evidencia dejaría de valer. Se cambian en <code>.claude/hooks/</code> por git y con revisión, y <code>./hx check</code> comprueba que están bien conectadas.</div></div>
+  </div></details>
+  <details class="sec" id="secHist" ${keep.secHist?"open":""}><summary>🕘 Historial de cambios <small>${d.history.length}</small></summary><div class="body">
+    ${d.history.length?`<table class="otable"><tr><th>Cuándo</th><th>Qué</th><th>Fichero</th><th></th></tr>${d.history.map(h=>`<tr><td>${esc(new Date(h.at).toLocaleString("es-ES"))}</td><td>${esc({environments:"Entornos",policies:"Políticas",agent:"Agente",undo:"Deshacer",protect:"Protección automática"}[h.kind]||h.kind)}${h.note?` <span class="hint">${esc(h.note)}</span>`:""}</td><td><code>${esc(h.file)}</code></td><td>${h.backup?`<button data-undo="${esc(h.backup)}">Deshacer</button>`:""}</td></tr>`).join("")}</table>`:`<div class="hint">Aún no has cambiado nada desde el panel.</div>`}
+  </div></details>`;
+  $("#eModel").value=env.model;
+  $("#orgRefresh").onclick=()=>{CFG.orgs=null;loadOrgs()};
+  $("#orgLogin").onclick=loginDialog;
+  $("#envSave").onclick=()=>previewSave("/api/config/environments",{model:$("#eModel").value,target:$("#eTarget").value.trim(),validation:$("#eVal").value.trim(),devhub:$("#eHub").value.trim(),protected:$("#eProt").value.split(",").map(x=>x.trim()).filter(Boolean)},"Entornos y orgs");
+  $("#polSave").onclick=()=>previewSave("/api/config/policies",{coverage:+$("#pCov").value,testLevel:$("#pLevel").value,severity:+$("#pSev").value,maxRework:+$("#pRew").value,designApproval:[...document.querySelectorAll(".pDes:checked")].map(x=>x.value)},"Políticas de calidad");
+  document.querySelectorAll("[data-ag]").forEach(b=>b.onclick=()=>editAgent(b.dataset.ag));
+  document.querySelectorAll("[data-undo]").forEach(b=>b.onclick=async()=>{const r=await api("/api/config/undo",{backup:b.dataset.undo});toast(r.output,r.rc?"bad":"good");loadCfg()});
+  renderOrgs();
+}
+function renderOrgs(){
+  const t=$("#orgTable");if(!t)return;const o=CFG.orgs;
+  if(!o){t.innerHTML=`<tr><td class="hint"><span class="spin"></span> Consultando <code>sf org list</code>…</td></tr>`;return}
+  if(o.error&&!o.orgs.length){t.innerHTML=`<tr><td class="hint">${esc(o.error)}</td></tr>`;return}
+  const env=CFG.data.environments,prot=env.protected.map(x=>x.toLowerCase());
+  const role=a=>a&&a===env.target?'<span class="tag role-dev">Desarrollo</span>':a&&a===env.validation?'<span class="tag role-val">Validación</span>':a&&prot.includes(a.toLowerCase())?'<span class="tag role-prot">Protegida</span>':a&&a===env.devhub?'<span class="tag devhub">DevHub</span>':"";
+  const KIND={production:["prod","Producción"],sandbox:["sandbox","Sandbox"],scratch:["scratch","Scratch"],devhub:["devhub","DevHub"]};
+  t.innerHTML=`<tr><th>Alias</th><th>Tipo</th><th>Usuario</th><th>Estado</th><th>En el harness</th></tr>`+(o.orgs.length?o.orgs.map(x=>{const k=KIND[x.kind]||["",x.kind];
+    return `<tr><td><b>${esc(x.alias||"—")}</b></td><td><span class="tag ${k[0]}">${k[1]}</span></td><td>${esc(x.username)}</td><td>${esc(x.status||"")}${x.expires?` <span class="hint">caduca ${esc(x.expires)}</span>`:""}</td><td>${role(x.alias)}</td></tr>`}).join(""):`<tr><td colspan="5" class="hint">No hay orgs conectadas todavía. Pulsa «Conectar una org».</td></tr>`);
+  $("#orgAliases").innerHTML=o.orgs.filter(x=>x.alias).map(x=>`<option value="${esc(x.alias)}">`).join("");
+}
+function loginDialog(){
+  dialog(`<h3>Conectar una org de Salesforce</h3><div class="sub">Se abrirá Salesforce en tu navegador para iniciar sesión. La sesión la guarda la CLI de Salesforce en tu máquina.</div>
+    <div class="grid2"><label class="field"><b>Alias</b> (cómo la llamará el harness)<input type="text" id="lAlias" placeholder="sit, uat, prod…"></label>
+    <label class="field"><b>Tipo</b><select id="lKind"><option value="sandbox">Sandbox (test.salesforce.com)</option><option value="production">Producción o Developer Edition (login.salesforce.com)</option><option value="mydomain">Mi dominio (URL propia)</option></select></label></div>
+    <label class="field" id="lUrlBox" hidden><b>URL de My Domain</b><input type="text" id="lUrl" placeholder="https://miempresa--sit.sandbox.my.salesforce.com"></label>
+    <div class="lock" id="lWarn" hidden>🔒<div>Una org de <b>producción</b> quedará <b>protegida</b> automáticamente: ningún agente podrá usarla.</div></div>
+    <div id="mOut"></div><div class="acts"><button data-close>Cancelar</button><button id="mGo" class="go">Abrir Salesforce</button></div>`);
+  const sync=()=>{$("#lUrlBox").hidden=$("#lKind").value!=="mydomain";$("#lWarn").hidden=$("#lKind").value!=="production"};$("#lKind").onchange=sync;sync();
+  $("#mGo").onclick=async()=>{
+    const r=await api("/api/orgs/login",{alias:$("#lAlias").value.trim(),kind:$("#lKind").value,url:$("#lUrl").value.trim()});
+    if(r.rc!==0){$("#mOut").innerHTML=`<pre class="bad">${esc(r.output)}</pre>`;return}
+    $("#mGo").disabled=true;$("#mOut").innerHTML=`<div class="hint"><span class="spin"></span> ${esc(r.output)} Esperando a que termines…</div>`;
+    const poll=setInterval(async()=>{const j=await api(`/api/orgs/login?job=${r.job}`);if(j.state==="running")return;clearInterval(poll);
+      if(j.state==="done"){closeDlg();toast(`Org conectada${j.output?": "+j.output:""}`,"good");CFG.orgs=null;await loadCfg()}
+      else{$("#mOut").innerHTML=`<pre class="bad">${esc(j.output||"No se completó el login.")}</pre>`;$("#mGo").disabled=false}},1500);
+  };
+  setTimeout(()=>$("#lAlias").focus(),30);
+}
+function editAgent(name){
+  const a=CFG.data.agents.find(x=>x.name===name);if(!a)return;
+  dialog(`<h3>${esc(roleInfo(name).name||name)} <span style="font-weight:300;color:var(--muted)">· ${esc(name)}</span></h3>
+    <div class="sub">${esc(DEPT_OF[a.class||"orchestrator"]||"")} · cambia cómo trabaja este agente en todas las features a partir de ahora.</div>
+    <label class="field"><b>Descripción</b> (el orquestador la usa para decidir a quién encarga qué)<textarea id="aDesc" rows="2">${esc(a.description)}</textarea></label>
+    <div class="grid2"><label class="field"><b>Modelo</b><select id="aModel">${["sonnet","opus","haiku","inherit"].map(m=>`<option ${m===a.model?"selected":""}>${m}</option>`).join("")}</select></label>
+    <div class="field"><b>Skills</b> (conocimiento que carga)<div class="checks2">${CFG.data.skills.map(s=>`<label><input type="checkbox" class="aSk" value="${esc(s)}" ${a.skills.includes(s)?"checked":""}> ${esc(s)}</label>`).join("")}</div></div></div>
+    <label class="field"><b>Instrucciones</b><textarea id="aBody" class="code">${esc(a.body)}</textarea></label>
+    <div class="acts"><button data-close>Cancelar</button><button id="mGo" class="go">Revisar cambios</button></div>`,true);
+  $("#mGo").onclick=()=>previewSave("/api/config/agent",{name,description:$("#aDesc").value,model:$("#aModel").value,skills:[...document.querySelectorAll(".aSk:checked")].map(x=>x.value),body:$("#aBody").value},`Agente ${roleInfo(name).name||name}`);
+}
+
+/* ---------- métricas ---------- */
+const PH_COL={design:"#4a8cca",build:"#fcc354",verify:"#ec86a3",release:"#5ab891"};
+async function loadMetrics(){
+  let m;try{m=await api("/api/metrics")}catch(e){$("#metBox").innerHTML=`<div class="hint">No pude leer las métricas.</div>`;return}
+  const rows=m.features,done=rows.filter(r=>r.status==="done"&&r.lead_time_s);
+  const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+  const fp=avg(rows.filter(r=>r.first_pass_gates!=null).map(r=>r.first_pass_gates));
+  const cost=rows.reduce((s,r)=>s+(r.cost?r.cost.usd:0),0)+(m.cost_unassigned?m.cost_unassigned.usd:0);
+  const k=[[done.length,"Features cerradas"],[done.length?fmtDur(avg(done.map(r=>r.lead_time_s))):"—","Tiempo medio de inicio a cierre"],[fp!=null?Math.round(fp)+" %":"—","Comprobaciones bien a la primera"],
+    [done.length?avg(done.map(r=>r.rework_loops)).toFixed(1).replace(".",","):"—","Correcciones por feature"],[m.guard_blocks_total,"Acciones impedidas por las guardas"],[cost?cost.toLocaleString("es-ES",{style:"currency",currency:"USD"}):"—","Coste del orquestador desde el panel"]];
+  const maxLead=Math.max(1,...rows.map(r=>Object.values(r.phase_time_s||{}).reduce((a,b)=>a+b,0)));
+  $("#metBox").innerHTML=`<div class="mkpis">${k.map(x=>`<div class="mkpi"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("")}</div>
+  ${rows.length?`<div class="legend">${Object.entries({design:"Diseño",build:"Desarrollo",verify:"Calidad",release:"Entrega"}).map(([p,n])=>`<span><i style="background:${PH_COL[p]}"></i>${n}</span>`).join("")}</div>
+  <table class="otable"><tr><th>Feature</th><th>Tiempo por fase</th><th>Total</th><th>1ª pasada</th><th>Rework</th><th>Coste</th><th></th></tr>
+  ${rows.map(r=>{const ph=r.phase_time_s||{},tot=Object.values(ph).reduce((a,b)=>a+b,0);
+    return `<tr><td><b>${esc(r.id)}</b> <span class="fst ${r.status}">${esc(STLABEL[r.status]||r.status)}</span><div class="hint" style="margin:2px 0 0">${esc(r.title.slice(0,60))} · ${esc(r.size||"")}</div></td>
+    <td><div class="phbar" title="${Object.entries(ph).map(([p,s])=>`${p}: ${fmtDur(s)}`).join(" · ")}" style="width:${Math.max(8,100*tot/maxLead)}%">${["design","build","verify","release"].map(p=>ph[p]?`<i style="width:${100*ph[p]/tot}%;background:${PH_COL[p]}"></i>`:"").join("")}</div></td>
+    <td>${r.lead_time_s?fmtDur(r.lead_time_s):fmtDur(tot)}</td><td>${r.first_pass_gates!=null?Math.round(r.first_pass_gates)+" %":"—"}</td><td>${r.rework_loops}</td>
+    <td>${r.cost?r.cost.usd.toLocaleString("es-ES",{style:"currency",currency:"USD"}):"—"}</td><td><button data-rep="${esc(r.id)}">Informe</button></td></tr>`}).join("")}</table>`
+  :`<div class="hint">Las métricas aparecen cuando arranca la primera feature.</div>`}
+  <div class="hint" style="margin-top:10px">El coste solo cuenta los turnos del orquestador lanzados desde este panel (lo informa Claude Code); los de la terminal no se ven aquí.</div>`;
+  document.querySelectorAll("[data-rep]").forEach(b=>b.onclick=()=>openReport(b.dataset.rep));
+}
+async function openReport(id){
+  const w=window.open("","_blank");
+  try{const r=await fetch(`/api/report?id=${encodeURIComponent(id)}`,{headers:{"X-HX-Token":CTL.token},cache:"no-store"});
+    const html=await r.text();if(!r.ok)throw new Error(html);
+    const url=URL.createObjectURL(new Blob([html],{type:"text/html"}));if(w)w.location=url;else location.href=url;
+  }catch(e){if(w)w.close();toast(`No pude generar el informe: ${e.message||e}`,"bad")}
 }
 
 /* ---------- marca ---------- */

@@ -30,7 +30,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from . import core
+from . import core, settings
 
 MAX_BODY = 64 * 1024
 ACTIONS = {"propose", "approve", "start", "close", "block", "unblock", "rework", "reverify"}
@@ -316,6 +316,15 @@ class Orchestrator:
                     self.add("tool-error", _short(content, 300))
         elif kind == "result":
             secs = (msg.get("duration_ms") or 0) / 1000
+            usage = msg.get("usage") or {}
+            try:
+                act = core.active_feature()
+            except Exception:  # noqa: BLE001
+                act = None
+            core.log_event("console_run", feature=act["id"] if act else None,
+                           cost_usd=round(float(msg.get("total_cost_usd") or 0), 4), duration_s=round(secs, 1),
+                           turns=msg.get("num_turns"), input_tokens=usage.get("input_tokens"),
+                           output_tokens=usage.get("output_tokens"), ok=not msg.get("is_error"))
             if msg.get("is_error") or msg.get("subtype") not in (None, "success"):
                 self.add("error", _short(msg.get("result") or msg.get("subtype") or "error", 400))
             else:
@@ -355,13 +364,18 @@ def brand_logo(base: Path) -> Optional[Tuple[Path, str]]:
 # --------------------------------------------------------------------------- #
 
 def serve(port: int, read_only: bool, cli_path: Path, plan_for: Callable, next_step: Callable,
-          on_ready: Callable[[str], None]) -> None:
+          on_ready: Callable[[str], None], metrics_fn: Callable[[], Dict[str, Any]] = dict,
+          report_fn: Callable[[str], str] = lambda fid: "") -> None:
     base = core.root()
     viewer = base / "harness" / "viewer" / "index.html"
     events = base / core.EVENTS_FILE
     token = secrets.token_urlsafe(24)
     orch = None if read_only else Orchestrator(base, shutil.which("claude"))
     action_lock = threading.Lock()
+    logins = settings.LoginJobs()
+    planners = {"/api/config/environments": lambda b: (settings.config_path(), *settings.plan_environments(b), "environments"),
+                "/api/config/policies": lambda b: (settings.config_path(), *settings.plan_policies(b), "policies"),
+                "/api/config/agent": lambda b: (*settings.plan_agent(b), "agent")}
 
     class Handler(BaseHTTPRequestHandler):
         server_version = "hx-watch"
@@ -394,6 +408,18 @@ def serve(port: int, read_only: bool, cli_path: Path, plan_for: Callable, next_s
             return secrets.compare_digest(given.encode(), token.encode())
 
         def do_GET(self) -> None:  # noqa: N802
+            try:
+                self._get()
+            except Exception as exc:  # noqa: BLE001 - nunca cortar la conexión sin respuesta
+                self._json(500, {"error": f"{type(exc).__name__}: {exc}"})
+
+        def do_POST(self) -> None:  # noqa: N802
+            try:
+                self._post()
+            except Exception as exc:  # noqa: BLE001
+                self._json(500, {"rc": 9, "output": f"Error interno: {type(exc).__name__}: {exc}"})
+
+        def _get(self) -> None:
             if not self._host_ok():
                 return self._send(403, b"host no permitido", "text/plain; charset=utf-8")
             path, _, query = self.path.partition("?")
@@ -419,12 +445,30 @@ def serve(port: int, read_only: bool, cli_path: Path, plan_for: Callable, next_s
                         return self._json(200, build_state(plan_for, next_step))
                     except Exception as exc:
                         return self._json(500, {"error": str(exc)})
+                if path == "/api/config":
+                    return self._json(200, {**settings.view_config(), "agents": settings.list_agents(),
+                                            "skills": settings.available_skills(), "history": settings.history()})
+                if path == "/api/orgs":
+                    return self._json(200, settings.list_orgs())
+                if path == "/api/orgs/login":
+                    m = re.search(r"(?:^|&)job=(L\d+)", query)
+                    return self._json(200, logins.view(m.group(1) if m else ""))
+                if path == "/api/metrics":
+                    return self._json(200, metrics_fn())
+                if path == "/api/report":
+                    m = re.search(r"(?:^|&)id=(F-\d{1,5})", query)
+                    if not m:
+                        return self._json(400, {"error": "id no válido"})
+                    try:
+                        return self._send(200, report_fn(m.group(1)).encode("utf-8"), "text/html; charset=utf-8")
+                    except core.HarnessError as exc:
+                        return self._json(404, {"error": str(exc)})
                 if path == "/api/orch":
                     m = re.search(r"(?:^|&)since=(\d+)", query)
                     return self._json(200, orch.view(int(m.group(1)) if m else 0))  # type: ignore[union-attr]
             self._send(404, b"no encontrado", "text/plain; charset=utf-8")
 
-        def do_POST(self) -> None:  # noqa: N802
+        def _post(self) -> None:
             if not self._host_ok():
                 return self._send(403, b"host no permitido", "text/plain; charset=utf-8")
             if not self.path.startswith("/api/"):
@@ -449,6 +493,24 @@ def serve(port: int, read_only: bool, cli_path: Path, plan_for: Callable, next_s
                 with action_lock:
                     rc, output = run_action(body, cli_path)
                 return self._json(200, {"rc": rc, "output": output})
+            if self.path in planners:
+                with action_lock:
+                    target, text, err, kind = planners[self.path](body)
+                    if err or target is None or text is None:
+                        return self._json(200, {"rc": 2, "output": err or "No válido."})
+                    old = target.read_text(encoding="utf-8") if target.exists() else ""
+                    if body.get("preview"):
+                        d = settings.diff(old, text, target.relative_to(core.root()).as_posix())
+                        return self._json(200, {"rc": 0, "diff": d, "output": "" if d else "Sin cambios."})
+                    rc, output = settings.write_checked(target, text, kind, cli_path, note=str(body.get("name") or ""))
+                return self._json(200, {"rc": rc, "output": output})
+            if self.path == "/api/config/undo":
+                with action_lock:
+                    rc, output = settings.undo(str(body.get("backup") or ""), cli_path)
+                return self._json(200, {"rc": rc, "output": output})
+            if self.path == "/api/orgs/login":
+                rc, output, job = logins.start(body)
+                return self._json(200, {"rc": rc, "output": output, "job": job})
             if self.path == "/api/orch/send":
                 rc, output = orch.send(str(body.get("message") or ""))
             elif self.path == "/api/orch/stop":

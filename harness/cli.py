@@ -19,7 +19,7 @@ solo si las precondiciones se cumplen con evidencia del árbol de fuente actual.
     ./hx watch                        (visor animado en el navegador)
     ./hx block <id> --reason ... | ./hx unblock <id>
     ./hx close <id>        [HUMANO] cierra la feature (done)
-    ./hx metrics | doctor | check | tree-hash
+    ./hx metrics | report [ID] | doctor | check | tree-hash
 """
 from __future__ import annotations
 
@@ -933,6 +933,38 @@ def _first_pass(items: List[Dict[str, Any]], key: str) -> Optional[float]:
     return round(100.0 * sum(1 for s in first.values() if s == "pass") / len(first), 1)
 
 
+def metrics_payload() -> Dict[str, Any]:
+    features = core.load_features()
+    events = core.read_events()
+    rows = [feature_metrics(f, events) for f in features if f["status"] not in ("draft", "approved")]
+    cost: Dict[str, Dict[str, float]] = {}
+    for e in events:
+        if e.get("event") == "console_run":
+            c = cost.setdefault(e.get("feature") or "-", {"usd": 0.0, "turns": 0, "runs": 0, "seconds": 0.0})
+            c["usd"] += float(e.get("cost_usd") or 0)
+            c["turns"] += int(e.get("turns") or 0)
+            c["runs"] += 1
+            c["seconds"] += float(e.get("duration_s") or 0)
+    for r in rows:
+        r["cost"] = cost.get(r["id"])
+    return {"features": rows, "guard_blocks_total": sum(1 for e in events if e["event"] == "guard_block"),
+            "cost_unassigned": cost.get("-"), "generated_at": core.now()}
+
+
+def cmd_report(args: argparse.Namespace) -> int:
+    from lib import report
+
+    fid = args.id or (core.active_feature() or {}).get("id")
+    if not fid:
+        raise HarnessError("Indica la feature: ./hx report F-001")
+    text = report.build(fid, plan_for, feature_metrics)
+    path = core.spec_dir(fid) / "evidence.html"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    out(f"{OK} Informe de evidencia: {path.relative_to(core.root()).as_posix()}  (ábrelo y «Guardar como PDF»)")
+    return 0
+
+
 def cmd_watch(args: argparse.Namespace) -> int:
     """Centro de control en http://127.0.0.1:<puerto>: visor animado, acciones humanas y chat con el
     orquestador. Con --read-only, solo el visor."""
@@ -953,7 +985,10 @@ def cmd_watch(args: argparse.Namespace) -> int:
         if not args.no_open:
             threading.Timer(0.4, lambda: webbrowser.open(url)).start()
 
-    console.serve(args.port, args.read_only, Path(__file__).resolve(), plan_for, next_step, ready)
+    from lib import report
+
+    console.serve(args.port, args.read_only, Path(__file__).resolve(), plan_for, next_step, ready,
+                  metrics_fn=metrics_payload, report_fn=lambda fid: report.build(fid, plan_for, feature_metrics))
     out("\nCentro de control cerrado.")
     return 0
 
@@ -1284,6 +1319,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("id")
     p.set_defaults(fn=cmd_close)
 
+    p = sub.add_parser("report", help="informe de evidencia de la feature (HTML imprimible a PDF)")
+    p.add_argument("id", nargs="?")
+    p.set_defaults(fn=cmd_report)
     p = sub.add_parser("watch", help="[HUMANO] centro de control en el navegador (http://127.0.0.1:8765)")
     p.add_argument("--port", type=int, default=8765)
     p.add_argument("--read-only", action="store_true", help="solo el visor, sin acciones ni orquestador")

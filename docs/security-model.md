@@ -113,6 +113,23 @@ orquestador. Es la única vía, además de la terminal, para pasar las puertas h
 
 No compartas el enlace con clave ni abras el puerto a la red. `--read-only` sirve solo el visor.
 
+### Configuración desde el panel
+
+La pestaña *Configuración* escribe solo dos tipos de fichero: `harness.config.json` (entornos y
+políticas con valores de una lista cerrada o en un rango) y `.claude/agents/<rol>.md` (descripción,
+modelo, skills e instrucciones; el nombre no se cambia). Cada cambio:
+
+- se previsualiza como diff antes de guardarse;
+- deja una copia del fichero anterior en `.harness/config-history/` y un evento `config_change`;
+- pasa `./hx check`, y si el harness deja de ser coherente se deshace solo;
+- se puede deshacer desde el historial.
+
+Que la org de desarrollo no esté entre las protegidas no lo comprueba solo la interfaz: el guarda
+`protected-org` lo vuelve a comprobar en cada comando. Conectar una org de producción la añade a
+`protectedAliases` automáticamente. El login usa `sf org login web`: las credenciales quedan en la CLI
+de Salesforce y el harness no las ve. **Las guardas (`.claude/hooks/`) no se editan desde el panel**:
+son la frontera de seguridad y cambian por git con revisión.
+
 ### Qué ve el visor de cada agente
 
 Para la oficina del visor, `activity.py` (lecturas, búsquedas, delegaciones, web y conectores) y
