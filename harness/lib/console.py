@@ -461,7 +461,8 @@ def serve(port: int, read_only: bool, cli_path: Path, plan_for: Callable, next_s
                         return self._json(500, {"error": str(exc)})
                 if path == "/api/config":
                     return self._json(200, {**settings.view_config(), "agents": settings.list_agents(),
-                                            "skills": settings.available_skills(), "history": settings.history()})
+                                            "skills": settings.available_skills(), "skillsInfo": settings.skills_info(),
+                                            "history": settings.history()})
                 if path == "/api/orgs":
                     return self._json(200, settings.list_orgs())
                 if path == "/api/orgs/login":

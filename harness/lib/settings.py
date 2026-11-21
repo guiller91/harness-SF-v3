@@ -26,7 +26,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from . import core
 
-ALIAS = re.compile(r"^[A-Za-z0-9_.-]{1,40}$")
+ALIAS = re.compile(r"^[A-Za-z0-9_.](?:[A-Za-z0-9_. -]{0,58}[A-Za-z0-9_.-])?$")  # la CLI admite alias con espacios
+LOGIN_ALIAS = re.compile(r"^[A-Za-z0-9_.][A-Za-z0-9_.-]{0,39}$")  # los alias nuevos, sin espacios: más fáciles de escribir
 MODELS = ("sonnet", "opus", "haiku", "inherit")
 TEST_LEVELS = ("RunSpecifiedTests", "RunLocalTests", "RunAllTestsInOrg")
 SIZES = ("S", "M", "L")
@@ -161,7 +162,7 @@ def plan_environments(body: Dict[str, Any]) -> Tuple[Optional[str], str]:
         return None, "Modelo de org no válido (scratch o sandbox)."
     for name, value in (("desarrollo", target), ("validación", validation), ("DevHub", devhub)):
         if value and not ALIAS.match(value):
-            return None, f"Alias de {name} no válido: solo letras, números, punto, guion y guion bajo."
+            return None, f"Alias de {name} no válido: letras, números, espacios, punto, guion y guion bajo."
     if not target:
         return None, "Falta la org de desarrollo."
     if any(not ALIAS.match(p) for p in protected):
@@ -223,6 +224,15 @@ def available_skills() -> List[str]:
     return sorted(p.parent.name for p in d.glob("*/SKILL.md")) if d.exists() else []
 
 
+def skills_info() -> List[Dict[str, str]]:
+    out = []
+    for name in available_skills():
+        text = (core.root() / ".claude" / "skills" / name / "SKILL.md").read_text(encoding="utf-8", errors="replace")
+        m = re.search(r"^description:\s*(.+)$", text[:2000], re.M)
+        out.append({"name": name, "description": (m.group(1).strip().strip('"') if m else "")[:240]})
+    return out
+
+
 def parse_agent(text: str) -> Dict[str, Any]:
     m = FRONT.match(text)
     front, body = (m.group(1), text[m.end():]) if m else ("", text)
@@ -240,13 +250,16 @@ def parse_agent(text: str) -> Dict[str, Any]:
 
 def list_agents() -> List[Dict[str, Any]]:
     roles = core.load_roles()["roles"]
+    touched = {e.get("file") for e in core.read_events() if e.get("event") == "config_change"}
     out = []
     for path in sorted(agents_dir().glob("*.md")):
         a = parse_agent(path.read_text(encoding="utf-8"))
         spec = roles.get(path.stem, {})
         out.append({"name": path.stem, "description": a["description"], "model": a["model"], "skills": a["skills"],
                     "class": spec.get("class", "orchestrator" if path.stem == "orchestrator" else ""),
-                    "body": a["body"]})
+                    "body": a["body"], "lines": a["body"].count("\n"),
+                    "customized": f".claude/agents/{path.name}" in touched,
+                    "upstream": (path.parent / f"{path.name}.upstream").exists()})
     return out
 
 
@@ -331,8 +344,13 @@ def list_orgs() -> Dict[str, Any]:
             user = o.get("username")
             if not user or user in seen:
                 continue
+            raw = str(o.get("connectedStatus") or o.get("status") or "")
+            low = raw.lower()
+            health = "ok" if low in ("connected", "active") else \
+                "expired" if ("expired" in low or "refresh token" in low or "invalid_grant" in low) else \
+                "unknown" if not raw else "error"
             seen[user] = {"alias": o.get("alias") or "", "username": user, "instanceUrl": o.get("instanceUrl") or "",
-                          "kind": _kind(o), "status": o.get("connectedStatus") or o.get("status") or "",
+                          "kind": _kind(o), "status": raw[:400], "health": health,
                           "expires": o.get("expirationDate") or ""}
     return {"available": True, "orgs": sorted(seen.values(), key=lambda x: (x["alias"] == "", x["alias"].lower())),
             "error": ""}
@@ -351,8 +369,8 @@ class LoginJobs:
             return 3, "No encuentro la CLI `sf` en esta máquina.", None
         alias = str(body.get("alias") or "").strip()
         kind = body.get("kind")
-        if not ALIAS.match(alias):
-            return 2, "Alias no válido: solo letras, números, punto, guion y guion bajo.", None
+        if not LOGIN_ALIAS.match(alias):
+            return 2, "Alias no válido: sin espacios; solo letras, números, punto, guion y guion bajo.", None
         if kind in LOGIN_URLS:
             url = LOGIN_URLS[kind]
         elif kind == "mydomain":

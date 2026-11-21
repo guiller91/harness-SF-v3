@@ -316,7 +316,10 @@ body.app:not(.live) header .grp .liveonly{display:none}
 .side-foot{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);display:grid;gap:4px}
 .side-foot .row{display:flex;align-items:center;gap:6px}
 .pg{overflow:auto;padding:24px 30px 40px}
-.pg-inner{max-width:1240px;width:100%;margin:0 auto;display:grid;gap:18px;align-content:start}
+.pg-inner{max-width:1240px;width:100%;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-content:start}
+.pg-inner>*{min-width:0}
+.box{overflow-x:auto}
+#cfgBox,#metBox{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
 .pg-title{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
 .pg-title h1{margin:0;font:300 26px/1.2 var(--sans)}
 .pg-title h1 b{font-weight:600}
@@ -388,8 +391,166 @@ body.app:not(.live) header .grp .liveonly{display:none}
 .crow .bar i{display:block;height:100%}
 .crow .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:1100px){.cols.c2,.cols.c3,.fsplit,.orchpage,.agent-editor{grid-template-columns:1fr}}
+/* ---------- componentes de configuración ---------- */
+.tb-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tb-head input[type=search],#protAdd{font:inherit;border:1px solid #d6d4cf;border-radius:12px;padding:8px 12px;min-width:220px;background:var(--card);color:var(--ink)}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px}
+.otable.orgs{table-layout:fixed;min-width:640px}
+.otable.orgs td{vertical-align:middle}
+.otable.orgs tr.has-role td{background:#fcfbfa}
+.oname{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ouser{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.health{display:inline-flex;align-items:center;gap:6px;font:600 11.5px var(--sans);padding:3px 9px;border-radius:12px;background:var(--soft);color:var(--muted);white-space:nowrap;cursor:help}
+.health::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.health.ok{background:#e3f3ec;color:#2f7d5b} .health.warn{background:#fdf1d6;color:#8a6110} .health.bad{background:#fddade;color:#b5293d}
+.relog{font-size:11.5px;margin-top:3px}
+.rolesel{width:100%;font:500 12.5px var(--sans);border-radius:12px;padding:6px 8px;border:1px solid #d6d4cf;background:var(--card);color:var(--ink)}
+.rolesel.r-dev{background:var(--ink);color:#fff;border-color:var(--ink)}
+.rolesel.r-val{background:#e3f3ec;border-color:#bfe3d3;color:#2f7d5b}
+.rolesel.r-prot{background:var(--poppy-l);border-color:var(--poppy-m);color:#b5293d}
+.rolesel.r-hub{background:var(--aqua);border-color:#b8d9d2;color:#2f6b5f}
+.envsum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.etile{background:var(--card);border-radius:15px;box-shadow:var(--shadow);padding:14px 16px;display:grid;gap:2px;min-width:0}
+.etile span{font:700 10.5px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.etile b{font:600 18px/1.3 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.etile i{font-style:normal;font-size:12px;color:var(--muted)}
+.warnrow{background:#fff8ea;border-color:#f6dc9e}
+.warnrow .ic{background:#fcc354;color:var(--ink);font-weight:700}
+#envWarn{display:grid;gap:10px}
+#envWarn:empty{display:none}
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.seg.col{grid-template-columns:1fr}
+.seg button{text-align:left;border-radius:12px;padding:10px 12px;display:grid;gap:2px;background:var(--card);border:1px solid #d6d4cf}
+.seg button b{font-weight:600} .seg button span{font-size:12px;color:var(--muted);font-weight:400}
+.seg button.on{border-color:var(--poppy);background:#fff7f8;box-shadow:0 0 0 3px rgba(248,72,94,.12)}
+.seg.mini2{display:flex;gap:4px;background:var(--soft);border-radius:12px;padding:3px}
+.seg.mini2 button{border:0;background:none;padding:5px 12px;font-size:12.5px}
+.seg.mini2 button.on{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tagx{display:inline-flex;align-items:center;gap:4px;background:var(--poppy-l);color:#b5293d;border-radius:12px;padding:3px 4px 3px 10px;font:600 12px var(--sans)}
+.tagx button{border:0;background:none;color:inherit;padding:0 6px;font-size:15px;line-height:1}
+.savebar{position:sticky;bottom:-40px;margin-top:4px;display:none;align-items:center;gap:10px;flex-wrap:wrap;background:var(--ink);color:#fff;border-radius:15px;padding:12px 16px;box-shadow:0 12px 30px -10px rgba(0,0,0,.4)}
+.savebar.on{display:flex}
+.savebar button:not(.primary){background:transparent;color:#fff;border-color:#77756f}
+/* ---------- agentes ---------- */
+.dept-sec{display:grid;gap:12px}
+.dept-h{display:flex;align-items:center;gap:10px}
+.dept-h h2{margin:0;font:600 16px var(--sans)}
+.dot2{width:12px;height:12px;border-radius:4px;background:var(--c);border:1px solid rgba(60,60,58,.25)}
+.c-orch .dot2{background:var(--ink)}
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.acard{position:relative;text-align:left;font:inherit;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:16px;display:grid;gap:10px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;overflow:hidden}
+.acard::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--c)}
+.acard.c-orch::before{background:var(--ink)}
+.acard:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:#cfcdc8}
+.acard-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.acard .avatar{width:50px;height:50px}
+.acard .avatar svg{width:38px;height:38px}
+.acard-n{display:grid;min-width:0;flex:1}
+.acard-n b{font:600 14.5px var(--sans)} .acard-n span{font-size:11.5px;color:var(--muted)}
+.acard p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;height:4.5em}
+.acard-f{display:flex;flex-wrap:wrap;gap:6px;align-items:center;align-self:end}
+.badge2{display:inline-block;font:700 10px var(--sans);letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:12px;background:var(--ink);color:#fff}
+.badge2.soft{background:var(--soft);color:var(--muted)} .badge2.up{background:var(--poppy);color:#fff;text-transform:none;letter-spacing:0;font-weight:600}
+.mpill{font:600 11px var(--sans);padding:3px 9px;border-radius:12px;background:var(--soft);border:1px solid var(--line)}
+.mpill.m-opus{background:#efe3f6;border-color:#d9c1ea;color:#63238c} .mpill.m-haiku{background:var(--aqua);border-color:#b8d9d2;color:#2f6b5f} .mpill.m-sonnet{background:#e2edf7;border-color:#c3d8ec;color:#2c5f91}
+.skp{font-size:11px;padding:3px 8px;border-radius:12px;background:var(--soft);color:var(--muted)}
+.ahero{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--card);border-radius:15px;box-shadow:var(--shadow);padding:18px 22px;position:relative;overflow:hidden}
+.ahero::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--c)}
+.ahero.c-orch::before{background:var(--ink)}
+.ahero h1{margin:2px 0 8px;font:600 24px var(--sans)}
+.ahero-t{min-width:0}
+.avatar.big{width:84px;height:84px}
+.avatar.big svg{width:64px;height:64px}
+.skgrid{display:grid;gap:8px}
+.skcard{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s}
+.skcard:has(input:checked){border-color:var(--poppy-m);background:#fff7f8}
+.skcard input{margin-top:3px;accent-color:var(--poppy)}
+.skcard b{display:block;font-size:12.5px} .skcard i{display:block;font-style:normal;font-size:11.5px;color:var(--muted);line-height:1.45}
+.counter{font-size:11.5px;color:var(--muted);text-align:right;margin-top:6px}
+.ins{display:grid;grid-template-rows:auto 1fr auto;gap:10px}
+.ins textarea.code,.mdprev{min-height:66vh}
+.mdprev{border:1px solid var(--line);border-radius:12px;padding:14px 18px;overflow:auto;max-height:66vh;font-size:13px;line-height:1.6}
+.mdprev h3,.mdprev h4,.mdprev h5{margin:14px 0 6px} .mdprev pre{background:var(--soft);border-radius:10px;padding:10px;white-space:pre-wrap;font:12px var(--mono)} .mdprev p{margin:6px 0}
+.agent-editor{grid-template-columns:380px minmax(0,1fr)!important}
+/* ---------- responsive ---------- */
+@media (max-width:1280px){
+  .envsum{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .agent-editor{grid-template-columns:320px minmax(0,1fr)!important}
+  .pg{padding:20px 22px 36px}
+}
+@media (max-width:1100px){
+  #pg-live.on{grid-template-rows:auto}
+  #pg-live main{height:auto}
+  .left,.right{grid-template-rows:none!important;grid-auto-rows:auto;min-height:auto}
+  .desk{grid-template-rows:auto auto auto}
+  .workers{overflow:visible}
+  .story .items{max-height:360px}
+  body{overflow:auto;min-height:0}
+  main{grid-template-columns:minmax(0,1fr)!important;overflow:visible}
+  .right{display:grid!important;grid-template-rows:auto auto}
+  .story{max-height:420px}
+  .cols.c2,.cols.c3,.fsplit,.orchpage,.agent-editor{grid-template-columns:minmax(0,1fr)!important}
+  .flist{position:static}
+  .orchpage{height:auto}
+  .orchpage .chatbox{min-height:70vh}
+  .ins textarea.code,.mdprev{min-height:50vh}
+}
+@media (max-width:900px){
+  html,body{height:auto}
+  body{grid-template-rows:auto auto auto;min-height:100vh}
+  #shell,#view{overflow:visible}
+  body.live footer{position:sticky;bottom:0;z-index:15;box-shadow:0 -8px 24px -12px rgba(60,60,58,.25)}
+  body.app #shell{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+  body.app #side{flex-direction:row;align-items:center;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px 10px;gap:4px;position:sticky;top:0;z-index:20}
+  body.app #side .side-proj,body.app #side .side-foot,body.app #side .nav-h{display:none}
+  .nav{width:auto;white-space:nowrap;padding:8px 12px}
+  #view,.page,.pg{overflow:visible}
+  #pg-live main{padding:12px}
+  .mkpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .journey{margin:4px 0 0}
+  .step .name{font-size:11px}
+  .bot3d{width:110px;height:130px;margin:-20px -6px -20px -10px}
+  .nowbar .txt{font-size:16px!important}
+  header{gap:8px 12px;padding:8px 12px}
+  header .grp{flex-wrap:wrap}
+  footer{grid-template-columns:1fr;gap:8px}
+  .pos{text-align:left;min-width:0}
+  .dlg{padding:18px!important;border-radius:20px}
+}
+@media (max-width:600px){
+  .tb-head h2{flex:1 1 100%}
+  .tb-head input[type=search]{flex:1 1 100%;order:5}
+  .otable.orgs{min-width:0;table-layout:auto}
+  .otable.orgs colgroup,.otable.orgs tr:first-child{display:none}
+  .otable.orgs,.otable.orgs tbody{display:block}
+  .otable.orgs tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .otable.orgs td{display:block;padding:0;border:0}
+  .otable.orgs td:nth-child(1){grid-column:1/-1}
+  .otable.orgs td:nth-child(4){grid-column:1/-1}
+  .tscroll{overflow:visible;margin:0;padding:0}
+  .warnrow .t{flex:1 1 100%}
+  .pg{padding:16px 12px 32px}
+  .pg-title h1{font-size:21px}
+  .envsum,.mkpis{grid-template-columns:minmax(0,1fr)}
+  .hero h2{font-size:19px}
+  .step .ball{width:28px;height:28px;font-size:11px}
+  .step .dur{display:none}
+  .journey::before,.journey .bar{top:13px}
+  .nowbar{flex-wrap:wrap}
+  .bot3d{display:none!important}
+  .nowbar.has3d .ico{display:block!important}
+  .workers{grid-template-columns:minmax(0,1fr)}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .kpi{border-right:0;padding:6px}
+  .act-row{flex-wrap:wrap}
+  .crow{grid-template-columns:minmax(0,1fr) 70px}
+  .crow .bar{grid-column:1/-1;order:3}
+  .msg{max-width:92%}
+  #todo .todo span:nth-of-type(2){display:none}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-@media (max-width:1100px){main{grid-template-columns:1fr}.right{display:none}body{overflow:auto}}
+
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
 </head>
@@ -1213,13 +1374,13 @@ async function previewSave(endpoint,payload,title,after){
     <div class="diff">${diffHtml(r.diff)}</div><div id="mOut"></div><div class="acts"><button data-close>Cancelar</button><button id="mGo" class="go">Guardar</button></div>`,true);
   $("#mGo").onclick=async()=>{$("#mGo").disabled=true;$("#mGo").textContent="Guardando…";
     let s;try{s=await api(endpoint,payload)}catch(e){s={rc:9,output:String(e)}}
-    if(s.rc===0){closeDlg();toast(s.output||"Guardado","good");await loadCfg();after&&after()}
+    if(s.rc===0){closeDlg();toast(s.output||"Guardado","good");after&&after();await loadCfg()}
     else{$("#mOut").innerHTML=`<pre class="bad">${esc(s.output)}</pre>`;$("#mGo").disabled=false;$("#mGo").textContent="Reintentar"}};
 }
 async function loadOrgs(){
   $("#orgTable")&&($("#orgTable").innerHTML=`<tr><td class="hint"><span class="spin"></span> Consultando <code>sf org list</code>…</td></tr>`);
   try{CFG.orgs=await api("/api/orgs")}catch(e){CFG.orgs={orgs:[],error:String(e)}}
-  renderOrgs();
+  renderEnv();
 }
 const CFG_TABS=[["entornos","🌐 Entornos y orgs"],["politicas","✅ Políticas de calidad"],["agentes","🤖 Agentes"],["historial","🕘 Historial"],["guardas","🛡️ Guardas"]];
 async function loadCfg(){
@@ -1232,28 +1393,7 @@ function renderCfg(){
   $("#cfgNav").querySelectorAll("[data-ct]").forEach(b=>b.onclick=()=>go(`#/configuracion/${b.dataset.ct}`));
   const env=d.environments,pol=d.policies,box=$("#cfgBox");
   if(tab==="entornos"){
-    box.innerHTML=`<div class="cols c2" style="align-items:start">
-      <div class="box"><h2>Orgs conectadas<span class="sp"></span><button id="orgRefresh">Actualizar</button><button id="orgLogin" class="primary">Conectar una org</button></h2>
-        <table class="otable" id="orgTable"></table>
-        <div class="hint" style="margin:10px 0 0">Las credenciales las guarda la CLI de Salesforce en tu máquina; el harness nunca las ve.</div></div>
-      <div class="box"><h2>Qué puede hacer cada agente</h2>
-        <div class="lock">🔒<div>Los agentes <b>solo escriben en la org de desarrollo</b>. En la de validación solo hacen comprobaciones sin cambios (<code>deploy validate</code>). Las <b>protegidas</b> (producción, orgs del cliente) no se tocan nunca, ni para leer. Lo aplican las guardas en cada comando.</div></div></div>
-    </div>
-    <div class="box"><h2>Asignación de entornos</h2>
-      <div class="grid2">
-        <label class="field"><b>Tipo de org de desarrollo</b><select id="eModel"><option value="scratch">Scratch orgs (desechables)</option><option value="sandbox">Sandbox</option></select></label>
-        <label class="field"><b>Org de desarrollo</b> (escriben los agentes)<input type="text" id="eTarget" list="orgAliases" value="${esc(env.target)}"></label>
-        <label class="field"><b>Org de validación</b> (solo comprobaciones)<input type="text" id="eVal" list="orgAliases" value="${esc(env.validation)}" placeholder="la misma de desarrollo"></label>
-        <label class="field"><b>DevHub</b> (crea scratch orgs)<input type="text" id="eHub" list="orgAliases" value="${esc(env.devhub)}"></label>
-      </div>
-      <label class="field" style="margin-top:10px"><b>Alias protegidos</b> (producción u orgs del cliente; separados por comas)<input type="text" id="eProt" value="${esc(env.protected.join(", "))}"></label>
-      <datalist id="orgAliases"></datalist>
-      <div class="acts2" style="margin-top:12px"><button id="envSave" class="primary">Revisar y guardar</button></div></div>`;
-    $("#eModel").value=env.model;
-    $("#orgRefresh").onclick=()=>{CFG.orgs=null;loadOrgs()};
-    $("#orgLogin").onclick=loginDialog;
-    $("#envSave").onclick=()=>previewSave("/api/config/environments",{model:$("#eModel").value,target:$("#eTarget").value.trim(),validation:$("#eVal").value.trim(),devhub:$("#eHub").value.trim(),protected:$("#eProt").value.split(",").map(x=>x.trim()).filter(Boolean)},"Entornos y orgs");
-    renderOrgs();
+    renderEnvPage();
   }else if(tab==="politicas"){
     box.innerHTML=`<div class="box"><h2>Umbrales que deciden si algo pasa</h2>
       <div class="grid2">
@@ -1268,9 +1408,7 @@ function renderCfg(){
   }else if(tab==="agentes"&&CTL.cfgTab.startsWith("agente:")){
     renderAgentEditor(CTL.cfgTab.slice(7));
   }else if(tab==="agentes"){
-    const byClass={};d.agents.forEach(a=>(byClass[a.class||"orchestrator"]=byClass[a.class||"orchestrator"]||[]).push(a));
-    box.innerHTML=["orchestrator","design","build","review","release"].filter(k=>byClass[k]).map(k=>`<div class="box"><h2>${DEPT_OF[k]} <small class="hint" style="margin:0">${byClass[k].length}</small></h2><div class="agents">${byClass[k].map(a=>`<button class="agent" data-ag="${esc(a.name)}"><b>${esc(roleInfo(a.name).name||a.name)}</b><span>${esc(a.description)}</span><i>${esc(a.model)} · ${a.skills.length} skills</i></button>`).join("")}</div></div>`).join("");
-    box.querySelectorAll("[data-ag]").forEach(b=>b.onclick=()=>go(`#/configuracion/agente:${b.dataset.ag}`));
+    renderAgentsList();
   }else if(tab==="historial"){
     box.innerHTML=`<div class="box"><h2>Cambios hechos desde el panel</h2>${d.history.length?`<table class="otable"><tr><th>Cuándo</th><th>Qué</th><th>Fichero</th><th></th></tr>${d.history.map(h=>`<tr><td>${esc(new Date(h.at).toLocaleString("es-ES"))}</td><td>${esc({environments:"Entornos",policies:"Políticas",agent:"Agente",undo:"Deshacer",protect:"Protección automática"}[h.kind]||h.kind)}${h.note?` <span class="hint">${esc(h.note)}</span>`:""}</td><td><code>${esc(h.file)}</code></td><td>${h.backup?`<button data-undo="${esc(h.backup)}">Deshacer</button>`:""}</td></tr>`).join("")}</table>`:`<div class="hint">Aún no has cambiado nada desde el panel.</div>`}</div>`;
     box.querySelectorAll("[data-undo]").forEach(b=>b.onclick=async()=>{const r=await api("/api/config/undo",{backup:b.dataset.undo});toast(r.output,r.rc?"bad":"good");loadCfg()});
@@ -1279,41 +1417,93 @@ function renderCfg(){
       <div class="kv" style="margin-top:14px"><dt>Org</dt><dd>solo la de desarrollo escribe; producción y alias protegidos, nunca</dd><dt>Ficheros</dt><dd>cada tipo de metadata tiene un rol dueño y solo dentro del alcance aprobado</dd><dt>Fases</dt><dd>fuera de desarrollo, la org está congelada</dd><dt>Puertas humanas</dt><dd>aprobar y cerrar los pulsas tú</dd><dt>Secretos</dt><dd>nada de credenciales en el código ni en el registro</dd></div></div>`;
   }
 }
-function renderAgentEditor(name){
-  const a=CFG.data.agents.find(x=>x.name===name),box=$("#cfgBox");
-  if(!a){box.innerHTML=`<div class="hint">Ese agente no existe.</div>`;return}
-  box.innerHTML=`<div class="pg-title"><div><p class="eyebrow">${esc(DEPT_OF[a.class||"orchestrator"]||"")} · ${esc(name)}</p><h1 style="font-size:22px"><b>${esc(roleInfo(name).name||name)}</b></h1></div><span class="sp" style="flex:1"></span><button id="agBack">← Todos los agentes</button><button id="agSave" class="primary">Revisar cambios</button></div>
-  <div class="agent-editor">
-    <div class="box" style="display:grid;gap:12px">
-      <label class="field"><b>Descripción</b> (el orquestador la usa para decidir a quién encarga qué)<textarea id="aDesc" rows="5">${esc(a.description)}</textarea></label>
-      <label class="field"><b>Modelo</b><select id="aModel">${["sonnet","opus","haiku","inherit"].map(m=>`<option ${m===a.model?"selected":""}>${m}</option>`).join("")}</select></label>
-      <div class="field"><b>Skills</b> (conocimiento que carga)<div class="checks2" style="display:grid;gap:6px">${CFG.data.skills.map(s=>`<label><input type="checkbox" class="aSk" value="${esc(s)}" ${a.skills.includes(s)?"checked":""}> ${esc(s)}</label>`).join("")}</div></div>
-      <div class="hint" style="margin:0">El cambio aplica a todas las features a partir de ahora. Al actualizar el harness, tu versión se conserva.</div>
-    </div>
-    <div class="box"><label class="field"><b>Instrucciones</b><textarea id="aBody" class="code">${esc(a.body)}</textarea></label></div>
+/* ---------- entornos: el papel de cada org se elige en su fila ---------- */
+const HEALTH={ok:["ok","Conectada"],expired:["warn","Sesión caducada"],error:["bad","Error"],unknown:["","—"]};
+const KIND={production:["prod","Producción"],sandbox:["sandbox","Sandbox"],scratch:["scratch","Scratch"],devhub:["devhub","DevHub"]};
+function envDraftFrom(env){return{model:env.model,target:env.target,validation:env.validation,devhub:env.devhub,protected:[...env.protected]}}
+function envDirty(){const a=CFG.envDraft,b=CFG.data.environments;return JSON.stringify([a.model,a.target,a.validation,a.devhub,[...a.protected].sort()])!==JSON.stringify([b.model,b.target,b.validation,b.devhub,[...b.protected].sort()])}
+function roleOf(alias){const d=CFG.envDraft,low=alias.toLowerCase();
+  if(alias===d.target)return"dev";if(alias===d.validation)return"val";if(alias===d.devhub)return"hub";
+  if(d.protected.some(p=>p.toLowerCase()===low))return"prot";return""}
+function setRole(alias,role){const d=CFG.envDraft,low=alias.toLowerCase();
+  if(d.target===alias)d.target="";if(d.validation===alias)d.validation="";if(d.devhub===alias)d.devhub="";
+  d.protected=d.protected.filter(p=>p.toLowerCase()!==low);
+  if(role==="dev")d.target=alias;if(role==="val")d.validation=alias;if(role==="hub")d.devhub=alias;if(role==="prot")d.protected.push(alias);
+  renderEnv()}
+function renderEnvPage(){
+  if(!CFG.envDraft)CFG.envDraft=envDraftFrom(CFG.data.environments);
+  $("#cfgBox").innerHTML=`
+  <div class="envsum" id="envSum"></div>
+  <div id="envWarn"></div>
+  <div class="box">
+    <div class="tb-head"><h2 style="margin:0">Orgs de Salesforce</h2><span class="sp"></span>
+      <input type="search" id="orgQ" placeholder="Buscar por alias o usuario" value="${esc(CFG.orgQ||"")}">
+      <button id="orgRefresh">Actualizar</button><button id="orgLogin" class="primary">Conectar una org</button></div>
+    <div class="chips" id="orgF" style="margin:12px 0"></div>
+    <div class="tscroll"><table class="otable orgs" id="orgTable"></table></div>
+    <div class="hint" style="margin:10px 0 0">Las credenciales las guarda la CLI de Salesforce en tu máquina; el harness nunca las ve. Las orgs de producción solo pueden ser <b>protegidas</b> (o DevHub).</div>
   </div>
-`;
-  $("#agBack").onclick=()=>go("#/configuracion/agentes");
-  $("#agSave").onclick=()=>previewSave("/api/config/agent",{name,description:$("#aDesc").value,model:$("#aModel").value,skills:[...document.querySelectorAll(".aSk:checked")].map(x=>x.value),body:$("#aBody").value},`Agente ${roleInfo(name).name||name}`);
+  <div class="cols c2" style="align-items:start">
+    <div class="box"><h2>Cómo se crean las orgs de desarrollo</h2>
+      <div class="seg" id="eModel">${[["sandbox","Sandbox","Trabajan en una sandbox que ya existe."],["scratch","Scratch orgs","El harness crea orgs desechables desde el DevHub."]].map(([k,n,h])=>`<button data-m="${k}"><b>${n}</b><span>${h}</span></button>`).join("")}</div></div>
+    <div class="box"><h2>Otros alias protegidos</h2><div class="hint" style="margin:0 0 8px">Nombres que nunca se tocan aunque no estén conectados en esta máquina (por ejemplo <code>prod</code>).</div>
+      <div class="tags" id="protOther"></div>
+      <div style="display:flex;gap:8px;margin-top:10px"><input type="text" id="protAdd" placeholder="Añadir alias"><button id="protAddBtn">Añadir</button></div></div>
+  </div>
+  <div class="savebar" id="envBar"><span>Tienes cambios sin guardar en los entornos.</span><span class="sp"></span><button id="envUndo">Descartar</button><button id="envSave" class="primary">Revisar y guardar</button></div>`;
+  $("#orgQ").oninput=e=>{CFG.orgQ=e.target.value;renderOrgs()};
+  $("#orgRefresh").onclick=()=>{CFG.orgs=null;loadOrgs()};
+  $("#orgLogin").onclick=loginDialog;
+  $("#protAddBtn").onclick=()=>{const v=$("#protAdd").value.trim();if(!v)return;if(!CFG.envDraft.protected.some(p=>p.toLowerCase()===v.toLowerCase()))CFG.envDraft.protected.push(v);$("#protAdd").value="";renderEnv()};
+  $("#protAdd").onkeydown=e=>{if(e.key==="Enter")$("#protAddBtn").click()};
+  $("#envUndo").onclick=()=>{CFG.envDraft=envDraftFrom(CFG.data.environments);renderEnv()};
+  $("#envSave").onclick=()=>{const d=CFG.envDraft;previewSave("/api/config/environments",{...d},"Entornos y orgs",()=>{CFG.envDraft=null})};
+  document.querySelectorAll("#eModel [data-m]").forEach(b=>b.onclick=()=>{CFG.envDraft.model=b.dataset.m;renderEnv()});
+  renderEnv();
+}
+function renderEnv(){
+  const d=CFG.envDraft;if(!d||!$("#envSum"))return;
+  const tile=(k,v,h)=>`<div class="etile"><span>${k}</span><b>${v?esc(v):"—"}</b><i>${h}</i></div>`;
+  $("#envSum").innerHTML=tile("Desarrollo",d.target,"aquí escriben los agentes")+tile("Validación",d.validation||(d.target?d.target+" (la misma)":""),"solo comprobaciones sin cambios")+tile("Protegidas",String(d.protected.length),"nunca se tocan, ni para leer")+tile("DevHub",d.devhub,d.model==="scratch"?"crea las scratch orgs":"no se usa con sandbox");
+  document.querySelectorAll("#eModel [data-m]").forEach(b=>b.classList.toggle("on",b.dataset.m===d.model));
+  const known=new Set((CFG.orgs?.orgs||[]).map(o=>o.alias.toLowerCase()).filter(Boolean));
+  $("#protOther").innerHTML=d.protected.filter(p=>!known.has(p.toLowerCase())).map(p=>`<span class="tagx">${esc(p)}<button data-rm="${esc(p)}" aria-label="Quitar ${esc(p)}">×</button></span>`).join("")||`<span class="hint" style="margin:0">Ninguno.</span>`;
+  $("#protOther").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{CFG.envDraft.protected=CFG.envDraft.protected.filter(p=>p!==b.dataset.rm);renderEnv()});
+  const naked=(CFG.orgs?.orgs||[]).filter(o=>o.kind==="production"&&o.alias&&!["prot","hub"].includes(roleOf(o.alias)));
+  $("#envWarn").innerHTML=naked.length?`<div class="act-row warnrow"><div class="ic">!</div><div class="t"><b>${naked.length===1?"Hay una org de producción sin proteger":`Hay ${naked.length} orgs de producción sin proteger`}</b><span>${naked.map(o=>esc(o.alias)).join(", ")}. Un agente no podría usarlas como org de trabajo, pero protegerlas impide también que las lea.</span></div><button class="go" id="protAll">Protegerlas</button></div>`:"";
+  if(naked.length)$("#protAll").onclick=()=>{naked.forEach(o=>CFG.envDraft.protected.push(o.alias));renderEnv()};
+  if(!d.target)$("#envWarn").innerHTML+=`<div class="act-row warnrow"><div class="ic">!</div><div class="t"><b>Falta la org de desarrollo</b><span>Elige en la tabla qué org usan los agentes para trabajar.</span></div></div>`;
+  $("#envBar").classList.toggle("on",envDirty());
+  renderOrgs();
 }
 function renderOrgs(){
-  const t=$("#orgTable");if(!t)return;const o=CFG.orgs;
+  const t=$("#orgTable");if(!t||!CFG.envDraft)return;const o=CFG.orgs;
   if(!o){t.innerHTML=`<tr><td class="hint"><span class="spin"></span> Consultando <code>sf org list</code>…</td></tr>`;return}
   if(o.error&&!o.orgs.length){t.innerHTML=`<tr><td class="hint">${esc(o.error)}</td></tr>`;return}
-  const env=CFG.data.environments,prot=env.protected.map(x=>x.toLowerCase());
-  const role=a=>a&&a===env.target?'<span class="tag role-dev">Desarrollo</span>':a&&a===env.validation?'<span class="tag role-val">Validación</span>':a&&prot.includes(a.toLowerCase())?'<span class="tag role-prot">Protegida</span>':a&&a===env.devhub?'<span class="tag devhub">DevHub</span>':"";
-  const KIND={production:["prod","Producción"],sandbox:["sandbox","Sandbox"],scratch:["scratch","Scratch"],devhub:["devhub","DevHub"]};
-  t.innerHTML=`<tr><th>Alias</th><th>Tipo</th><th>Usuario</th><th>Estado</th><th>En el harness</th></tr>`+(o.orgs.length?o.orgs.map(x=>{const k=KIND[x.kind]||["",x.kind];
-    return `<tr><td><b>${esc(x.alias||"—")}</b></td><td><span class="tag ${k[0]}">${k[1]}</span></td><td>${esc(x.username)}</td><td>${esc(x.status||"")}${x.expires?` <span class="hint">caduca ${esc(x.expires)}</span>`:""}</td><td>${role(x.alias)}</td></tr>`}).join(""):`<tr><td colspan="5" class="hint">No hay orgs conectadas todavía. Pulsa «Conectar una org».</td></tr>`);
-  $("#orgAliases").innerHTML=o.orgs.filter(x=>x.alias).map(x=>`<option value="${esc(x.alias)}">`).join("");
+  const F=[["all","Todas"],["role","Con papel"],["production","Producción"],["problems","Con problemas"]];CFG.orgF=CFG.orgF||"all";
+  const count={all:o.orgs.length,role:o.orgs.filter(x=>x.alias&&roleOf(x.alias)).length,production:o.orgs.filter(x=>x.kind==="production").length,problems:o.orgs.filter(x=>x.health!=="ok").length};
+  $("#orgF").innerHTML=F.map(([k,n])=>`<button class="chip-btn ${CFG.orgF===k?"on":""}" data-of="${k}">${n} <span style="opacity:.6">${count[k]}</span></button>`).join("");
+  $("#orgF").querySelectorAll("[data-of]").forEach(b=>b.onclick=()=>{CFG.orgF=b.dataset.of;renderOrgs()});
+  const q=(CFG.orgQ||"").toLowerCase();
+  const rows=o.orgs.filter(x=>(!q||(x.alias+" "+x.username).toLowerCase().includes(q))&&(CFG.orgF==="all"||(CFG.orgF==="role"&&x.alias&&roleOf(x.alias))||(CFG.orgF==="production"&&x.kind==="production")||(CFG.orgF==="problems"&&x.health!=="ok")));
+  const ROLE_OPTS=[["","Sin papel"],["dev","Desarrollo"],["val","Validación"],["hub","DevHub"],["prot","Protegida"]];
+  t.innerHTML=`<colgroup><col style="width:38%"><col style="width:120px"><col style="width:150px"><col style="width:190px"></colgroup>
+    <tr><th>Org</th><th>Tipo</th><th>Estado</th><th>Papel en el harness</th></tr>`+(rows.length?rows.map(x=>{const k=KIND[x.kind]||["",x.kind],h=HEALTH[x.health]||HEALTH.unknown,r=x.alias?roleOf(x.alias):"",prod=x.kind==="production";
+    const sel=x.alias?`<select class="rolesel r-${r||"none"}" data-alias="${esc(x.alias)}">${ROLE_OPTS.map(([v,n])=>`<option value="${v}" ${v===r?"selected":""} ${prod&&["dev","val"].includes(v)?"disabled":""}>${n}${prod&&["dev","val"].includes(v)?" (no en producción)":""}</option>`).join("")}</select>`:`<span class="hint" style="margin:0">sin alias</span>`;
+    return `<tr class="${r?"has-role":""}"><td><div class="oname">${esc(x.alias||"(sin alias)")}</div><div class="ouser" title="${esc(x.username)}">${esc(x.username)}</div></td><td><span class="tag ${k[0]}">${k[1]}</span></td>
+      <td><span class="health ${h[0]}" title="${esc(x.status)}">${h[1]}</span>${x.expires?`<div class="ouser">caduca ${esc(x.expires)}</div>`:""}${x.health==="expired"&&x.alias?`<div><button class="link relog" data-relog="${esc(x.alias)}" data-kind="${x.kind}">Volver a conectar</button></div>`:""}</td><td>${sel}</td></tr>`}).join(""):`<tr><td colspan="4" class="hint">Ninguna org coincide.</td></tr>`);
+  t.querySelectorAll("select[data-alias]").forEach(s=>s.onchange=()=>setRole(s.dataset.alias,s.value));
+  t.querySelectorAll("[data-relog]").forEach(b=>b.onclick=()=>loginDialog(b.dataset.relog,b.dataset.kind==="production"?"production":"sandbox"));
 }
-function loginDialog(){
+
+function loginDialog(preAlias,preKind){
   dialog(`<h3>Conectar una org de Salesforce</h3><div class="sub">Se abrirá Salesforce en tu navegador para iniciar sesión. La sesión la guarda la CLI de Salesforce en tu máquina.</div>
     <div class="grid2"><label class="field"><b>Alias</b> (cómo la llamará el harness)<input type="text" id="lAlias" placeholder="sit, uat, prod…"></label>
     <label class="field"><b>Tipo</b><select id="lKind"><option value="sandbox">Sandbox (test.salesforce.com)</option><option value="production">Producción o Developer Edition (login.salesforce.com)</option><option value="mydomain">Mi dominio (URL propia)</option></select></label></div>
     <label class="field" id="lUrlBox" hidden><b>URL de My Domain</b><input type="text" id="lUrl" placeholder="https://miempresa--sit.sandbox.my.salesforce.com"></label>
     <div class="lock" id="lWarn" hidden>🔒<div>Una org de <b>producción</b> quedará <b>protegida</b> automáticamente: ningún agente podrá usarla.</div></div>
     <div id="mOut"></div><div class="acts"><button data-close>Cancelar</button><button id="mGo" class="go">Abrir Salesforce</button></div>`);
+  if(typeof preAlias==="string"){$("#lAlias").value=preAlias;if(preKind)$("#lKind").value=preKind}
   const sync=()=>{$("#lUrlBox").hidden=$("#lKind").value!=="mydomain";$("#lWarn").hidden=$("#lKind").value!=="production"};$("#lKind").onchange=sync;sync();
   $("#mGo").onclick=async()=>{
     const r=await api("/api/orgs/login",{alias:$("#lAlias").value.trim(),kind:$("#lKind").value,url:$("#lUrl").value.trim()});
@@ -1325,6 +1515,73 @@ function loginDialog(){
   };
   setTimeout(()=>$("#lAlias").focus(),30);
 }
+
+/* ---------- agentes ---------- */
+const MODEL_INFO={sonnet:["Sonnet","Equilibrado: el recomendado para la mayoría"],opus:["Opus","Máximo razonamiento; más lento y más caro"],haiku:["Haiku","Rápido y barato, para tareas acotadas"],inherit:["Heredado","Usa el modelo de la sesión"]};
+const DEPT_CLS={orchestrator:"orch",design:"design",build:"build",review:"review",release:"release"};
+function renderAgentsList(){
+  const d=CFG.data,byClass={};d.agents.forEach(a=>(byClass[a.class||"orchestrator"]=byClass[a.class||"orchestrator"]||[]).push(a));
+  const q=(CFG.agQ||"").toLowerCase();
+  const custom=d.agents.filter(a=>a.customized).length,ups=d.agents.filter(a=>a.upstream).length;
+  $("#cfgBox").innerHTML=`<div class="tb-head"><div class="hint" style="margin:0">${d.agents.length} agentes · ${custom} personalizados${ups?` · <b style="color:#c22c40">${ups} con versión nueva del harness</b>`:""}</div><span class="sp"></span><input type="search" id="agQ" placeholder="Buscar agente o skill" value="${esc(CFG.agQ||"")}"></div>`+
+  ["orchestrator","design","build","review","release"].filter(k=>byClass[k]).map(k=>{
+    const list=byClass[k].filter(a=>!q||(a.name+" "+(roleInfo(a.name).name||"")+" "+a.description+" "+a.skills.join(" ")).toLowerCase().includes(q));
+    if(!list.length)return"";
+    return `<section class="dept-sec c-${DEPT_CLS[k]}"><div class="dept-h"><span class="dot2"></span><h2>${DEPT_OF[k]}</h2><span class="hint" style="margin:0">${list.length}</span></div>
+    <div class="agrid">${list.map(a=>{const r=roleInfo(a.name),m=MODEL_INFO[a.model]||[a.model,""];
+      return `<button class="acard c-${DEPT_CLS[k]}" data-ag="${esc(a.name)}">
+        <div class="acard-top"><div class="avatar">${robot(r.cls==="other"?{...r,cls:DEPT_CLS[k]}:r,true)}</div><div class="acard-n"><b>${esc(r.name||a.name)}</b><span>${esc(a.name)}</span></div>
+        ${a.customized?`<span class="badge2">Personalizado</span>`:""}${a.upstream?`<span class="badge2 up">Versión nueva</span>`:""}</div>
+        <p>${esc(a.description)}</p>
+        <div class="acard-f"><span class="mpill m-${esc(a.model)}">${esc(m[0])}</span>${a.skills.slice(0,3).map(s=>`<span class="skp">${esc(s.replace(/^sf-/,""))}</span>`).join("")}${a.skills.length>3?`<span class="skp">+${a.skills.length-3}</span>`:""}</div>
+      </button>`}).join("")}</div></section>`}).join("");
+  $("#agQ").oninput=e=>{CFG.agQ=e.target.value;const pos=e.target.selectionStart;renderAgentsList();const i=$("#agQ");i.focus();i.setSelectionRange(pos,pos)};
+  document.querySelectorAll("#cfgBox [data-ag]").forEach(b=>b.onclick=()=>go(`#/configuracion/agente:${b.dataset.ag}`));
+}
+function mdBlock(src){
+  const lines=String(src||"").replace(/\r/g,"").split("\n");let out="",list=null,code=false;
+  const close=()=>{if(list){out+=`</${list}>`;list=null}};
+  for(const ln of lines){
+    if(/^```/.test(ln)){close();out+=code?"</pre>":"<pre>";code=!code;continue}
+    if(code){out+=esc(ln)+"\n";continue}
+    let m;
+    if((m=ln.match(/^(#{1,4})\s+(.*)$/))){close();out+=`<h${m[1].length+2}>${md(m[2])}</h${m[1].length+2}>`;continue}
+    if((m=ln.match(/^\s*[-*]\s+(.*)$/))){if(list!=="ul"){close();out+="<ul>";list="ul"}out+=`<li>${md(m[1])}</li>`;continue}
+    if((m=ln.match(/^\s*\d+[.)]\s+(.*)$/))){if(list!=="ol"){close();out+="<ol>";list="ol"}out+=`<li>${md(m[1])}</li>`;continue}
+    if(!ln.trim()){close();continue}
+    close();out+=`<p>${md(ln)}</p>`;
+  }
+  close();if(code)out+="</pre>";return out;
+}
+function renderAgentEditor(name){
+  const a=CFG.data.agents.find(x=>x.name===name),box=$("#cfgBox");
+  if(!a){box.innerHTML=`<div class="hint">Ese agente no existe.</div>`;return}
+  const r=roleInfo(name),k=DEPT_CLS[a.class||"orchestrator"],info=CFG.data.skillsInfo||CFG.data.skills.map(s=>({name:s,description:""}));
+  box.innerHTML=`<div class="ahero c-${k}"><div class="avatar big working">${robot(r.cls==="other"?{...r,cls:k}:r,true)}</div>
+      <div class="ahero-t"><p class="eyebrow">${esc(DEPT_OF[a.class||"orchestrator"]||"")} · ${esc(name)}</p><h1>${esc(r.name||name)}</h1>
+      <div class="chips">${a.customized?`<span class="badge2">Personalizado</span>`:`<span class="badge2 soft">Versión del harness</span>`}${a.upstream?`<span class="badge2 up">Hay una versión nueva del harness en <code>${esc(name)}.md.upstream</code></span>`:""}</div></div>
+      <span class="sp"></span><button id="agBack">← Todos los agentes</button><button id="agSave" class="primary">Revisar cambios</button></div>
+    <div class="agent-editor">
+      <div style="display:grid;gap:18px;align-content:start">
+        <div class="box"><h2>Qué hace</h2><label class="field">La descripción con la que el orquestador decide a quién encarga cada cosa.<textarea id="aDesc" rows="5" maxlength="400">${esc(a.description)}</textarea></label><div class="counter"><span id="aDescN"></span>/400</div></div>
+        <div class="box"><h2>Modelo</h2><div class="seg col" id="aModel">${Object.entries(MODEL_INFO).map(([m,[n,h]])=>`<button data-model="${m}" class="${m===a.model?"on":""}"><b>${n}</b><span>${h}</span></button>`).join("")}</div></div>
+        <div class="box"><h2>Skills <span class="hint" style="margin:0" id="aSkN"></span></h2><div class="hint" style="margin:0 0 10px">Conocimiento que el agente carga al trabajar.</div>
+          <div class="skgrid">${info.map(s=>`<label class="skcard"><input type="checkbox" class="aSk" value="${esc(s.name)}" ${a.skills.includes(s.name)?"checked":""}><span><b>${esc(s.name)}</b>${s.description?`<i>${esc(s.description)}</i>`:""}</span></label>`).join("")}</div></div>
+      </div>
+      <div class="box ins"><div class="tb-head"><h2 style="margin:0">Instrucciones</h2><span class="sp"></span><div class="seg mini2" id="aView"><button data-v="edit" class="on">Editar</button><button data-v="prev">Vista previa</button></div></div>
+        <textarea id="aBody" class="code" spellcheck="false">${esc(a.body)}</textarea><div class="mdprev" id="aPrev" hidden></div>
+        <div class="counter"><span id="aBodyN"></span></div></div>
+    </div>`;
+  let model=a.model;
+  const cnt=()=>{$("#aDescN").textContent=$("#aDesc").value.length;const b=$("#aBody").value;$("#aBodyN").textContent=`${b.split("\n").length} líneas · ${b.length.toLocaleString("es-ES")} caracteres`;$("#aSkN").textContent=`${document.querySelectorAll(".aSk:checked").length} activas`};
+  $("#aDesc").oninput=cnt;$("#aBody").oninput=cnt;document.querySelectorAll(".aSk").forEach(c=>c.onchange=cnt);cnt();
+  document.querySelectorAll("#aModel [data-model]").forEach(b=>b.onclick=()=>{model=b.dataset.model;document.querySelectorAll("#aModel [data-model]").forEach(x=>x.classList.toggle("on",x===b))});
+  document.querySelectorAll("#aView [data-v]").forEach(b=>b.onclick=()=>{const prev=b.dataset.v==="prev";document.querySelectorAll("#aView [data-v]").forEach(x=>x.classList.toggle("on",x===b));
+    $("#aBody").hidden=prev;$("#aPrev").hidden=!prev;if(prev)$("#aPrev").innerHTML=mdBlock($("#aBody").value)});
+  $("#agBack").onclick=()=>go("#/configuracion/agentes");
+  $("#agSave").onclick=()=>previewSave("/api/config/agent",{name,description:$("#aDesc").value,model,skills:[...document.querySelectorAll(".aSk:checked")].map(x=>x.value),body:$("#aBody").value},`Agente ${r.name||name}`);
+}
+
 /* ---------- métricas ---------- */
 const PH_COL={design:"#4a8cca",build:"#fcc354",verify:"#ec86a3",release:"#5ab891"};
 const PH_ES={design:"Diseño",build:"Desarrollo",verify:"Calidad",release:"Entrega"};

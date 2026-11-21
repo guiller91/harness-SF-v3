@@ -200,6 +200,15 @@ class WatchGuardTest(unittest.TestCase):
             self.assertEqual(rc, 2, cmd)
             self.assertIn("console-api", err)
 
+    def test_alias_protegido_con_espacios_bloquea(self):
+        cfg = self.p.root / "harness.config.json"
+        data = json.loads(cfg.read_text(encoding="utf-8"))
+        data["org"]["protectedAliases"] = ["LEVEL - Prod"]
+        cfg.write_text(json.dumps(data), encoding="utf-8")
+        rc, _, err = self.bash('sf data query -q "SELECT Id FROM Account" --target-org "LEVEL - Prod"')
+        self.assertEqual(rc, 2)
+        self.assertIn("protected-org", err)
+
     def test_en_el_centro_de_control_el_orquestador_no_aprueba(self):
         rc, out, err = self.bash("./hx approve F-001", env={"HX_CONSOLE": "1"})
         self.assertEqual(rc, 2)

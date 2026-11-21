@@ -86,6 +86,20 @@ class SettingsApiTest(unittest.TestCase):
         org = self.cfg()["org"]
         self.assertEqual((org["model"], org["targetOrgAlias"], org["validationOrgAlias"]), ("sandbox", "sit", "uat"))
 
+    def test_alias_con_espacios_como_los_de_la_cli(self):
+        env = {"model": "sandbox", "target": "sit", "validation": "", "devhub": "",
+               "protected": ["LEVEL - Prod", "Barcelona Production", "OppEst -- ENGIE dev"]}
+        r = self.api("/api/config/environments", env)
+        self.assertEqual(r["rc"], 0, r["output"])
+        self.assertIn("LEVEL - Prod", self.cfg()["org"]["protectedAliases"])
+        for bad in ("-o otra", "x;y", 'a"b', "sit,prod"):
+            self.assertEqual(self.api("/api/config/environments", {**env, "target": bad})["rc"], 2, bad)
+        orgs = self.api("/api/orgs")["orgs"]
+        self.assertTrue(all("health" in o for o in orgs))
+        cfg = self.api("/api/config")
+        self.assertTrue(all("description" in s for s in cfg["skillsInfo"]))
+        self.assertIn("customized", cfg["agents"][0])
+
     def test_agente_se_edita_y_queda_coherente(self):
         a = next(x for x in self.api("/api/config")["agents"] if x["name"] == "apex-developer")
         body = {"name": "apex-developer", "description": "Escribe Apex: clases y triggers con sharing declarado.",
