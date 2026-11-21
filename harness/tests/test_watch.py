@@ -81,6 +81,21 @@ class WatchTest(unittest.TestCase):
         self.assertEqual(r.headers["Content-Type"], "model/gltf-binary")
         self.assertEqual(r.read(4), b"glTF")
 
+    def test_un_corte_del_navegador_no_ensucia_la_consola(self):
+        import socket
+        port = int(self.url.rsplit(":", 1)[1])
+        for _ in range(20):  # peticiones que el cliente abandona sin leer la respuesta
+            s = socket.create_connection(("127.0.0.1", port), timeout=5)
+            s.sendall(f"GET /events.jsonl HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\n\r\n".encode())
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, b"\x01\x00\x00\x00\x00\x00\x00\x00")
+            s.close()  # RST inmediato, como al cerrar una pestaña
+        self.assertEqual(self.get("/events.jsonl").status, 200)   # el servidor sigue vivo
+        self.proc.terminate()
+        out = self.proc.stdout.read()
+        self.assertNotIn("Traceback", out)
+        self.assertNotIn("ConnectionAbortedError", out)
+        self.assertNotIn("ConnectionResetError", out)
+
     def test_logo_del_proyecto(self):
         self.assertEqual(self.status(lambda: self.get("/brand/logo")), 404)
         (self.p.root / ".harness/brand").mkdir(parents=True)

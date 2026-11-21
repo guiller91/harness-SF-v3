@@ -359,6 +359,21 @@ def brand_logo(base: Path) -> Optional[Tuple[Path, str]]:
     return None
 
 
+# Cortes de conexión del lado del navegador (en Windows, WinError 10053/10054): no son errores.
+GONE = (ConnectionAbortedError, ConnectionResetError, BrokenPipeError)
+
+
+def log_problem(method: str, path: str, exc: Optional[BaseException]) -> None:
+    """Un error real del servidor: una línea en la consola, sin traza (la traza completa con HX_DEBUG=1)."""
+    if exc is None:
+        return
+    clean = re.sub(r"([?&]k=)[\w-]+", r"\1…", path)  # nunca la clave en la consola
+    print(f"[hx watch] {method} {clean}: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+    if os.environ.get("HX_DEBUG") == "1":
+        import traceback
+        traceback.print_exception(exc)
+
+
 # --------------------------------------------------------------------------- #
 # Servidor
 # --------------------------------------------------------------------------- #
@@ -408,17 +423,23 @@ def serve(port: int, read_only: bool, cli_path: Path, plan_for: Callable, next_s
             given = self.headers.get("X-HX-Token", "")
             return secrets.compare_digest(given.encode(), token.encode())
 
-        def do_GET(self) -> None:  # noqa: N802
+        def _safe(self, fn: Callable[[], None], body_for: Callable[[Exception], Dict[str, Any]]) -> None:
             try:
-                self._get()
+                fn()
+            except GONE:
+                return  # el navegador cerró la petición (recarga, cambio de página): no es un error
             except Exception as exc:  # noqa: BLE001 - nunca cortar la conexión sin respuesta
-                self._json(500, {"error": f"{type(exc).__name__}: {exc}"})
+                log_problem(self.command, self.path, exc)
+                try:
+                    self._json(500, body_for(exc))
+                except GONE:
+                    pass
+
+        def do_GET(self) -> None:  # noqa: N802
+            self._safe(self._get, lambda exc: {"error": f"{type(exc).__name__}: {exc}"})
 
         def do_POST(self) -> None:  # noqa: N802
-            try:
-                self._post()
-            except Exception as exc:  # noqa: BLE001
-                self._json(500, {"rc": 9, "output": f"Error interno: {type(exc).__name__}: {exc}"})
+            self._safe(self._post, lambda exc: {"rc": 9, "output": f"Error interno: {type(exc).__name__}: {exc}"})
 
         def _get(self) -> None:
             if not self._host_ok():
@@ -549,8 +570,17 @@ def serve(port: int, read_only: bool, cli_path: Path, plan_for: Callable, next_s
         def log_message(self, *a: Any) -> None:
             pass
 
+    class Server(ThreadingHTTPServer):
+        daemon_threads = True
+
+        def handle_error(self, request: Any, client_address: Any) -> None:
+            exc = sys.exc_info()[1]
+            if isinstance(exc, GONE):
+                return
+            log_problem("?", "?", exc)
+
     try:
-        server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+        server = Server(("127.0.0.1", port), Handler)
     except OSError as exc:
         raise core.HarnessError(f"No se pudo abrir el puerto {port}: {exc}. Prueba con --port <otro>.")
     server.daemon_threads = True
