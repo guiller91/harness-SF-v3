@@ -8,6 +8,7 @@ from pathlib import Path
 
 from harness.tests.test_watch import FAKE, start
 from harness.tests.util import Project
+import urllib.error
 import urllib.request
 
 FAKE_SF = Path(__file__).resolve().parent / "fixtures" / "fake_sf.py"
@@ -148,6 +149,42 @@ class SettingsApiTest(unittest.TestCase):
         m = self.api("/api/metrics")
         row = next(r for r in m["features"] if r["id"] == fid)
         self.assertAlmostEqual(row["cost"]["usd"], 0.42)
+
+
+@unittest.skipIf(os.name == "nt", "los binarios falsos son scripts sh")
+class ReportTicketTest(unittest.TestCase):
+    def test_el_informe_se_abre_con_un_pase_temporal_y_nunca_sale_en_blanco(self):
+        p = Project()
+        proc, url, token = start(p)
+        try:
+            fid = p.to_verify()
+            # Una feature antigua: criterios como texto plano y sin historia completa.
+            fl = p.root / "feature_list.json"
+            data = json.loads(fl.read_text(encoding="utf-8"))
+            items = data if isinstance(data, list) else data["features"]
+            items[0]["acceptance_criteria"] = ["texto plano sin id", {"text": "sin id tampoco"}]
+            items[0]["history"] = items[0].get("history", []) + ["basura"]
+            fl.write_text(json.dumps(data), encoding="utf-8")
+            req = urllib.request.Request(url + "/api/report/ticket", data=json.dumps({"id": fid}).encode(),
+                                         headers={"X-HX-Token": token, "Content-Type": "application/json"})
+            t = json.loads(urllib.request.urlopen(req, timeout=30).read())
+            self.assertEqual(t["rc"], 0)
+            html = urllib.request.urlopen(url + t["url"], timeout=60).read().decode("utf-8")
+            self.assertIn("Informe de evidencia", html)
+            self.assertIn("AC-1</b> texto plano sin id", html)
+            with self.assertRaises(urllib.error.HTTPError) as ctx:          # un pase inventado no sirve
+                urllib.request.urlopen(url + "/report/inventado", timeout=10)
+            self.assertEqual(ctx.exception.code, 404)
+            req = urllib.request.Request(url + "/api/report/ticket", data=json.dumps({"id": fid}).encode(),
+                                         headers={"Content-Type": "application/json"})
+            with self.assertRaises(urllib.error.HTTPError) as ctx:          # sin clave no hay pase
+                urllib.request.urlopen(req, timeout=10)
+            self.assertEqual(ctx.exception.code, 403)
+        finally:
+            proc.terminate()
+            proc.wait(timeout=10)
+            proc.stdout.close()
+            p.cleanup()
 
 
 class ReportCliTest(unittest.TestCase):

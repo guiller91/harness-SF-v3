@@ -373,6 +373,7 @@ def serve(port: int, read_only: bool, cli_path: Path, plan_for: Callable, next_s
     orch = None if read_only else Orchestrator(base, shutil.which("claude"))
     action_lock = threading.Lock()
     logins = settings.LoginJobs()
+    tickets: Dict[str, Tuple[str, float]] = {}   # pase temporal para abrir un informe en otra pestaña
     planners = {"/api/config/environments": lambda b: (settings.config_path(), *settings.plan_environments(b), "environments"),
                 "/api/config/policies": lambda b: (settings.config_path(), *settings.plan_policies(b), "policies"),
                 "/api/config/agent": lambda b: (*settings.plan_agent(b), "agent")}
@@ -430,6 +431,19 @@ def serve(port: int, read_only: bool, cli_path: Path, plan_for: Callable, next_s
                 if glb.is_file():
                     return self._send(200, glb.read_bytes(), "model/gltf-binary")
                 return self._send(404, b"no encontrado", "text/plain; charset=utf-8")
+            if path.startswith("/report/"):
+                tk = path[len("/report/"):]
+                entry = tickets.get(tk)
+                if not entry or entry[1] < time.time():
+                    return self._send(404, "<h3>Este enlace de informe ha caducado. Ábrelo otra vez desde el panel.</h3>".encode("utf-8"),
+                                      "text/html; charset=utf-8")
+                fid = entry[0]
+                try:
+                    page = report_fn(fid)
+                except Exception as exc:  # noqa: BLE001
+                    from . import report as _report
+                    page = _report.error_page(fid, exc)
+                return self._send(200, page.encode("utf-8"), "text/html; charset=utf-8")
             if path == "/brand/logo":
                 found = brand_logo(base)
                 if found:
@@ -508,6 +522,16 @@ def serve(port: int, read_only: bool, cli_path: Path, plan_for: Callable, next_s
                 with action_lock:
                     rc, output = settings.undo(str(body.get("backup") or ""), cli_path)
                 return self._json(200, {"rc": rc, "output": output})
+            if self.path == "/api/report/ticket":
+                fid = str(body.get("id") or "")
+                if not FID.match(fid):
+                    return self._json(200, {"rc": 2, "output": "Id no válido."})
+                now = time.time()
+                for k in [k for k, v in tickets.items() if v[1] < now]:
+                    tickets.pop(k, None)
+                tk = secrets.token_urlsafe(18)
+                tickets[tk] = (fid, now + 900)
+                return self._json(200, {"rc": 0, "url": f"/report/{tk}"})
             if self.path == "/api/orgs/login":
                 rc, output, job = logins.start(body)
                 return self._json(200, {"rc": rc, "output": output, "job": job})

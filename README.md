@@ -182,7 +182,8 @@ compares. Los hooks nuevos se añaden a tu `.claude/settings.json` sin quitar na
 
 ### Centro de control: sin terminal
 
-`./hx watch` abre en tu navegador un panel desde el que llevas todo el ciclo:
+`./hx watch` abre en tu navegador una aplicación con menú lateral (Resumen, En directo, Features,
+Orquestador, Nueva feature, Configuración y Métricas) desde la que llevas todo el ciclo:
 
 - **Pides la feature** contándosela al orquestador (te pregunta lo que falte y redacta los criterios) o
   rellenando tú el borrador.

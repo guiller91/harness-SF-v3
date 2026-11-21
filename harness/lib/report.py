@@ -96,8 +96,15 @@ def build(fid: str, plan_for: Callable, metrics_row: Callable[[Dict[str, Any], L
     feat = core.find_feature(core.load_features(), fid)
     events = core.read_events()
     evs = [x for x in events if x.get("feature") == fid]
-    m = metrics_row(feat, events)
-    tree = core.tree_hash(cfg)
+    try:
+        m = metrics_row(feat, events)
+    except Exception:  # noqa: BLE001 - una feature antigua sin historia completa no impide el informe
+        m = {"phase_time_s": {}, "lead_time_s": None, "first_pass_gates": None, "rework_loops": feat.get("rework_count", 0)}
+    m.setdefault("phase_time_s", {})
+    try:
+        tree = core.tree_hash(cfg)
+    except Exception:  # noqa: BLE001
+        tree = "desconocido"
     try:
         plan, _ = plan_for(feat, cfg)
     except Exception:  # noqa: BLE001 - el informe sale aunque el plan no se pueda derivar
@@ -158,6 +165,7 @@ def build(fid: str, plan_for: Callable, metrics_row: Callable[[Dict[str, Any], L
         for (lbl, at), k in zip(approvals, ("approve", "approve", "close")) if at or lbl != "Diseño aprobado")
     # --- cronología ---
     hist = feat.get("history", [])
+    hist = [h for h in hist if isinstance(h, dict)]
     hist_rows = "".join(f"<tr><td>{when(h.get('at'))}</td><td>{e(STATE_ES.get(h.get('from') or '', h.get('from') or '—'))} → "
                         f"{e(STATE_ES.get(h.get('to'), h.get('to')))}</td><td>{e(h.get('note', ''))}</td></tr>" for h in hist)
     # --- seguridad ---
@@ -165,8 +173,12 @@ def build(fid: str, plan_for: Callable, metrics_row: Callable[[Dict[str, Any], L
     block_rows = "".join(f"<tr><td>{when(x.get('at'))}</td><td>{e(x.get('role') or 'orchestrator')}</td><td>{e(x.get('rule'))}</td>"
                          f"<td>{e((x.get('detail') or '')[:200])}</td></tr>" for x in blocks)
     # --- requisitos y diseño ---
-    acs = "".join(f"<li><b>{e(a.get('id'))}</b> {e(a.get('text'))}</li>" for a in feat.get("acceptance_criteria", []))
-    oos = "".join(f"<li>{e(x)}</li>" for x in feat.get("out_of_scope", []))
+    def _ac(i: int, a: Any) -> str:
+        if isinstance(a, dict):
+            return f"<li><b>{e(a.get('id') or f'AC-{i + 1}')}</b> {e(a.get('text') or a.get('description') or '')}</li>"
+        return f"<li><b>AC-{i + 1}</b> {e(a)}</li>"
+    acs = "".join(_ac(i, a) for i, a in enumerate(feat.get("acceptance_criteria") or []))
+    oos = "".join(f"<li>{e(x.get('text') if isinstance(x, dict) else x)}</li>" for x in feat.get("out_of_scope") or [])
     design_path = core.spec_dir(fid) / "design.md"
     design = _first_section(design_path)
     phase_cells = "".join(f"<div class='kpi'><b>{dur(m['phase_time_s'].get(k))}</b><span>{lbl}</span></div>"
@@ -253,3 +265,12 @@ footer{{margin-top:28px;padding-top:12px;border-top:1px solid var(--line);font-s
 <footer>Generado el {generated} por el harness a partir de feature_list.json, .harness/evidence, events.jsonl y los informes de progress/.
 Los resúmenes de trabajo y de revisión salen de los informes que escribieron los agentes; todo lo demás (fases, aprobaciones, resultados, hashes, bloqueos) son registros del propio proceso, sin interpretar.</footer>
 </div></body></html>"""
+
+
+def error_page(fid: str, exc: BaseException) -> str:
+    return f"""<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Informe {e(fid)}</title>
+<style>body{{font:14px/1.6 system-ui,sans-serif;color:#3c3c3a;background:#efeeee;margin:0}}
+.box{{max-width:720px;margin:60px auto;background:#fff;border-radius:15px;padding:28px 32px;border-left:4px solid #f8485e}}
+code{{background:#f7f6f4;padding:2px 6px;border-radius:6px}}</style></head><body><div class="box">
+<h2>No he podido generar el informe de {e(fid)}</h2><p>El motivo:</p><p><code>{e(type(exc).__name__)}: {e(exc)}</code></p>
+<p>Prueba <code>./hx report {e(fid)}</code> en la terminal para ver el detalle completo y pásame el mensaje.</p></div></body></html>"""

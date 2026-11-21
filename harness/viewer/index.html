@@ -126,7 +126,9 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;padding:16p
 @keyframes rot{to{transform:rotate(360deg)}}
 
 /* equipo */
-.team{display:grid;grid-template-columns:auto repeat(4,auto) 1fr;gap:6px 22px;align-items:center;padding:12px 22px}
+.team{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;padding:12px 22px;min-width:0}
+body.app .mini{width:30px;height:30px}
+body.app .mini svg{width:23px;height:23px}
 .dept{display:grid;gap:4px}
 .dept .eyebrow{font-size:10px}
 .dept .ppl{display:flex;gap:4px}
@@ -188,15 +190,11 @@ footer{background:var(--card);border-top:1px solid var(--line);padding:8px 18px;
 #drop.on{display:grid}
 
 /* centro de control */
-#btnCtl{background:var(--poppy);border-color:var(--poppy);color:#fff}
-#btnCtl.on{background:var(--ink);border-color:var(--ink)}
 .todo{display:flex;align-items:center;gap:8px;padding:4px 5px 4px 12px;border-radius:12px;background:#fff2f4;border:1px solid var(--poppy);font-size:12.5px;animation:swap .3s}
 .todo b{font-weight:600}
 .todo button{padding:4px 11px;border-radius:10px;background:var(--poppy);color:#fff;border:0;font-weight:600}
 .todo.busy{background:var(--soft);border-color:var(--line)}
 .spin{width:11px;height:11px;border-radius:50%;border:2px solid var(--poppy);border-right-color:transparent;animation:rot .8s linear infinite;flex:none;display:inline-block}
-.drawer{position:fixed;top:var(--top,56px);right:0;bottom:var(--bot,52px);width:min(470px,100vw);background:var(--card);border-left:1px solid var(--line);z-index:30;display:grid;grid-template-rows:auto 1fr;box-shadow:-24px 0 48px -24px rgba(60,60,58,.35);transform:translateX(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1)}
-.drawer.open{transform:none}
 .tabs{display:flex;gap:4px;padding:10px 14px 0;border-bottom:1px solid var(--line)}
 .tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;color:var(--muted);padding:7px 10px}
 .tabs button.on{color:var(--ink);border-bottom-color:var(--poppy)}
@@ -250,7 +248,6 @@ details summary{cursor:pointer;color:var(--muted);font-size:12px;margin:14px 0 8
 .toast{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:12px;padding:9px 16px;z-index:70;font-size:12.5px;animation:swap .25s}
 .toast.bad{background:#c22c40}
 /* configuración y métricas */
-.drawer.wide{width:min(780px,100vw)}
 .sec{border:1px solid var(--line);border-radius:15px;margin-bottom:12px;overflow:hidden}
 .sec>summary{list-style:none;cursor:pointer;padding:12px 16px;display:flex;gap:10px;align-items:center;font:600 13.5px var(--sans);margin:0;color:var(--ink)}
 .sec>summary::-webkit-details-marker{display:none}
@@ -292,6 +289,105 @@ details summary{cursor:pointer;color:var(--muted);font-size:12px;margin:14px 0 8
 .phbar i{display:block;height:100%}
 .legend{display:flex;gap:12px;font-size:11px;color:var(--muted);margin:6px 0 10px}
 .legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+/* ---------- aplicación (centro de control a pantalla completa) ---------- */
+#shell{display:grid;grid-template-columns:minmax(0,1fr);min-height:0}
+body.app #shell{grid-template-columns:236px minmax(0,1fr)}
+#side{display:none}
+body.app #side{display:flex;flex-direction:column;gap:2px;background:var(--card);border-right:1px solid var(--line);padding:16px 12px;min-height:0;overflow:auto}
+#view{min-height:0;display:grid;grid-template-columns:minmax(0,1fr);overflow:hidden}
+.page{display:none;min-height:0}
+.page.on{display:grid;grid-template-columns:minmax(0,1fr)}
+#pg-live.on{display:grid;grid-template-rows:minmax(0,1fr)}
+#pg-live main{min-height:0;min-width:0;width:100%}
+#pg-live .left,#pg-live .right,#pg-live .card{min-width:0}
+body.app:not(.live) footer{display:none}
+body.app:not(.live) header .grp .liveonly{display:none}
+.nav-h{font:700 10.5px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:14px 10px 6px}
+.nav{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;color:var(--ink);text-decoration:none;font:500 13.5px var(--sans);border:0;background:none;width:100%;text-align:left;cursor:pointer}
+.nav svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:.75}
+.nav:hover{background:var(--soft)}
+.nav.on{background:#fff2f4;color:#c22c40}
+.nav.on svg{opacity:1}
+.nav .badge{margin-left:auto;min-width:20px;height:20px;border-radius:10px;background:var(--poppy);color:#fff;font:700 11px/20px var(--sans);text-align:center;padding:0 6px}
+.nav .badge.soft{background:var(--soft);color:var(--muted)}
+.side-proj{padding:6px 10px 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.side-proj b{display:block;font:600 14px var(--sans)}
+.side-proj span{font-size:12px;color:var(--muted)}
+.side-foot{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);display:grid;gap:4px}
+.side-foot .row{display:flex;align-items:center;gap:6px}
+.pg{overflow:auto;padding:24px 30px 40px}
+.pg-inner{max-width:1240px;width:100%;margin:0 auto;display:grid;gap:18px;align-content:start}
+.pg-title{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.pg-title h1{margin:0;font:300 26px/1.2 var(--sans)}
+.pg-title h1 b{font-weight:600}
+.pg-title p{margin:4px 0 0;color:var(--muted)}
+.pg-title .sp{flex:1}
+.cols{display:grid;gap:18px}
+.cols.c2{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+.cols.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.box{background:var(--card);border-radius:15px;box-shadow:var(--shadow);padding:18px 20px;min-width:0}
+.box h2{margin:0 0 12px;font:600 15px var(--sans);display:flex;align-items:center;gap:8px}
+.box h2 .sp{flex:1}
+.box h2 a,.link{font:500 12.5px var(--sans);color:#c22c40;text-decoration:none;cursor:pointer;background:none;border:0;padding:0}
+.box h2 a:hover,.link:hover{text-decoration:underline}
+.big-actions{display:grid;gap:10px}
+.act-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:15px;background:#fff7f8;border:1px solid var(--poppy-m)}
+.act-row .ic{width:40px;height:40px;border-radius:12px;background:var(--poppy);color:#fff;display:grid;place-items:center;font-size:18px;flex:none}
+.act-row .t{flex:1;min-width:0}
+.act-row .t b{display:block;font-weight:600}
+.act-row .t span{font-size:12.5px;color:var(--muted)}
+.okline{display:flex;align-items:center;gap:10px;color:#2f7d5b;background:#eef8f3;border-radius:12px;padding:12px 14px}
+.mini-journey{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.mj{padding:4px 11px;border-radius:12px;font:600 11.5px var(--sans);background:var(--soft);color:#a9a69f}
+.mj.done{background:var(--ink);color:#fff} .mj.now{background:var(--poppy);color:#fff}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:500}
+.recent .it{animation:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip-btn{border-radius:12px;padding:6px 12px;font:500 12.5px var(--sans);background:var(--soft);border:1px solid var(--line)}
+.chip-btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+/* features */
+.fsplit{display:grid;grid-template-columns:360px minmax(0,1fr);gap:18px;min-height:0;align-items:start}
+.flist{display:grid;gap:10px;align-content:start;position:sticky;top:0}
+.fitem{border:1px solid var(--line);border-radius:15px;padding:12px 14px;background:var(--card);cursor:pointer;display:grid;gap:4px;text-align:left;font:inherit;width:100%}
+.fitem:hover{border-color:#bdbab3}
+.fitem.sel{border-color:var(--poppy);box-shadow:0 0 0 3px rgba(248,72,94,.12)}
+.fitem .top{display:flex;align-items:center;gap:8px}
+.fitem .id{font:600 12px var(--sans);color:var(--muted)}
+.fitem b{font-weight:600;font-size:13.5px}
+.fitem .meta{font-size:12px;color:var(--muted)}
+.fitem .pend{font:600 11.5px var(--sans);color:#c22c40}
+.fdetail{display:grid;gap:16px}
+.fhead{display:flex;gap:14px;align-items:flex-start}
+.fhead h2{margin:0;font:300 22px/1.25 var(--sans)}
+.fhead h2 b{font-weight:600}
+.actionbar{display:flex;gap:8px;flex-wrap:wrap}
+.report-frame{width:100%;height:72vh;border:1px solid var(--line);border-radius:15px;background:#fff}
+.aclist{margin:0;padding-left:20px} .aclist li{margin:4px 0}
+/* orquestador */
+.orchpage{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;min-height:0;height:100%}
+.orchpage .chatbox{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px;min-height:0;background:var(--card);border-radius:15px;box-shadow:var(--shadow);padding:16px 18px}
+#pg-orch .pg{display:grid;padding-bottom:24px}
+#pg-orch .pg-inner{grid-template-rows:auto minmax(0,1fr);height:100%}
+.chat{font-size:13.5px}
+.msg{max-width:78%}
+.compose textarea{min-height:70px}
+.quick{display:grid;gap:8px}
+.quick button{text-align:left;border-radius:12px;padding:9px 12px;background:var(--soft);border:1px solid var(--line);font-size:12.5px}
+/* configuración */
+.subnav{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:0}
+.subnav button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;padding:10px 14px;color:var(--muted);font:500 13.5px var(--sans)}
+.subnav button.on{color:var(--ink);border-bottom-color:var(--poppy)}
+.agent-editor{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;align-items:start}
+.agent-editor textarea.code{min-height:62vh;font:12.5px/1.6 var(--mono)}
+.stick-bar{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 30%);padding:16px 0 0;display:flex;gap:10px;justify-content:flex-end}
+/* métricas */
+.chart{display:grid;gap:10px}
+.crow{display:grid;grid-template-columns:200px minmax(0,1fr) 90px;gap:12px;align-items:center;font-size:12.5px}
+.crow .bar{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--soft)}
+.crow .bar i{display:block;height:100%}
+.crow .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:1100px){.cols.c2,.cols.c3,.fsplit,.orchpage,.agent-editor{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:1100px){main{grid-template-columns:1fr}.right{display:none}body{overflow:auto}}
 </style>
@@ -305,15 +401,29 @@ details summary{cursor:pointer;color:var(--muted);font-size:12px;margin:14px 0 8
   <div id="todo"></div>
   <div class="sp"></div>
   <div class="grp">
-    <button id="btnCtl" hidden title="Pedir features, aprobar, cerrar y hablar con el orquestador">Centro de control</button>
-    <select id="feat" aria-label="Feature"></select>
-    <button id="btnDemo" title="Guion de ejemplo basado en una feature S">Ejemplo</button>
-    <button id="btnLive" title="Solo con ./hx watch" hidden>En vivo</button>
-    <button id="btnFile" title="Carga .harness/events.jsonl, o arrástralo a la ventana">Cargar events.jsonl</button>
+    <select id="feat" class="liveonly" aria-label="Feature"></select>
+    <button id="btnDemo" class="liveonly" title="Guion de ejemplo basado en una feature S">Ejemplo</button>
+    <button id="btnLive" class="liveonly" title="Solo con ./hx watch" hidden>En vivo</button>
+    <button id="btnFile" class="liveonly" title="Carga .harness/events.jsonl, o arrástralo a la ventana">Cargar events.jsonl</button>
     <input type="file" id="file" accept=".jsonl,.json,.txt,.log" hidden>
   </div>
 </header>
 
+<div id="shell">
+  <nav id="side" aria-label="Centro de control">
+    <div class="side-proj"><b id="sProj">Proyecto</b><span id="sOrg">org de desarrollo —</span></div>
+    <a class="nav" href="#/inicio" data-pg="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Resumen<span class="badge" id="bHome" hidden></span></a>
+    <a class="nav" href="#/directo" data-pg="live"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>En directo</a>
+    <a class="nav" href="#/features" data-pg="feats"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9h10M7 13h10M7 17h6"/></svg>Features<span class="badge soft" id="bFeats" hidden></span></a>
+    <a class="nav" href="#/orquestador" data-pg="orch"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>Orquestador<span class="badge soft" id="bOrch" hidden></span></a>
+    <a class="nav" href="#/nueva" data-pg="new"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Nueva feature</a>
+    <div class="nav-h">Gestión</div>
+    <a class="nav" href="#/configuracion" data-pg="cfg"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Configuración</a>
+    <a class="nav" href="#/metricas" data-pg="met"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Métricas</a>
+    <div class="side-foot"><div class="row"><span class="dot" id="sDot"></span><span id="sLive">conectado a ./hx watch</span></div><span>Solo tu navegador puede actuar.</span></div>
+  </nav>
+  <div id="view">
+  <section class="page on" id="pg-live">
 <main>
   <div class="left">
     <section class="card hero" aria-label="La feature">
@@ -334,41 +444,77 @@ details summary{cursor:pointer;color:var(--muted);font-size:12px;margin:14px 0 8
     <section class="card story"><p class="eyebrow">Lo que ha pasado</p><div class="items" id="story"></div></section>
   </div>
 </main>
+  </section>
+  <section class="page" id="pg-home"><div class="pg"><div class="pg-inner">
+    <div class="pg-title"><div><h1>Resumen de <b id="hProj">tu proyecto</b></h1><p id="hSub">Lo que necesita tu atención y cómo va el trabajo.</p></div></div>
+    <div class="cols c2">
+      <div class="box"><h2>Te toca</h2><div id="hTodo" class="big-actions"></div></div>
+      <div class="box"><h2>Orquestador<span class="sp"></span><a href="#/orquestador">Abrir conversación</a></h2><div id="hOrch"></div></div>
+    </div>
+    <div class="cols c2">
+      <div class="box"><h2>Feature activa<span class="sp"></span><a href="#/directo">Verla en directo</a></h2><div id="hFeat"></div></div>
+      <div class="box"><h2>Entornos<span class="sp"></span><a href="#/configuracion/entornos">Configurar</a></h2><div id="hEnv"></div></div>
+    </div>
+    <div class="box"><h2>Cómo va<span class="sp"></span><a href="#/metricas">Ver métricas</a></h2><div id="hKpis" class="mkpis" style="margin:0"></div></div>
+    <div class="box recent"><h2>Actividad reciente<span class="sp"></span><a href="#/directo">Historia completa</a></h2><div id="hRecent" class="items" style="overflow:visible"></div></div>
+  </div></div></section>
 
-<div class="drawer" id="ctl" aria-label="Centro de control" aria-hidden="true">
-  <div class="tabs" role="tablist">
-    <button data-tab="orch" class="on">Orquestador</button>
-    <button data-tab="feats">Features</button>
-    <button data-tab="new">Nueva feature</button>
-    <button data-tab="cfg">Configuración</button>
-    <button data-tab="met">Métricas</button>
-    <button class="x" id="ctlClose" aria-label="Cerrar panel">✕</button>
-  </div>
-  <section class="pane on" id="p-orch">
-    <div class="ostat"><span id="oStat">—</span><span class="sp"></span><button id="oStop" class="danger" hidden>Detener</button><button id="oReset" title="Empieza una conversación nueva con el orquestador">Nueva conversación</button></div>
-    <div class="chat" id="chat"></div>
-    <div class="compose"><textarea id="oMsg" rows="3" placeholder="Habla con el orquestador: pide una feature, responde a sus preguntas, dile que siga…  (Ctrl+Enter envía)"></textarea><button id="oSend" class="primary">Enviar</button></div>
-  </section>
-  <section class="pane" id="p-feats"><div id="feats"></div></section>
-  <section class="pane" id="p-new">
-    <div class="hint">Lo normal: cuéntaselo al orquestador. Te hará las preguntas que falten, redactará los criterios de aceptación y te la traerá para aprobar.</div>
-    <textarea id="nAsk" rows="6" placeholder="Ej.: Necesito que al crear una Account se valide el dominio del email del contacto principal contra una lista permitida…"></textarea>
-    <div style="display:flex;justify-content:flex-end;margin-top:8px"><button id="nAskBtn" class="primary">Encargar al orquestador</button></div>
-    <details><summary>O regístrala tú directamente (sin orquestador)</summary>
-      <div class="form">
-        <label>Título<input type="text" id="fTitle" maxlength="140"></label>
-        <label>Descripción (qué y para qué)<textarea id="fDesc" rows="3"></textarea></label>
-        <div class="two"><label>Tipo<select id="fType"><option>feature</option><option>bugfix</option><option>refactor</option><option>chore</option></select></label>
-        <label>Tamaño<select id="fSize"><option>S</option><option selected>M</option><option>L</option></select></label></div>
-        <label>Criterios de aceptación (uno por línea)<textarea id="fAc" rows="4"></textarea></label>
-        <label>Fuera de alcance (uno por línea, opcional)<textarea id="fOut" rows="2"></textarea></label>
-        <div style="display:flex;justify-content:flex-end"><button id="fSend" class="primary">Registrar borrador</button></div>
+  <section class="page" id="pg-feats"><div class="pg"><div class="pg-inner">
+    <div class="pg-title"><div><h1><b>Features</b></h1><p>Todo lo pedido, en qué punto está y lo que espera por ti.</p></div><span class="sp"></span><a class="nav" style="width:auto;background:var(--poppy);color:#fff" href="#/nueva">+ Nueva feature</a></div>
+    <div class="chips" id="fFilter"></div>
+    <div class="fsplit"><div class="flist" id="feats"></div><div class="box fdetail" id="fDetail"></div></div>
+  </div></div></section>
+
+  <section class="page" id="pg-orch"><div class="pg"><div class="pg-inner">
+    <div class="pg-title"><div><h1>Conversación con el <b>orquestador</b></h1><p>Trabaja en tu carpeta con los mismos agentes y guardas que en la terminal. Las puertas humanas las pulsas tú.</p></div></div>
+    <div class="orchpage">
+      <div class="chatbox">
+        <div class="ostat"><span id="oStat">—</span><span class="sp"></span><button id="oStop" class="danger" hidden>Detener</button><button id="oReset" title="Empieza una conversación nueva con el orquestador">Nueva conversación</button></div>
+        <div class="chat" id="chat"></div>
+        <div class="compose"><textarea id="oMsg" rows="3" placeholder="Pide una feature, responde a sus preguntas o dile que siga…  (Ctrl+Enter envía)"></textarea><button id="oSend" class="primary">Enviar</button></div>
       </div>
-    </details>
-  </section>
-  <section class="pane" id="p-cfg"><div id="cfgBox"><div class="hint">Cargando configuración…</div></div></section>
-  <section class="pane" id="p-met"><div id="metBox"><div class="hint">Cargando métricas…</div></div></section>
+      <div style="display:grid;gap:18px;align-content:start">
+        <div class="box"><h2>Atajos</h2><div class="quick" id="oQuick"></div></div>
+        <div class="box"><h2>Cómo funciona</h2><div class="hint" style="margin:0">Cada mensaje lanza un turno de Claude Code sin terminal que reanuda la conversación. Lo que normalmente te preguntaría en la terminal aquí se le deniega y te lo pide en el chat. Aprobar y cerrar los haces tú desde <a class="link" href="#/features">Features</a>.</div></div>
+      </div>
+    </div>
+  </div></div></section>
+
+  <section class="page" id="pg-new"><div class="pg"><div class="pg-inner">
+    <div class="pg-title"><div><h1>Nueva <b>feature</b></h1><p>Cuéntaselo al orquestador o regístrala tú directamente.</p></div></div>
+    <div class="cols c2">
+      <div class="box"><h2>💬 Cuéntaselo al orquestador <small class="hint" style="margin:0">recomendado</small></h2>
+        <div class="hint">Te hará solo las preguntas imprescindibles, redactará los criterios de aceptación y te la traerá para aprobar.</div>
+        <div class="chips" id="nTpl" style="margin-bottom:10px"></div>
+        <textarea id="nAsk" rows="10" placeholder="Ej.: al crear una Account, valida que el dominio del email del contacto principal esté en una lista permitida…"></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px"><button id="nAskBtn" class="primary">Encargar al orquestador</button></div></div>
+      <div class="box"><h2>📝 Regístrala tú</h2>
+        <div class="form">
+          <label>Título<input type="text" id="fTitle" maxlength="140"></label>
+          <label>Descripción (qué y para qué)<textarea id="fDesc" rows="3"></textarea></label>
+          <div class="two"><label>Tipo<select id="fType"><option>feature</option><option>bugfix</option><option>refactor</option><option>chore</option></select></label>
+          <label>Tamaño<select id="fSize"><option>S</option><option selected>M</option><option>L</option></select></label></div>
+          <label>Criterios de aceptación (uno por línea)<textarea id="fAc" rows="5"></textarea></label>
+          <label>Fuera de alcance (uno por línea, opcional)<textarea id="fOut" rows="2"></textarea></label>
+          <div style="display:flex;justify-content:flex-end"><button id="fSend" class="primary">Registrar borrador</button></div>
+        </div></div>
+    </div>
+  </div></div></section>
+
+  <section class="page" id="pg-cfg"><div class="pg"><div class="pg-inner">
+    <div class="pg-title"><div><h1><b>Configuración</b></h1><p>Dónde trabajan los agentes, qué umbrales deben pasar y cómo trabaja cada uno. Cada cambio se revisa como diff y se comprueba antes de guardarse.</p></div></div>
+    <div class="subnav" id="cfgNav"></div>
+    <div id="cfgBox"><div class="hint">Cargando configuración…</div></div>
+  </div></div></section>
+
+  <section class="page" id="pg-met"><div class="pg"><div class="pg-inner">
+    <div class="pg-title"><div><h1><b>Métricas</b></h1><p>Cuánto se tarda, a la primera cuánto pasa y cuánto cuesta.</p></div></div>
+    <div id="metBox"><div class="hint">Cargando métricas…</div></div>
+  </div></div></section>
+  </div>
 </div>
+
+
 <div id="modal" role="dialog" aria-modal="true"><div class="dlg" id="dlg"></div></div>
 
 <footer>
@@ -806,9 +952,9 @@ async function goLive(){
 $("#btnLive").onclick=()=>goLive();
 
 
-/* ---------- centro de control ---------- */
-const CTL={token:null,on:false,state:null,on2:false,orchN:0,orch:{available:false,running:false,session:false},tab:"orch",open:false,timer:null,otimer:null};
-const STLABEL={draft:"borrador",approved:"aprobada",design:"diseño",build:"construcción",verify:"verificación",release:"entrega",done:"hecha",blocked:"bloqueada"};
+/* ---------- centro de control (aplicación) ---------- */
+const CTL={token:null,on:false,state:null,orchN:0,orch:{available:false,running:false,session:false},page:"live",timer:null,otimer:null,sel:null,filter:"all",metrics:null,cfgTab:"entornos"};
+const STLABEL={draft:"borrador",approved:"aprobada",design:"diseño",build:"desarrollo",verify:"calidad",release:"entrega",done:"hecha",blocked:"bloqueada"};
 function readToken(){
   const u=new URL(location.href),k=u.searchParams.get("k");
   if(k){CTL.token=k;try{sessionStorage.setItem("hxk",k)}catch{}u.searchParams.delete("k");history.replaceState(null,"",u.pathname+u.search+u.hash)}
@@ -820,47 +966,130 @@ async function api(path,body){
   if(r.status===403)throw new Error("clave");
   return r.json();
 }
-function toast(text,kind=""){const t=el("div","toast "+kind,esc(text));document.body.append(t);setTimeout(()=>t.remove(),3200)}
+function toast(text,kind=""){const t=el("div","toast "+kind,esc(text));document.body.append(t);setTimeout(()=>t.remove(),3400)}
 function md(s){return esc(s).replace(/`([^`\n]+)`/g,"<code>$1</code>").replace(/\*\*([^*\n]+)\*\*/g,"<b>$1</b>")}
-function sizeDrawer(){const d=$("#ctl");d.style.setProperty("--top",$("header").offsetHeight+"px");d.style.setProperty("--bot",$("footer").offsetHeight+"px")}
-function openCtl(tab){CTL.open=true;sizeDrawer();$("#ctl").classList.add("open");$("#ctl").setAttribute("aria-hidden","false");$("#btnCtl").classList.add("on");if(tab)showTab(tab);pollOrch()}
-function closeCtl(){CTL.open=false;$("#ctl").classList.remove("open");$("#ctl").setAttribute("aria-hidden","true");$("#btnCtl").classList.remove("on")}
-function showTab(t){CTL.tab=t;$("#ctl").classList.toggle("wide",t==="cfg"||t==="met");if(t==="cfg")loadCfg();if(t==="met")loadMetrics();document.querySelectorAll(".tabs [data-tab]").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("on",p.id==="p-"+t));if(t==="orch")setTimeout(()=>$("#oMsg").focus(),50)}
+function acText(a){return typeof a==="string"?a:(a&&(a.text||a.description))||""}
+function acId(a,i){return a&&typeof a==="object"&&a.id?a.id:`AC-${i+1}`}
 
-/* estado y tareas pendientes */
+/* navegación: #/inicio · #/directo · #/features[/F-001] · #/orquestador · #/nueva · #/configuracion[/sección] · #/metricas */
+const ROUTES={inicio:"home",directo:"live",features:"feats",orquestador:"orch",nueva:"new",configuracion:"cfg",metricas:"met"};
+function go(hash){if(location.hash!==hash)location.hash=hash;else route()}
+function route(){
+  if(!CTL.on)return;
+  const parts=location.hash.replace(/^#\/?/,"").split("/"),pg=ROUTES[parts[0]]||"home";
+  CTL.page=pg;document.body.classList.toggle("live",pg==="live");
+  document.querySelectorAll("#view .page").forEach(p=>p.classList.toggle("on",p.id==="pg-"+pg));
+  document.querySelectorAll("#side .nav").forEach(a=>a.classList.toggle("on",a.dataset.pg===pg));
+  if(pg==="live")setTimeout(()=>{render(false);window.dispatchEvent(new Event("resize"))},30);
+  if(pg==="home"){renderHome();loadMetrics(true)}
+  if(pg==="feats"){if(parts[1])CTL.sel=decodeURIComponent(parts[1]);renderFeatures()}
+  if(pg==="orch"){pollOrch();setTimeout(()=>$("#oMsg").focus(),50)}
+  if(pg==="cfg"){CTL.cfgTab=parts[1]||CTL.cfgTab||"entornos";loadCfg()}
+  if(pg==="met")loadMetrics();
+}
+const openCtl=t=>go({orch:"#/orquestador",feats:"#/features",new:"#/nueva",cfg:"#/configuracion",met:"#/metricas"}[t]||"#/inicio");
+const closeCtl=()=>{};
+
+/* estado */
 async function pollState(){
   try{CTL.state=await api("/api/state");renderState()}
-  catch(e){if(e.message==="clave"){disableCtl("La clave de esta pestaña ya no vale: abre el enlace que imprimió ./hx watch.")}}
+  catch(e){if(e.message==="clave")disableCtl("La clave de esta pestaña ya no vale: abre el enlace que imprimió ./hx watch.")}
 }
 function renderState(){
   const s=CTL.state;if(!s)return;if(S)render(false);
+  $("#sProj").textContent=s.project&&s.project!=="CHANGE_ME"?s.project:"Proyecto sin nombre";
+  $("#sOrg").innerHTML=`org de desarrollo <b>${esc(s.org||"—")}</b>`;
+  const n=s.pending.length;$("#bHome").hidden=!n;$("#bHome").textContent=n;
+  const open=s.features.filter(f=>!["done"].includes(f.status)).length;$("#bFeats").hidden=!open;$("#bFeats").textContent=open;
+  $("#bOrch").hidden=!CTL.orch.running;$("#bOrch").innerHTML=CTL.orch.running?'<span class="spin" style="border-color:var(--muted);border-right-color:transparent"></span>':"";
   const box=$("#todo");box.innerHTML="";
-  if(CTL.orch.running){box.append(el("div","todo busy",`<span class="spin"></span><span>El orquestador está trabajando…</span><button id="tdOrch">Ver</button>`));$("#tdOrch").onclick=()=>openCtl("orch")}
-  else if(s.pending.length){const p=s.pending[0],f=s.features.find(x=>x.id===p.id);
-    box.append(el("div","todo",`<span>Te toca:</span><b>${esc(p.label)}</b>${f?`<span style="color:var(--muted)">· ${esc(f.title.slice(0,46))}</span>`:""}<button id="tdGo">Revisar</button>`));
+  if(CTL.orch.running){box.append(el("div","todo busy",`<span class="spin"></span><span>El orquestador está trabajando…</span><button id="tdOrch">Ver</button>`));$("#tdOrch").onclick=()=>go("#/orquestador")}
+  else if(n){const p=s.pending[0],f=s.features.find(x=>x.id===p.id);
+    box.append(el("div","todo",`<span>Te toca:</span><b>${esc(p.label)}</b>${f?`<span style="color:var(--muted)">· ${esc(f.title.slice(0,40))}</span>`:""}<button id="tdGo">Revisar</button>`));
     $("#tdGo").onclick=()=>doAction(p.action,p.id,p.kind)}
-  // tarjetas
+  if(CTL.page==="home")renderHome();
+  if(CTL.page==="feats")renderFeatures();
+}
+
+/* Resumen */
+function renderHome(){
+  const s=CTL.state;if(!s)return;
+  $("#hProj").textContent=s.project&&s.project!=="CHANGE_ME"?s.project:"tu proyecto";
+  const ICON={feature:"✓",design:"🧭",close:"🏁",start:"▶",blocked:"⛔"};
+  $("#hTodo").innerHTML=s.pending.length?s.pending.map((p,i)=>{const f=s.features.find(x=>x.id===p.id)||{};
+    return `<div class="act-row"><div class="ic">${ICON[p.kind]||"✋"}</div><div class="t"><b>${esc(p.label)}</b><span>${esc(f.title||"")}</span></div><button class="go" data-pi="${i}">Revisar</button></div>`}).join("")
+    :`<div class="okline">✓ Nada pendiente por tu parte. ${s.active?"El equipo trabaja en "+esc(s.active)+".":"Puedes pedir una feature nueva."}</div>`;
+  $("#hTodo").querySelectorAll("[data-pi]").forEach(b=>b.onclick=()=>{const p=s.pending[+b.dataset.pi];doAction(p.action,p.id,p.kind)});
+  const o=CTL.orch,last=[...document.querySelectorAll("#chat .msg.assistant")].pop();
+  $("#hOrch").innerHTML=!o.available?`<div class="hint" style="margin:0">No encuentro <code>claude</code> en esta máquina: puedes aprobar y configurar, pero no hablar con el orquestador desde aquí.</div>`
+    :`<div class="kv"><dt>Estado</dt><dd>${o.running?'<span class="spin"></span> trabajando':o.session?"esperando tu mensaje":"sin conversación"}</dd></div>${last?`<div class="msg assistant" style="max-width:none;margin-top:10px;max-height:140px;overflow:hidden">${last.innerHTML}</div>`:""}`;
+  const f=s.features.find(x=>x.id===s.active);
+  if(f){const cur=STEP_OF[f.status]??0;
+    $("#hFeat").innerHTML=`<div class="fitem" style="cursor:default;border:0;padding:0"><div class="top"><span class="id">${esc(f.id)}</span><span class="fst ${f.status}">${esc(STLABEL[f.status]||f.status)}</span></div><b style="font-size:16px">${esc(f.title)}</b><span class="meta">${esc(f.type||"")} · tamaño ${esc(f.size||"")}${f.rework_count?` · ${f.rework_count} correcciones`:""}</span></div>
+      <div class="mini-journey">${STEPS.map(([k,n],i)=>`<span class="mj ${i<cur?"done":i===cur?"now":""}">${n}</span>`).join("")}</div>
+      ${s.next?`<div class="next">Siguiente paso: ${md(s.next)}</div>`:""}<div class="actionbar"><button data-goto="#/features/${esc(f.id)}">Abrir ficha</button><button data-goto="#/directo">Verla en directo</button></div>`;
+  }else $("#hFeat").innerHTML=`<div class="hint" style="margin:0">No hay ninguna feature en curso.</div><div class="actionbar"><button class="primary" data-goto="#/nueva">Pedir una feature</button></div>`;
+  document.querySelectorAll("#pg-home [data-goto]").forEach(b=>b.onclick=()=>go(b.dataset.goto));
+  $("#hEnv").innerHTML=`<div class="kv"><dt>Desarrollo</dt><dd>${esc(s.org||"—")} <span class="tag role-dev">escriben</span></dd></div><div class="hint" style="margin:8px 0 0">Validación y orgs protegidas en <a class="link" href="#/configuracion/entornos">Configuración</a>. Producción nunca la tocan los agentes.</div>`;
+  const items=[...document.querySelectorAll("#story .it")].slice(0,7);
+  $("#hRecent").innerHTML=items.length?items.map(x=>x.outerHTML).join(""):`<div class="hint">Aún no ha pasado nada.</div>`;
+}
+
+/* Features */
+const FILTERS=[["all","Todas"],["mine","Esperan por ti"],["active","En curso"],["draft","Borradores"],["blocked","Bloqueadas"],["done","Hechas"]];
+function renderFeatures(){
+  const s=CTL.state;if(!s)return;const pendIds=new Set(s.pending.map(p=>p.id));
+  $("#fFilter").innerHTML=FILTERS.map(([k,n])=>`<button class="chip-btn ${CTL.filter===k?"on":""}" data-f="${k}">${n}</button>`).join("");
+  $("#fFilter").querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{CTL.filter=b.dataset.f;renderFeatures()});
+  const ok=f=>CTL.filter==="all"||(CTL.filter==="mine"&&pendIds.has(f.id))||(CTL.filter==="active"&&["design","build","verify","release"].includes(f.status))||(CTL.filter==="draft"&&["draft","approved"].includes(f.status))||CTL.filter===f.status;
   const order={release:0,verify:1,build:2,design:3,blocked:4,draft:5,approved:6,done:9};
-  const fs=[...s.features].sort((a,b)=>(order[a.status]??7)-(order[b.status]??7)||b.id.localeCompare(a.id));
-  const wrap=$("#feats");
-  if(!fs.length){wrap.innerHTML=`<div class="hint">Todavía no hay features. Pídesela al orquestador en «Nueva feature».</div>`;return}
-  wrap.innerHTML=(s.active?`<div class="hint">Proyecto ${esc(s.project||"")} · org <b>${esc(s.org||"")}</b></div>`:"")+fs.map(f=>{
-    const act=f.id===s.active,pend=s.pending.filter(p=>p.id===f.id),btn=[];
-    pend.forEach(p=>btn.push(`<button class="go" data-a="${p.action}" data-id="${f.id}" data-k="${p.kind}">${esc(p.label.replace(" "+f.id,""))}</button>`));
-    if(!["draft","approved"].includes(f.status))btn.push(`<button data-rep="${f.id}">Informe de evidencia</button>`);
-    if(["verify","release"].includes(f.status))btn.push(`<button data-a="rework" data-id="${f.id}">Rework</button>`);
-    if(f.status==="release")btn.push(`<button data-a="reverify" data-id="${f.id}">Reverify</button>`);
-    if(!["done","blocked"].includes(f.status))btn.push(`<button class="danger" data-a="block" data-id="${f.id}">Bloquear</button>`);
-    return `<div class="fcard ${act?"act":""}"><h4><span class="id">${esc(f.id)}</span>${esc(f.title)}<span class="fst ${f.status}">${STLABEL[f.status]||f.status}</span></h4>
-      <p>${esc(f.type||"")} · tamaño ${esc(f.size||"")}${f.rework_count?` · ${f.rework_count} rework`:""}${f.blocked_reason?` · <span style="color:var(--build)">${esc(f.blocked_reason)}</span>`:""}</p>
-      ${act&&s.next?`<div class="next">Siguiente: ${md(s.next)}</div>`:""}
-      ${btn.length?`<div class="row">${btn.join("")}</div>`:""}</div>`}).join("");
-  wrap.querySelectorAll("button[data-a]").forEach(b=>b.onclick=()=>doAction(b.dataset.a,b.dataset.id,b.dataset.k));
-  wrap.querySelectorAll("button[data-rep]").forEach(b=>b.onclick=()=>openReport(b.dataset.rep));
+  const fs=[...s.features].filter(ok).sort((a,b)=>(order[a.status]??7)-(order[b.status]??7)||b.id.localeCompare(a.id));
+  if(!CTL.sel||!s.features.find(f=>f.id===CTL.sel))CTL.sel=(s.active||fs[0]?.id||null);
+  $("#feats").innerHTML=fs.length?fs.map(f=>`<button class="fitem ${f.id===CTL.sel?"sel":""}" data-fid="${esc(f.id)}"><div class="top"><span class="id">${esc(f.id)}</span><span class="fst ${f.status}">${esc(STLABEL[f.status]||f.status)}</span></div><b>${esc(f.title)}</b><span class="meta">${esc(f.type||"")} · tamaño ${esc(f.size||"")}</span>${pendIds.has(f.id)?`<span class="pend">✋ Espera por ti</span>`:""}</button>`).join("")
+    :`<div class="hint">No hay features con este filtro.</div>`;
+  $("#feats").querySelectorAll("[data-fid]").forEach(b=>b.onclick=()=>go(`#/features/${b.dataset.fid}`));
+  renderDetail();
+}
+function renderDetail(){
+  const s=CTL.state,box=$("#fDetail"),f=s.features.find(x=>x.id===CTL.sel);
+  if(!f){box.innerHTML=`<div class="hint">Todavía no hay features. <a class="link" href="#/nueva">Pide la primera</a>.</div>`;return}
+  if(box.dataset.fid===f.id&&box.dataset.v===JSON.stringify([f,s.pending,s.next]))return;
+  box.dataset.fid=f.id;box.dataset.v=JSON.stringify([f,s.pending,s.next]);
+  const act=f.id===s.active,pend=s.pending.filter(p=>p.id===f.id),btn=[];
+  pend.forEach(p=>btn.push(`<button class="go" data-a="${p.action}" data-k="${p.kind}">${esc(p.label.replace(" "+f.id,""))}</button>`));
+  if(!["draft","approved"].includes(f.status))btn.push(`<button data-rep="1">Informe de evidencia</button>`);
+  if(["verify","release"].includes(f.status))btn.push(`<button data-a="rework">Pedir corrección</button>`);
+  if(f.status==="release")btn.push(`<button data-a="reverify">Repetir comprobaciones</button>`);
+  if(!["done","blocked"].includes(f.status))btn.push(`<button class="danger" data-a="block">Bloquear</button>`);
+  const cur=STEP_OF[f.status]??0,acs=f.acceptance_criteria||[],oos=f.out_of_scope||[];
+  box.innerHTML=`<div class="fhead"><div style="flex:1"><p class="eyebrow">${esc(f.id)} · ${esc(f.type||"")} · tamaño ${esc(f.size||"")}</p><h2>${esc(f.title)}</h2></div><span class="fst ${f.status}">${esc(STLABEL[f.status]||f.status)}</span></div>
+    ${f.status!=="blocked"?`<div class="mini-journey">${STEPS.map(([k,n],i)=>`<span class="mj ${f.status==="done"||i<cur?"done":i===cur?"now":""}">${n}</span>`).join("")}</div>`:`<div class="act-row"><div class="ic">⛔</div><div class="t"><b>Bloqueada</b><span>${esc(f.blocked_reason||"")}</span></div></div>`}
+    ${act&&s.next?`<div class="nowbar" style="min-height:0"><div class="ico">🧭</div><div class="txt" style="font-size:15px">Siguiente paso: ${md(s.next)}</div></div>`:""}
+    ${btn.length?`<div class="actionbar">${btn.join("")}</div>`:""}
+    <div><p class="eyebrow" style="margin-bottom:6px">Qué se pidió</p><div>${md(f.description||"Sin descripción.")}</div></div>
+    <div><p class="eyebrow" style="margin-bottom:6px">Criterios de aceptación</p>${acs.length?`<ol class="aclist">${acs.map((a,i)=>`<li><b>${esc(acId(a,i))}</b> ${md(acText(a))}</li>`).join("")}</ol>`:`<div class="hint">Sin criterios.</div>`}</div>
+    ${oos.length?`<div><p class="eyebrow" style="margin-bottom:6px">Fuera de alcance</p><ul class="aclist">${oos.map(x=>`<li>${md(acText(x))}</li>`).join("")}</ul></div>`:""}
+    <div id="repWrap"></div>`;
+  box.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>doAction(b.dataset.a,f.id,b.dataset.k));
+  box.querySelectorAll("[data-rep]").forEach(b=>b.onclick=()=>showReport(f.id));
+}
+async function reportUrl(id){const r=await api("/api/report/ticket",{id});if(r.rc!==0)throw new Error(r.output);return r.url}
+async function showReport(id){
+  const w=$("#repWrap");if(!w)return;
+  w.innerHTML=`<div class="hint"><span class="spin"></span> Generando el informe…</div>`;
+  try{const url=await reportUrl(id);
+    w.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><p class="eyebrow" style="margin:0">Informe de evidencia</p><span class="sp" style="flex:1"></span><a class="link" href="${url}" target="_blank" rel="noopener">Abrir en otra pestaña para imprimir o guardar en PDF</a></div><iframe class="report-frame" src="${url}" title="Informe de evidencia de ${esc(id)}"></iframe>`;
+    w.scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(e){w.innerHTML=`<div class="hint">No pude generar el informe: ${esc(e.message||e)}</div>`}
+}
+async function openReport(id){
+  const w=window.open("about:blank","_blank");
+  try{const url=await reportUrl(id);if(w)w.location.href=url;else location.href=url}
+  catch(e){if(w)w.close();toast(`No pude generar el informe: ${e.message||e}`,"bad")}
 }
 
 /* acciones humanas */
-const VERB={approve:"Aprobar",start:"Arrancar",close:"Cerrar como DONE",unblock:"Desbloquear",block:"Bloquear",rework:"Devolver a construcción (rework)",reverify:"Repetir verificación (reverify)"};
+const VERB={approve:"Aprobar",start:"Arrancar",close:"Cerrar como hecha",unblock:"Desbloquear",block:"Bloquear",rework:"Pedir corrección (rework)",reverify:"Repetir comprobaciones (reverify)"};
 function doAction(action,id,kind){
   const s=CTL.state||{features:[]},f=s.features.find(x=>x.id===id)||{id,title:""};
   const reason=["block","rework","reverify"].includes(action);
@@ -869,17 +1098,17 @@ function doAction(action,id,kind){
   let body=`<h3>${esc(title)}</h3><div class="sub">${esc(f.title)} · ${esc(f.type||"")} · tamaño ${esc(f.size||"")} · ${STLABEL[f.status]||f.status||""}</div>`;
   if(gate||action==="start"){
     if(f.description)body+=`<div class="k">Qué y para qué</div><div>${md(f.description)}</div>`;
-    if(f.acceptance_criteria?.length)body+=`<div class="k">Criterios de aceptación</div><ul>${f.acceptance_criteria.map(a=>`<li><b class="mono">${esc(a.id)}</b> ${md(a.text)}</li>`).join("")}</ul>`;
-    if(f.out_of_scope?.length)body+=`<div class="k">Fuera de alcance</div><ul>${f.out_of_scope.map(x=>`<li>${md(x)}</li>`).join("")}</ul>`;
-    if(kind==="design")body+=`<div class="hint">Revisa <code>docs/specs/${esc(id)}/design.md</code> antes de aprobar: el orquestador te lo ha resumido en el chat.</div>`;
-    if(action==="close")body+=`<div class="hint">Todos los gates y revisiones están en verde para el código actual. El plan de entrega está en <code>docs/specs/${esc(id)}/release.md</code> y el manifest en <code>manifest/${esc(id)}/</code>. Cerrar no despliega a ningún entorno superior.</div>`;
+    if(f.acceptance_criteria?.length)body+=`<div class="k">Criterios de aceptación</div><ul>${f.acceptance_criteria.map((a,i)=>`<li><b>${esc(acId(a,i))}</b> ${md(acText(a))}</li>`).join("")}</ul>`;
+    if(f.out_of_scope?.length)body+=`<div class="k">Fuera de alcance</div><ul>${f.out_of_scope.map(x=>`<li>${md(acText(x))}</li>`).join("")}</ul>`;
+    if(kind==="design")body+=`<div class="hint">Revisa <code>docs/specs/${esc(id)}/design.md</code> antes de aprobar: el orquestador te lo ha resumido en la conversación.</div>`;
+    if(action==="close")body+=`<div class="hint">Todos los gates y revisiones están en verde para el código actual. Cerrar no despliega en ningún entorno superior: eso lo hace vuestro pipeline.</div>`;
   }
   if(reason)body+=`<div class="k">Motivo</div><textarea id="mReason" rows="3" placeholder="Por qué"></textarea>`;
-  if(action==="unblock")body+=`<label style="display:flex;gap:6px;margin-top:10px;font-size:12px;color:var(--muted)"><input type="checkbox" id="mReset"> Poner a cero los ciclos de rework</label>`;
+  if(action==="unblock")body+=`<label style="display:flex;gap:6px;margin-top:10px;font-size:12px;color:var(--muted)"><input type="checkbox" id="mReset"> Poner a cero las correcciones</label>`;
   const notify=CTL.orch.available&&CTL.orch.session;
   body+=`<div id="mOut"></div><div class="acts">${notify?`<label><input type="checkbox" id="mNotify" checked> Avisar al orquestador para que siga</label>`:""}<button id="mCancel">Cancelar</button><button id="mGo" class="${action==="block"?"danger":"go"}">${gate?"Confirmo: ":""}${esc(VERB[action])}</button></div>`;
   $("#dlg").className="dlg";$("#dlg").innerHTML=body;$("#modal").classList.add("on");
-  $("#mCancel").onclick=()=>$("#modal").classList.remove("on");
+  $("#mCancel").onclick=closeDlg;
   $("#mGo").onclick=async()=>{
     const payload={action,id};
     if(reason){payload.reason=$("#mReason").value.trim();if(!payload.reason){$("#mReason").focus();return}}
@@ -889,11 +1118,11 @@ function doAction(action,id,kind){
     let r;try{r=await api("/api/action",payload)}catch(e){r={rc:9,output:String(e)}}
     $("#mOut").innerHTML=`<pre class="${r.rc===0?"good":"bad"}">${esc(r.output||"")}</pre>`;
     $("#mGo").disabled=false;$("#mGo").textContent="Reintentar";
-    pollState();
+    await pollState();
     if(r.rc===0){
       toast(`${title}: hecho`,"good");
       if(tell&&!CTL.orch.running){const extra=payload.reason?` Motivo: ${payload.reason}`:"";await sendOrch(`He pulsado «${title}» en el centro de control y ha ido bien.${extra} Continúa con ./hx status.`,false)}
-      setTimeout(()=>$("#modal").classList.remove("on"),r.output?900:0);
+      setTimeout(closeDlg,r.output?900:0);
     }
   };
   setTimeout(()=>($("#mReason")||$("#mGo")).focus(),30);
@@ -907,54 +1136,62 @@ function renderItems(items){
     if(k==="tool"||k==="tool-error")d.title=it.text;chat.append(d)});
   if(stick||items.some(i=>i.kind==="user"))chat.scrollTop=chat.scrollHeight;
 }
+let orchBusy=false;
 async function pollOrch(){
+  if(orchBusy)return;orchBusy=true;
   try{
     const o=await api(`/api/orch?since=${CTL.orchN}`);
     const was=CTL.orch.running;CTL.orch=o;
-    if(o.total<CTL.orchN){$("#chat").innerHTML="";CTL.orchN=0;return pollOrch()}
+    if(o.total<CTL.orchN){$("#chat").innerHTML="";CTL.orchN=0;orchBusy=false;return pollOrch()}
     if(o.items.length){renderItems(o.items);CTL.orchN=o.total}
-    if(!o.available){$("#oStat").innerHTML=`<span style="color:var(--build)">No encuentro <code>claude</code> en esta máquina.</span> Instala Claude Code para hablar con el orquestador desde aquí; las aprobaciones funcionan igual.`;$("#oSend").disabled=true}
+    if(!o.available){$("#oStat").innerHTML=`<span style="color:#a8561b">No encuentro <code>claude</code> en esta máquina.</span> Instala Claude Code para hablar con el orquestador desde aquí.`;$("#oSend").disabled=true}
     else $("#oStat").innerHTML=o.running?`<span class="spin"></span>&nbsp;Trabajando…`:o.session?"Esperando tu mensaje":"Sin conversación todavía";
     $("#oStop").hidden=!o.running;$("#oSend").disabled=!o.available||o.running;$("#oReset").disabled=o.running;
     if(was!==o.running){renderState();if(!o.running&&was)pollState()}
-    if(!CTL.orchN&&!o.items.length&&!o.running&&!$("#chat").children.length)$("#chat").innerHTML=`<div class="hint" id="chatHint">Escribe lo que necesitas. El orquestador trabaja en tu carpeta con los mismos guardas que en la terminal; cuando toque aprobar o cerrar, te avisará y lo pulsas tú aquí.</div>`;
+    if(!CTL.orchN&&!o.items.length&&!o.running&&!$("#chat").children.length)$("#chat").innerHTML=`<div class="hint" id="chatHint">Escribe lo que necesitas. Cuando toque aprobar o cerrar, te avisará y lo pulsas tú.</div>`;
   }catch(e){if(e.message==="clave")disableCtl("La clave de esta pestaña ya no vale.")}
+  finally{orchBusy=false}
 }
 async function sendOrch(text,switchTab=true){
   text=(text||"").trim();if(!text)return false;
-  if(switchTab)openCtl("orch");
+  if(switchTab)go("#/orquestador");
   $("#chatHint")?.remove();
   let r;try{r=await api("/api/orch/send",{message:text})}catch(e){r={rc:9,output:String(e)}}
   if(r.rc!==0){toast(r.output,"bad");return false}
   CTL.orch.running=true;renderState();pollOrch();return true;
 }
-function disableCtl(msg){CTL.on=false;clearInterval(CTL.timer);clearInterval(CTL.otimer);$("#btnCtl").hidden=true;$("#todo").innerHTML="";closeCtl();if(msg)toast(msg,"bad");try{sessionStorage.removeItem("hxk")}catch{}}
+function disableCtl(msg){CTL.on=false;clearInterval(CTL.timer);clearInterval(CTL.otimer);document.body.classList.remove("app","live");$("#todo").innerHTML="";if(msg)toast(msg,"bad");try{sessionStorage.removeItem("hxk")}catch{}}
 
+const QUICK=["¿En qué estado está la feature y qué falta?","Sigue con el siguiente paso.","Resume lo que se ha hecho hasta ahora, en cinco líneas.","¿Hay algo que necesites que decida yo?"];
+const TEMPLATES=[["Campo + validación","Necesito un campo nuevo en <objeto> y una regla que valide <condición>."],["Trigger / lógica Apex","Cuando <evento> en <objeto>, el sistema debe <acción>."],["Componente LWC","Quiero un componente en la página de <objeto> que muestre <datos> y permita <acción>."],["Flow","Automatiza <proceso>: cuando <condición>, <acciones>."],["Corrección","Hay un error: al <acción> pasa <síntoma>; debería <comportamiento esperado>."]];
 async function initCtl(){
   readToken();if(!CTL.token)return false;
-  try{CTL.state=await api("/api/state")}catch{disableCtl(location.search?"":"");return false}
-  CTL.on=true;$("#btnCtl").hidden=false;renderState();
-  $("#btnCtl").onclick=()=>CTL.open?closeCtl():openCtl();
-  $("#ctlClose").onclick=closeCtl;
-  document.querySelectorAll(".tabs [data-tab]").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+  try{CTL.state=await api("/api/state")}catch{disableCtl();return false}
+  CTL.on=true;document.body.classList.add("app");
+  addEventListener("hashchange",route);
   $("#oSend").onclick=async()=>{if(await sendOrch($("#oMsg").value))$("#oMsg").value=""};
   $("#oMsg").onkeydown=e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("#oSend").click()}};
   $("#oStop").onclick=async()=>{await api("/api/orch/stop",{});pollOrch()};
   $("#oReset").onclick=async()=>{const r=await api("/api/orch/reset",{});if(r.rc){toast(r.output,"bad");return}$("#chat").innerHTML="";CTL.orchN=0;pollOrch()};
+  $("#oQuick").innerHTML=QUICK.map((q,i)=>`<button data-q="${i}">${esc(q)}</button>`).join("");
+  $("#oQuick").querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>sendOrch(QUICK[+b.dataset.q]));
+  $("#nTpl").innerHTML=TEMPLATES.map((t,i)=>`<button class="chip-btn" data-t="${i}">${esc(t[0])}</button>`).join("");
+  $("#nTpl").querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{$("#nAsk").value=TEMPLATES[+b.dataset.t][1];$("#nAsk").focus()});
   $("#nAskBtn").onclick=async()=>{const t=$("#nAsk").value.trim();if(!t){$("#nAsk").focus();return}
     if(await sendOrch(`Quiero una feature nueva. Hazme solo las preguntas imprescindibles, registra el borrador con ./hx propose y enséñamelo para que lo apruebe en el panel.\n\n${t}`))$("#nAsk").value=""};
   $("#fSend").onclick=async()=>{
     const lines=id=>$(id).value.split("\n").map(x=>x.trim()).filter(Boolean);
     const draft={title:$("#fTitle").value.trim(),description:$("#fDesc").value.trim(),type:$("#fType").value,size:$("#fSize").value,acceptance_criteria:lines("#fAc"),out_of_scope:lines("#fOut")};
     let r;try{r=await api("/api/action",{action:"propose",draft})}catch(e){r={rc:9,output:String(e)}}
-    if(r.rc===0){toast("Borrador registrado","good");["#fTitle","#fDesc","#fAc","#fOut"].forEach(x=>$(x).value="");await pollState();showTab("feats")}
-    else{$("#dlg").innerHTML=`<h3>No se pudo registrar</h3><pre class="bad">${esc(r.output)}</pre><div class="acts"><button id="mCancel">Cerrar</button></div>`;$("#modal").classList.add("on");$("#mCancel").onclick=()=>$("#modal").classList.remove("on")}
+    if(r.rc===0){toast("Borrador registrado","good");["#fTitle","#fDesc","#fAc","#fOut"].forEach(x=>$(x).value="");await pollState();CTL.filter="mine";go("#/features")}
+    else dialog(`<h3>No se pudo registrar</h3><pre class="bad">${esc(r.output)}</pre><div class="acts"><button data-close>Cerrar</button></div>`);
   };
-  addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#modal").classList.contains("on"))closeDlg();else if(CTL.open)closeCtl()}});
-  addEventListener("resize",sizeDrawer);
+  addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#modal").classList.contains("on"))closeDlg()});
   CTL.timer=setInterval(pollState,2000);
-  CTL.otimer=setInterval(()=>{if(CTL.open||CTL.orch.running)pollOrch()},1000);
-  pollOrch();
+  CTL.otimer=setInterval(()=>{if(CTL.page==="orch"||CTL.page==="home"||CTL.orch.running)pollOrch()},1000);
+  await pollOrch();renderState();
+  if(!location.hash||!ROUTES[location.hash.replace(/^#\/?/,"").split("/")[0]])history.replaceState(null,"",location.pathname+"#/inicio");
+  route();
   return true;
 }
 
@@ -979,61 +1216,85 @@ async function previewSave(endpoint,payload,title,after){
     if(s.rc===0){closeDlg();toast(s.output||"Guardado","good");await loadCfg();after&&after()}
     else{$("#mOut").innerHTML=`<pre class="bad">${esc(s.output)}</pre>`;$("#mGo").disabled=false;$("#mGo").textContent="Reintentar"}};
 }
-async function loadCfg(){
-  try{CFG.data=await api("/api/config")}catch(e){$("#cfgBox").innerHTML=`<div class="hint">No pude leer la configuración: ${esc(e)}</div>`;return}
-  renderCfg();if(!CFG.orgs)loadOrgs();
-}
 async function loadOrgs(){
   $("#orgTable")&&($("#orgTable").innerHTML=`<tr><td class="hint"><span class="spin"></span> Consultando <code>sf org list</code>…</td></tr>`);
   try{CFG.orgs=await api("/api/orgs")}catch(e){CFG.orgs={orgs:[],error:String(e)}}
   renderOrgs();
 }
-function opened(id){const d=document.getElementById(id);return d?d.open:id==="secEnv"}
+const CFG_TABS=[["entornos","🌐 Entornos y orgs"],["politicas","✅ Políticas de calidad"],["agentes","🤖 Agentes"],["historial","🕘 Historial"],["guardas","🛡️ Guardas"]];
+async function loadCfg(){
+  try{CFG.data=await api("/api/config")}catch(e){$("#cfgBox").innerHTML=`<div class="hint">No pude leer la configuración: ${esc(e)}</div>`;return}
+  renderCfg();if(!CFG.orgs&&CTL.cfgTab==="entornos")loadOrgs();
+}
 function renderCfg(){
-  const d=CFG.data,env=d.environments,pol=d.policies,keep={secEnv:opened("secEnv"),secPol:opened("secPol"),secAg:opened("secAg"),secHist:opened("secHist")};
-  const byClass={};d.agents.forEach(a=>(byClass[a.class||"orchestrator"]=byClass[a.class||"orchestrator"]||[]).push(a));
-  $("#cfgBox").innerHTML=`
-  <details class="sec" id="secEnv" ${keep.secEnv?"open":""}><summary>🌐 Entornos y orgs <small>dónde puede trabajar cada agente</small></summary><div class="body">
-    <div class="lock">🔒<div>Los agentes <b>solo escriben en la org de desarrollo</b>. En la de validación solo hacen comprobaciones sin cambios (<code>deploy validate</code>). Las <b>protegidas</b> (producción) no se tocan nunca: ni leer. Lo aplican las guardas en cada comando.</div></div>
-    <table class="otable" id="orgTable"></table>
-    <div class="acts2"><span class="hint">Las credenciales las guarda la CLI de Salesforce; el harness nunca las ve.</span><button id="orgRefresh">Actualizar</button><button id="orgLogin" class="primary">Conectar una org</button></div>
-    <div class="grid2">
-      <label class="field"><b>Tipo de org de desarrollo</b><select id="eModel"><option value="scratch">Scratch orgs (desechables)</option><option value="sandbox">Sandbox</option></select></label>
-      <label class="field"><b>Org de desarrollo</b> (escriben los agentes)<input type="text" id="eTarget" list="orgAliases" value="${esc(env.target)}"></label>
-      <label class="field"><b>Org de validación</b> (solo comprobaciones)<input type="text" id="eVal" list="orgAliases" value="${esc(env.validation)}" placeholder="la misma de desarrollo"></label>
-      <label class="field"><b>DevHub</b> (crea scratch orgs)<input type="text" id="eHub" list="orgAliases" value="${esc(env.devhub)}"></label>
+  const d=CFG.data;if(!d)return;const tab=CTL.cfgTab.startsWith("agente:")?"agentes":CTL.cfgTab;
+  $("#cfgNav").innerHTML=CFG_TABS.map(([k,n])=>`<button class="${k===tab?"on":""}" data-ct="${k}">${n}${k==="historial"&&d.history.length?` <span class="tag">${d.history.length}</span>`:""}</button>`).join("");
+  $("#cfgNav").querySelectorAll("[data-ct]").forEach(b=>b.onclick=()=>go(`#/configuracion/${b.dataset.ct}`));
+  const env=d.environments,pol=d.policies,box=$("#cfgBox");
+  if(tab==="entornos"){
+    box.innerHTML=`<div class="cols c2" style="align-items:start">
+      <div class="box"><h2>Orgs conectadas<span class="sp"></span><button id="orgRefresh">Actualizar</button><button id="orgLogin" class="primary">Conectar una org</button></h2>
+        <table class="otable" id="orgTable"></table>
+        <div class="hint" style="margin:10px 0 0">Las credenciales las guarda la CLI de Salesforce en tu máquina; el harness nunca las ve.</div></div>
+      <div class="box"><h2>Qué puede hacer cada agente</h2>
+        <div class="lock">🔒<div>Los agentes <b>solo escriben en la org de desarrollo</b>. En la de validación solo hacen comprobaciones sin cambios (<code>deploy validate</code>). Las <b>protegidas</b> (producción, orgs del cliente) no se tocan nunca, ni para leer. Lo aplican las guardas en cada comando.</div></div></div>
     </div>
-    <label class="field"><b>Alias protegidos</b> (producción u orgs del cliente; separados por comas)<input type="text" id="eProt" value="${esc(env.protected.join(", "))}"></label>
-    <datalist id="orgAliases"></datalist>
-    <div class="acts2"><button id="envSave" class="primary">Revisar y guardar</button></div>
-  </div></details>
-  <details class="sec" id="secPol" ${keep.secPol?"open":""}><summary>✅ Políticas de calidad <small>umbrales que deciden si algo pasa</small></summary><div class="body">
-    <div class="grid2">
-      <label class="field"><b>Cobertura mínima por clase</b><input type="number" id="pCov" min="75" max="100" value="${pol.coverage}"></label>
-      <label class="field"><b>Tests Apex que se ejecutan</b><select id="pLevel">${d.choices.testLevels.map(l=>`<option value="${l}" ${l===pol.testLevel?"selected":""}>${esc(LEVEL_ES[l]||l)}</option>`).join("")}</select></label>
-      <label class="field"><b>Severidad que bloquea en el análisis estático</b><select id="pSev">${[1,2,3,4,5].map(n=>`<option value="${n}" ${n===pol.severity?"selected":""}>${SEV_ES[n]}</option>`).join("")}</select></label>
-      <label class="field"><b>Correcciones (rework) antes de bloquear</b><input type="number" id="pRew" min="1" max="10" value="${pol.maxRework}"></label>
+    <div class="box"><h2>Asignación de entornos</h2>
+      <div class="grid2">
+        <label class="field"><b>Tipo de org de desarrollo</b><select id="eModel"><option value="scratch">Scratch orgs (desechables)</option><option value="sandbox">Sandbox</option></select></label>
+        <label class="field"><b>Org de desarrollo</b> (escriben los agentes)<input type="text" id="eTarget" list="orgAliases" value="${esc(env.target)}"></label>
+        <label class="field"><b>Org de validación</b> (solo comprobaciones)<input type="text" id="eVal" list="orgAliases" value="${esc(env.validation)}" placeholder="la misma de desarrollo"></label>
+        <label class="field"><b>DevHub</b> (crea scratch orgs)<input type="text" id="eHub" list="orgAliases" value="${esc(env.devhub)}"></label>
+      </div>
+      <label class="field" style="margin-top:10px"><b>Alias protegidos</b> (producción u orgs del cliente; separados por comas)<input type="text" id="eProt" value="${esc(env.protected.join(", "))}"></label>
+      <datalist id="orgAliases"></datalist>
+      <div class="acts2" style="margin-top:12px"><button id="envSave" class="primary">Revisar y guardar</button></div></div>`;
+    $("#eModel").value=env.model;
+    $("#orgRefresh").onclick=()=>{CFG.orgs=null;loadOrgs()};
+    $("#orgLogin").onclick=loginDialog;
+    $("#envSave").onclick=()=>previewSave("/api/config/environments",{model:$("#eModel").value,target:$("#eTarget").value.trim(),validation:$("#eVal").value.trim(),devhub:$("#eHub").value.trim(),protected:$("#eProt").value.split(",").map(x=>x.trim()).filter(Boolean)},"Entornos y orgs");
+    renderOrgs();
+  }else if(tab==="politicas"){
+    box.innerHTML=`<div class="box"><h2>Umbrales que deciden si algo pasa</h2>
+      <div class="grid2">
+        <label class="field"><b>Cobertura mínima por clase</b> (Salesforce exige 75 % para desplegar)<input type="number" id="pCov" min="75" max="100" value="${pol.coverage}"></label>
+        <label class="field"><b>Tests Apex que se ejecutan</b><select id="pLevel">${d.choices.testLevels.map(l=>`<option value="${l}" ${l===pol.testLevel?"selected":""}>${esc(LEVEL_ES[l]||l)}</option>`).join("")}</select></label>
+        <label class="field"><b>Severidad que bloquea en el análisis estático</b><select id="pSev">${[1,2,3,4,5].map(n=>`<option value="${n}" ${n===pol.severity?"selected":""}>${SEV_ES[n]}</option>`).join("")}</select></label>
+        <label class="field"><b>Correcciones antes de bloquear la feature</b><input type="number" id="pRew" min="1" max="10" value="${pol.maxRework}"></label>
+      </div>
+      <div class="field" style="margin-top:12px"><b>Tamaños que necesitan tu aprobación del diseño</b><div class="checks2">${d.choices.sizes.map(z=>`<label><input type="checkbox" class="pDes" value="${z}" ${pol.designApproval.includes(z)?"checked":""}> ${z}</label>`).join("")}</div></div>
+      <div class="acts2" style="margin-top:12px"><span class="hint">Los gates en sí (qué comandos ejecutan) no se editan aquí: solo sus umbrales.</span><button id="polSave" class="primary">Revisar y guardar</button></div></div>`;
+    $("#polSave").onclick=()=>previewSave("/api/config/policies",{coverage:+$("#pCov").value,testLevel:$("#pLevel").value,severity:+$("#pSev").value,maxRework:+$("#pRew").value,designApproval:[...document.querySelectorAll(".pDes:checked")].map(x=>x.value)},"Políticas de calidad");
+  }else if(tab==="agentes"&&CTL.cfgTab.startsWith("agente:")){
+    renderAgentEditor(CTL.cfgTab.slice(7));
+  }else if(tab==="agentes"){
+    const byClass={};d.agents.forEach(a=>(byClass[a.class||"orchestrator"]=byClass[a.class||"orchestrator"]||[]).push(a));
+    box.innerHTML=["orchestrator","design","build","review","release"].filter(k=>byClass[k]).map(k=>`<div class="box"><h2>${DEPT_OF[k]} <small class="hint" style="margin:0">${byClass[k].length}</small></h2><div class="agents">${byClass[k].map(a=>`<button class="agent" data-ag="${esc(a.name)}"><b>${esc(roleInfo(a.name).name||a.name)}</b><span>${esc(a.description)}</span><i>${esc(a.model)} · ${a.skills.length} skills</i></button>`).join("")}</div></div>`).join("");
+    box.querySelectorAll("[data-ag]").forEach(b=>b.onclick=()=>go(`#/configuracion/agente:${b.dataset.ag}`));
+  }else if(tab==="historial"){
+    box.innerHTML=`<div class="box"><h2>Cambios hechos desde el panel</h2>${d.history.length?`<table class="otable"><tr><th>Cuándo</th><th>Qué</th><th>Fichero</th><th></th></tr>${d.history.map(h=>`<tr><td>${esc(new Date(h.at).toLocaleString("es-ES"))}</td><td>${esc({environments:"Entornos",policies:"Políticas",agent:"Agente",undo:"Deshacer",protect:"Protección automática"}[h.kind]||h.kind)}${h.note?` <span class="hint">${esc(h.note)}</span>`:""}</td><td><code>${esc(h.file)}</code></td><td>${h.backup?`<button data-undo="${esc(h.backup)}">Deshacer</button>`:""}</td></tr>`).join("")}</table>`:`<div class="hint">Aún no has cambiado nada desde el panel.</div>`}</div>`;
+    box.querySelectorAll("[data-undo]").forEach(b=>b.onclick=async()=>{const r=await api("/api/config/undo",{backup:b.dataset.undo});toast(r.output,r.rc?"bad":"good");loadCfg()});
+  }else{
+    box.innerHTML=`<div class="box"><h2>Las guardas no se editan desde aquí</h2><div class="lock">🔒<div>Son la frontera de seguridad: deciden qué puede hacer cada agente en cada momento (qué ficheros toca, contra qué org, en qué fase). Si se pudieran cambiar con un clic, la evidencia dejaría de valer. Se cambian en <code>.claude/hooks/</code> por git y con revisión, y <code>./hx check</code> comprueba que están bien conectadas.</div></div>
+      <div class="kv" style="margin-top:14px"><dt>Org</dt><dd>solo la de desarrollo escribe; producción y alias protegidos, nunca</dd><dt>Ficheros</dt><dd>cada tipo de metadata tiene un rol dueño y solo dentro del alcance aprobado</dd><dt>Fases</dt><dd>fuera de desarrollo, la org está congelada</dd><dt>Puertas humanas</dt><dd>aprobar y cerrar los pulsas tú</dd><dt>Secretos</dt><dd>nada de credenciales en el código ni en el registro</dd></div></div>`;
+  }
+}
+function renderAgentEditor(name){
+  const a=CFG.data.agents.find(x=>x.name===name),box=$("#cfgBox");
+  if(!a){box.innerHTML=`<div class="hint">Ese agente no existe.</div>`;return}
+  box.innerHTML=`<div class="pg-title"><div><p class="eyebrow">${esc(DEPT_OF[a.class||"orchestrator"]||"")} · ${esc(name)}</p><h1 style="font-size:22px"><b>${esc(roleInfo(name).name||name)}</b></h1></div><span class="sp" style="flex:1"></span><button id="agBack">← Todos los agentes</button><button id="agSave" class="primary">Revisar cambios</button></div>
+  <div class="agent-editor">
+    <div class="box" style="display:grid;gap:12px">
+      <label class="field"><b>Descripción</b> (el orquestador la usa para decidir a quién encarga qué)<textarea id="aDesc" rows="5">${esc(a.description)}</textarea></label>
+      <label class="field"><b>Modelo</b><select id="aModel">${["sonnet","opus","haiku","inherit"].map(m=>`<option ${m===a.model?"selected":""}>${m}</option>`).join("")}</select></label>
+      <div class="field"><b>Skills</b> (conocimiento que carga)<div class="checks2" style="display:grid;gap:6px">${CFG.data.skills.map(s=>`<label><input type="checkbox" class="aSk" value="${esc(s)}" ${a.skills.includes(s)?"checked":""}> ${esc(s)}</label>`).join("")}</div></div>
+      <div class="hint" style="margin:0">El cambio aplica a todas las features a partir de ahora. Al actualizar el harness, tu versión se conserva.</div>
     </div>
-    <div class="field"><b>Tamaños que necesitan tu aprobación del diseño</b><div class="checks2">${d.choices.sizes.map(z=>`<label><input type="checkbox" class="pDes" value="${z}" ${pol.designApproval.includes(z)?"checked":""}> ${z}</label>`).join("")}</div></div>
-    <div class="acts2"><button id="polSave" class="primary">Revisar y guardar</button></div>
-  </div></details>
-  <details class="sec" id="secAg" ${keep.secAg?"open":""}><summary>🤖 Agentes <small>${d.agents.length} · qué hace cada uno y cómo</small></summary><div class="body">
-    ${["orchestrator","design","build","review","release"].filter(k=>byClass[k]).map(k=>`<div><p class="eyebrow" style="margin-bottom:6px">${DEPT_OF[k]}</p><div class="agents">${byClass[k].map(a=>`<button class="agent" data-ag="${esc(a.name)}"><b>${esc(roleInfo(a.name).name||a.name)}</b><span>${esc(a.description)}</span><i>${esc(a.model)} · ${a.skills.length} skills</i></button>`).join("")}</div></div>`).join("")}
-  </div></details>
-  <details class="sec" id="secGuard"><summary>🛡️ Guardas <small>no se editan desde aquí</small></summary><div class="body">
-    <div class="lock">🔒<div>Las guardas son la frontera de seguridad: deciden qué puede hacer cada agente en cada momento. Si se pudieran cambiar con un clic, la evidencia dejaría de valer. Se cambian en <code>.claude/hooks/</code> por git y con revisión, y <code>./hx check</code> comprueba que están bien conectadas.</div></div>
-  </div></details>
-  <details class="sec" id="secHist" ${keep.secHist?"open":""}><summary>🕘 Historial de cambios <small>${d.history.length}</small></summary><div class="body">
-    ${d.history.length?`<table class="otable"><tr><th>Cuándo</th><th>Qué</th><th>Fichero</th><th></th></tr>${d.history.map(h=>`<tr><td>${esc(new Date(h.at).toLocaleString("es-ES"))}</td><td>${esc({environments:"Entornos",policies:"Políticas",agent:"Agente",undo:"Deshacer",protect:"Protección automática"}[h.kind]||h.kind)}${h.note?` <span class="hint">${esc(h.note)}</span>`:""}</td><td><code>${esc(h.file)}</code></td><td>${h.backup?`<button data-undo="${esc(h.backup)}">Deshacer</button>`:""}</td></tr>`).join("")}</table>`:`<div class="hint">Aún no has cambiado nada desde el panel.</div>`}
-  </div></details>`;
-  $("#eModel").value=env.model;
-  $("#orgRefresh").onclick=()=>{CFG.orgs=null;loadOrgs()};
-  $("#orgLogin").onclick=loginDialog;
-  $("#envSave").onclick=()=>previewSave("/api/config/environments",{model:$("#eModel").value,target:$("#eTarget").value.trim(),validation:$("#eVal").value.trim(),devhub:$("#eHub").value.trim(),protected:$("#eProt").value.split(",").map(x=>x.trim()).filter(Boolean)},"Entornos y orgs");
-  $("#polSave").onclick=()=>previewSave("/api/config/policies",{coverage:+$("#pCov").value,testLevel:$("#pLevel").value,severity:+$("#pSev").value,maxRework:+$("#pRew").value,designApproval:[...document.querySelectorAll(".pDes:checked")].map(x=>x.value)},"Políticas de calidad");
-  document.querySelectorAll("[data-ag]").forEach(b=>b.onclick=()=>editAgent(b.dataset.ag));
-  document.querySelectorAll("[data-undo]").forEach(b=>b.onclick=async()=>{const r=await api("/api/config/undo",{backup:b.dataset.undo});toast(r.output,r.rc?"bad":"good");loadCfg()});
-  renderOrgs();
+    <div class="box"><label class="field"><b>Instrucciones</b><textarea id="aBody" class="code">${esc(a.body)}</textarea></label></div>
+  </div>
+`;
+  $("#agBack").onclick=()=>go("#/configuracion/agentes");
+  $("#agSave").onclick=()=>previewSave("/api/config/agent",{name,description:$("#aDesc").value,model:$("#aModel").value,skills:[...document.querySelectorAll(".aSk:checked")].map(x=>x.value),body:$("#aBody").value},`Agente ${roleInfo(name).name||name}`);
 }
 function renderOrgs(){
   const t=$("#orgTable");if(!t)return;const o=CFG.orgs;
@@ -1064,47 +1325,38 @@ function loginDialog(){
   };
   setTimeout(()=>$("#lAlias").focus(),30);
 }
-function editAgent(name){
-  const a=CFG.data.agents.find(x=>x.name===name);if(!a)return;
-  dialog(`<h3>${esc(roleInfo(name).name||name)} <span style="font-weight:300;color:var(--muted)">· ${esc(name)}</span></h3>
-    <div class="sub">${esc(DEPT_OF[a.class||"orchestrator"]||"")} · cambia cómo trabaja este agente en todas las features a partir de ahora.</div>
-    <label class="field"><b>Descripción</b> (el orquestador la usa para decidir a quién encarga qué)<textarea id="aDesc" rows="2">${esc(a.description)}</textarea></label>
-    <div class="grid2"><label class="field"><b>Modelo</b><select id="aModel">${["sonnet","opus","haiku","inherit"].map(m=>`<option ${m===a.model?"selected":""}>${m}</option>`).join("")}</select></label>
-    <div class="field"><b>Skills</b> (conocimiento que carga)<div class="checks2">${CFG.data.skills.map(s=>`<label><input type="checkbox" class="aSk" value="${esc(s)}" ${a.skills.includes(s)?"checked":""}> ${esc(s)}</label>`).join("")}</div></div></div>
-    <label class="field"><b>Instrucciones</b><textarea id="aBody" class="code">${esc(a.body)}</textarea></label>
-    <div class="acts"><button data-close>Cancelar</button><button id="mGo" class="go">Revisar cambios</button></div>`,true);
-  $("#mGo").onclick=()=>previewSave("/api/config/agent",{name,description:$("#aDesc").value,model:$("#aModel").value,skills:[...document.querySelectorAll(".aSk:checked")].map(x=>x.value),body:$("#aBody").value},`Agente ${roleInfo(name).name||name}`);
-}
-
 /* ---------- métricas ---------- */
 const PH_COL={design:"#4a8cca",build:"#fcc354",verify:"#ec86a3",release:"#5ab891"};
-async function loadMetrics(){
-  let m;try{m=await api("/api/metrics")}catch(e){$("#metBox").innerHTML=`<div class="hint">No pude leer las métricas.</div>`;return}
+const PH_ES={design:"Diseño",build:"Desarrollo",verify:"Calidad",release:"Entrega"};
+const usd=v=>v.toLocaleString("es-ES",{style:"currency",currency:"USD"});
+async function loadMetrics(homeOnly){
+  let m;try{m=await api("/api/metrics")}catch(e){if(!homeOnly)$("#metBox").innerHTML=`<div class="hint">No pude leer las métricas.</div>`;return}
+  CTL.metrics=m;
   const rows=m.features,done=rows.filter(r=>r.status==="done"&&r.lead_time_s);
   const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
   const fp=avg(rows.filter(r=>r.first_pass_gates!=null).map(r=>r.first_pass_gates));
   const cost=rows.reduce((s,r)=>s+(r.cost?r.cost.usd:0),0)+(m.cost_unassigned?m.cost_unassigned.usd:0);
   const k=[[done.length,"Features cerradas"],[done.length?fmtDur(avg(done.map(r=>r.lead_time_s))):"—","Tiempo medio de inicio a cierre"],[fp!=null?Math.round(fp)+" %":"—","Comprobaciones bien a la primera"],
-    [done.length?avg(done.map(r=>r.rework_loops)).toFixed(1).replace(".",","):"—","Correcciones por feature"],[m.guard_blocks_total,"Acciones impedidas por las guardas"],[cost?cost.toLocaleString("es-ES",{style:"currency",currency:"USD"}):"—","Coste del orquestador desde el panel"]];
-  const maxLead=Math.max(1,...rows.map(r=>Object.values(r.phase_time_s||{}).reduce((a,b)=>a+b,0)));
-  $("#metBox").innerHTML=`<div class="mkpis">${k.map(x=>`<div class="mkpi"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("")}</div>
-  ${rows.length?`<div class="legend">${Object.entries({design:"Diseño",build:"Desarrollo",verify:"Calidad",release:"Entrega"}).map(([p,n])=>`<span><i style="background:${PH_COL[p]}"></i>${n}</span>`).join("")}</div>
-  <table class="otable"><tr><th>Feature</th><th>Tiempo por fase</th><th>Total</th><th>1ª pasada</th><th>Rework</th><th>Coste</th><th></th></tr>
-  ${rows.map(r=>{const ph=r.phase_time_s||{},tot=Object.values(ph).reduce((a,b)=>a+b,0);
-    return `<tr><td><b>${esc(r.id)}</b> <span class="fst ${r.status}">${esc(STLABEL[r.status]||r.status)}</span><div class="hint" style="margin:2px 0 0">${esc(r.title.slice(0,60))} · ${esc(r.size||"")}</div></td>
-    <td><div class="phbar" title="${Object.entries(ph).map(([p,s])=>`${p}: ${fmtDur(s)}`).join(" · ")}" style="width:${Math.max(8,100*tot/maxLead)}%">${["design","build","verify","release"].map(p=>ph[p]?`<i style="width:${100*ph[p]/tot}%;background:${PH_COL[p]}"></i>`:"").join("")}</div></td>
-    <td>${r.lead_time_s?fmtDur(r.lead_time_s):fmtDur(tot)}</td><td>${r.first_pass_gates!=null?Math.round(r.first_pass_gates)+" %":"—"}</td><td>${r.rework_loops}</td>
-    <td>${r.cost?r.cost.usd.toLocaleString("es-ES",{style:"currency",currency:"USD"}):"—"}</td><td><button data-rep="${esc(r.id)}">Informe</button></td></tr>`}).join("")}</table>`
-  :`<div class="hint">Las métricas aparecen cuando arranca la primera feature.</div>`}
-  <div class="hint" style="margin-top:10px">El coste solo cuenta los turnos del orquestador lanzados desde este panel (lo informa Claude Code); los de la terminal no se ven aquí.</div>`;
-  document.querySelectorAll("[data-rep]").forEach(b=>b.onclick=()=>openReport(b.dataset.rep));
-}
-async function openReport(id){
-  const w=window.open("","_blank");
-  try{const r=await fetch(`/api/report?id=${encodeURIComponent(id)}`,{headers:{"X-HX-Token":CTL.token},cache:"no-store"});
-    const html=await r.text();if(!r.ok)throw new Error(html);
-    const url=URL.createObjectURL(new Blob([html],{type:"text/html"}));if(w)w.location=url;else location.href=url;
-  }catch(e){if(w)w.close();toast(`No pude generar el informe: ${e.message||e}`,"bad")}
+    [done.length?avg(done.map(r=>r.rework_loops)).toFixed(1).replace(".",","):"—","Correcciones por feature"],[m.guard_blocks_total,"Acciones impedidas por las guardas"],[cost?usd(cost):"—","Coste del orquestador (desde el panel)"]];
+  const kpis=k.map(x=>`<div class="mkpi"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("");
+  $("#hKpis").innerHTML=kpis;
+  if(homeOnly)return;
+  const tot=r=>Object.values(r.phase_time_s||{}).reduce((a,b)=>a+b,0);
+  const maxT=Math.max(1,...rows.map(tot));
+  $("#metBox").innerHTML=`<div class="mkpis">${kpis}</div>
+  ${rows.length?`<div class="cols c2" style="align-items:start">
+    <div class="box"><h2>Tiempo por fase de cada feature</h2><div class="legend">${Object.keys(PH_COL).map(p=>`<span><i style="background:${PH_COL[p]}"></i>${PH_ES[p]}</span>`).join("")}</div>
+      <div class="chart">${rows.map(r=>{const ph=r.phase_time_s||{},t=tot(r);return `<div class="crow"><span class="lbl"><b>${esc(r.id)}</b> ${esc(r.title)}</span><div class="bar" style="width:${Math.max(4,100*t/maxT)}%" title="${Object.entries(ph).map(([p,s])=>`${PH_ES[p]||p}: ${fmtDur(s)}`).join(" · ")}">${Object.keys(PH_COL).map(p=>ph[p]?`<i style="width:${100*ph[p]/t}%;background:${PH_COL[p]}"></i>`:"").join("")}</div><span>${fmtDur(r.lead_time_s||t)}</span></div>`}).join("")}</div></div>
+    <div class="box"><h2>Calidad a la primera</h2><div class="chart">${rows.map(r=>{const v=r.first_pass_gates;return `<div class="crow" style="grid-template-columns:120px 1fr 60px"><span class="lbl"><b>${esc(r.id)}</b></span><div class="bar"><i style="width:${v||0}%;background:${v>=80?"#5ab891":v>=50?"#fcc354":"#f8485e"}"></i></div><span>${v!=null?Math.round(v)+" %":"—"}</span></div>`}).join("")}</div>
+      <div class="hint" style="margin:10px 0 0">Porcentaje de comprobaciones automáticas que pasaron en su primer intento.</div></div>
+  </div>
+  <div class="box"><h2>Detalle por feature</h2><table class="otable"><tr><th>Feature</th><th>Estado</th><th>Total</th><th>1ª pasada</th><th>Revisiones rechazadas</th><th>Correcciones</th><th>Frenadas</th><th>Coste</th><th></th></tr>
+  ${rows.map(r=>`<tr><td><b>${esc(r.id)}</b> ${esc(r.title.slice(0,60))}<div class="hint" style="margin:2px 0 0">tamaño ${esc(r.size||"")}</div></td><td><span class="fst ${r.status}">${esc(STLABEL[r.status]||r.status)}</span></td>
+    <td>${fmtDur(r.lead_time_s||tot(r))}</td><td>${r.first_pass_gates!=null?Math.round(r.first_pass_gates)+" %":"—"}</td><td>${r.review_rejections||0}</td><td>${r.rework_loops}</td><td>${r.blocked_actions||0}</td>
+    <td>${r.cost?usd(r.cost.usd):"—"}</td><td><button data-rep="${esc(r.id)}">Informe</button></td></tr>`).join("")}</table>
+  <div class="hint" style="margin:10px 0 0">El coste solo cuenta los turnos del orquestador lanzados desde este panel (lo informa Claude Code); los de la terminal no se ven aquí.</div></div>`
+  :`<div class="box"><div class="hint" style="margin:0">Las métricas aparecen cuando arranca la primera feature.</div></div>`}`;
+  document.querySelectorAll("#metBox [data-rep]").forEach(b=>b.onclick=()=>openReport(b.dataset.rep));
 }
 
 /* ---------- marca ---------- */
