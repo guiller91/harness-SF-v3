@@ -399,6 +399,11 @@ def serve(port: int, read_only: bool, cli_path: Path, plan_for: Callable, next_s
             path, _, query = self.path.partition("?")
             if path in ("/", "/index.html"):
                 return self._send(200, viewer.read_bytes(), "text/html; charset=utf-8")
+            if path == "/assets/robot.glb":
+                glb = base / "harness" / "viewer" / "assets" / "robot.glb"
+                if glb.is_file():
+                    return self._send(200, glb.read_bytes(), "model/gltf-binary")
+                return self._send(404, b"no encontrado", "text/plain; charset=utf-8")
             if path == "/brand/logo":
                 found = brand_logo(base)
                 if found:

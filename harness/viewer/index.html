@@ -68,6 +68,16 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;padding:16p
 @keyframes breathe{50%{box-shadow:0 0 0 11px rgba(248,72,94,.06)}}
 @keyframes shakeb{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 .nowbar{display:flex;align-items:center;gap:14px;background:var(--soft);border-radius:15px;padding:14px 18px;border-left:4px solid var(--poppy);min-height:64px}
+.nowbar{position:relative}
+.bot3d{display:none;width:150px;height:170px;margin:-30px -6px -30px -14px;flex:none}
+.bot3d canvas{display:block;width:100%;height:100%}
+.nowbar.has3d{min-height:118px;padding-left:10px}
+.nowbar.has3d .bot3d{display:block}
+.nowbar.has3d .ico{display:none}
+.nowbar.has3d .txt{font-size:20px}
+#credit3d{display:none;font-size:10.5px;color:var(--muted);text-decoration:none;margin-top:2px}
+#credit3d.on{display:block}
+#credit3d:hover{text-decoration:underline}
 .nowbar .ico{font-size:24px;width:32px;text-align:center;flex:none}
 .nowbar .txt{font:400 18px/1.35 var(--sans);flex:1}
 .nowbar .txt b{font-weight:600}
@@ -242,6 +252,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:12px;margin:14px 0 8
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:1100px){main{grid-template-columns:1fr}.right{display:none}body{overflow:auto}}
 </style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
 </head>
 <body>
 <header>
@@ -266,7 +277,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:12px;margin:14px 0 8
       <div class="top"><p class="eyebrow" id="meta">—</p></div>
       <h2 id="title">—</h2>
       <div class="journey" id="journey"><div class="bar" id="jbar"></div></div>
-      <div class="nowbar" id="now" aria-live="polite"><div class="ico" id="nowIco">⏳</div><div class="txt" id="nowTxt">—</div><div class="since" id="nowSince"></div></div>
+      <div class="nowbar" id="now" aria-live="polite"><div class="bot3d" id="bot3d" aria-hidden="true"></div><div class="ico" id="nowIco">⏳</div><div class="txt" id="nowTxt">—</div><div class="since" id="nowSince"></div></div>
     </section>
     <section class="card desk" aria-label="Quién trabaja ahora">
       <div class="deskhead"><p class="eyebrow">Trabajando ahora</p><span class="src" id="orgLine">org de desarrollo <b id="orgName" style="color:var(--ink)">sit</b></span></div>
@@ -321,7 +332,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:12px;margin:14px 0 8
     <select id="speed" aria-label="Velocidad"><option value=".5">×0,5</option><option value="1">×1</option><option value="2" selected>×2</option><option value="4">×4</option><option value="8">×8</option><option value="20">×20</option></select>
   </div>
   <div class="scrub"><input type="range" id="scrub" min="0" max="0" value="0" aria-label="Línea de tiempo"><canvas id="ticks"></canvas></div>
-  <div class="pos" id="pos">—</div>
+  <div><div class="pos" id="pos">—</div><a id="credit3d" href="https://sketchfab.com/3d-models/robot-playground-59fc99d8dcb146f3a6c16dbbcc4680da" target="_blank" rel="noopener">Robot 3D: «Robot Playground» de Hadrien59 · CC BY 4.0 (modificado)</a></div>
 </footer>
 <div id="drop">Suelta aquí tu events.jsonl</div>
 
@@ -490,14 +501,29 @@ function render(anim){
   if(fin){ico="🎉";txt="<b>Feature terminada</b>: verificada y cerrada por ti";cls="done"}
   else if(S.wait){ico=S.wait.ico;txt=S.wait.text;cls="wait"}
   else if(S.gateRun){ico="🔎";txt=`Comprobando <b>${esc(GATE_NAME[S.gateRun]||S.gateRun)}</b>…`;since=`desde hace ${fmtT(t-S.gateRunAt)}`}
-  else if(act.length){const[r,a]=act[0];ico=icoFor(a.act);txt=`<b>${nameOf(r)}</b> ${esc(a.act)}`;if(act.length>1)txt+=` <span style="color:var(--muted);font-size:14px">· y ${act.length-1} más trabajando</span>`;since=`lleva ${fmtT(t-a.since)}`}
+  else if(act.length){const[r,a]=act[0];ico=icoFor(a.act);txt=a.blockedAt&&S.now-a.blockedAt<12?`🛡️ Las guardas frenan a <b>${nameOf(r)}</b>: lo intentará de la forma correcta`:`<b>${nameOf(r)}</b> ${esc(a.act)}`;if(act.length>1)txt+=` <span style="color:var(--muted);font-size:14px">· y ${act.length-1} más trabajando</span>`;since=`lleva ${fmtT(t-a.since)}`}
   else if(S.phase==="blocked"){ico="⛔";txt="Feature <b>bloqueada</b>: necesita tu decisión";cls="wait"}
   else if(typeof CTL!=="undefined"&&CTL.on&&CTL.state&&CTL.state.pending.length&&!CTL.orch.running){ico="✋";txt=`Te toca: <b>${esc(CTL.state.pending[0].label)}</b> · pulsa «Revisar» arriba`;cls="wait"}
   else{ico="🧭";txt=S.lastOrch||"El orquestador prepara el siguiente paso"}
+  botSync(fin,act);
   const nt=$("#nowTxt");if(nt.dataset.v!==txt){nt.innerHTML=txt;nt.dataset.v=txt;if(anim){nt.classList.remove("swap");void nt.offsetWidth;nt.classList.add("swap")}}
-  $("#nowIco").textContent=ico;$("#nowSince").textContent=since;$("#now").className="nowbar "+cls;
+  $("#nowIco").textContent=ico;$("#nowSince").textContent=since;{const nb=$("#now");["wait","done"].forEach(k=>nb.classList.toggle(k,cls===k))}
   renderWorkers(anim,t);renderGates();renderTeam();renderKpis(t);
 }
+const BOT_COLOR={design:"#4a8cca",build:"#fcc354",review:"#ec86a3",release:"#5ab891",orch:"#5a5955",other:"#5a5955"};
+let lastBot=null;
+function botSync(fin,act){
+  if(fin===undefined){if(lastBot&&window.HXBOT)window.HXBOT.set(lastBot);return}
+  let st={mode:"idle",color:BOT_COLOR.orch};
+  const pend=typeof CTL!=="undefined"&&CTL.on&&CTL.state&&CTL.state.pending.length&&!CTL.orch.running;
+  if(fin)st={mode:"happy",color:BOT_COLOR.release};
+  else if(S.wait||S.phase==="blocked"||(!act.length&&pend))st={mode:"wait",color:"#f8485e"};
+  else if(act.length){const[r,a]=act[0],c=BOT_COLOR[roleInfo(r).cls]||BOT_COLOR.orch;
+    st=a.blockedAt&&S.now-a.blockedAt<12?{mode:"alarm",color:"#f8485e"}:{mode:/^(lee|busca|estudia|consulta|empieza|lee el encargo)/.test(a.act)?"think":"work",color:c}}
+  else if(S.gateRun)st={mode:"think",color:BOT_COLOR.orch};
+  lastBot=st;if(window.HXBOT)window.HXBOT.set(st);
+}
+window.__botSync=()=>botSync();
 function workerCard(id){
   const r=roleInfo(id),c=el("div",`worker c-${r.cls}`);c.dataset.role=id;c.style.cursor="pointer";c.onclick=()=>showWho(id);
   c.innerHTML=`<div class="who"><div class="avatar">${robot(r,true)}</div><div><div class="nm">${esc(r.name)}</div><div class="dp">${DEPT_NAME[r.cls]||""}</div></div><div class="tm"></div></div>
@@ -910,6 +936,68 @@ buildStage();resetState();
     try{const t=await fetchEvents();if(parseJsonl(t).length&&source==="demo"){clearInterval(w);await goLive()}}catch{}},2000)}
 })();
 window.__hx=window.__hx||{};
+</script>
+<script type="module">
+/* Robot 3D protagonista. Si no hay WebGL, no carga three.js o la página es un file://, se queda el icono. */
+(async()=>{
+  if(!/^https?:$/.test(location.protocol))return;
+  const box=document.getElementById("bot3d");if(!box)return;
+  try{
+    const THREE=await import("three");
+    const {GLTFLoader}=await import("three/addons/loaders/GLTFLoader.js");
+    const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
+    const scene=new THREE.Scene();scene.add(new THREE.HemisphereLight(0xffffff,0xb8b4ae,2.3));
+    const key=new THREE.DirectionalLight(0xffffff,2.2);key.position.set(2.5,5,4);scene.add(key);
+    const cam=new THREE.PerspectiveCamera(26,1,0.05,100);
+    const gltf=await new GLTFLoader().loadAsync(window.HX_ROBOT_URL||"assets/robot.glb");
+    const root=gltf.scene;scene.add(root);root.rotation.y=0;
+    const body=[],holo=[];
+    root.traverse(o=>{if(o.isMesh){o.frustumCulled=false;const m=o.material;if(!m)return;
+      if(m.name==="holo1"){if(!holo.includes(m))holo.push(m);o.userData.holo=true}else if(!body.includes(m))body.push(m)}});
+    holo.forEach(m=>{m.color.set("#f8485e");m.emissive&&m.emissive.set("#f8485e");m.emissiveIntensity=0.6});
+    const holoMeshes=[];root.traverse(o=>{if(o.userData.holo){if(/^(pDisc1|pPipe\d|MASH1_ReproMesh[123]_)/.test(o.name))o.userData.floor=true;holoMeshes.push(o)}});
+    // tramos de la única animación (25 s): espera, feliz, pensar, trabajar
+    const full=gltf.animations[0],F=30,cut=(n,a,b)=>THREE.AnimationUtils.subclip(full,n,Math.round(a*F),Math.round(b*F),F);
+    const clips={idle:cut("idle",0.1,2.8),happy:cut("happy",2.0,4.3),think:cut("think",5.8,8.4),work:cut("work",9.0,21.0)};
+    const mixer=new THREE.AnimationMixer(root),acts={};
+    Object.entries(clips).forEach(([k,c])=>{acts[k]=mixer.clipAction(c);acts[k].setLoop(THREE.LoopPingPong)});
+    acts.work.setLoop(THREE.LoopRepeat);
+    // caras: los huesos de expresión se encienden con escala 1 y se apagan con 0
+    const bones={};root.traverse(o=>{if(o.isBone||o.type==="Bone"||o.isObject3D){const m=(o.name||"").match(/^(eyeL?(?:Clos(?:Kawai|Happy)?)?|mouth(?:Clos(?:Kawai|Happy)?)?)_\d+$/);if(m)(bones[m[1]]=bones[m[1]]||[]).push(o)}});
+    const FACES={happy:["eyeClosHappy","eyeLClosHappy","mouthClosHappy"],surprise:["eye","eyeL","mouth"],calm:["eye","eyeL","mouthClosHappy"],sleepy:["eyeClos","eyeLClos","mouthClos"]};
+    function face(name){if(!name)return;const on=new Set(FACES[name]);Object.entries(bones).forEach(([k,list])=>list.forEach(b=>{const v=on.has(k)?1:0;b.scale.set(v,v,v)}))}
+    // encuadre: el robot de cuerpo entero
+    function fit(){const w=box.clientWidth||132,h=box.clientHeight||150;renderer.setSize(w,h,false);cam.aspect=w/h;cam.position.set(0,0.9,4.4);cam.lookAt(0,0.78,0);cam.updateProjectionMatrix()}
+    box.append(renderer.domElement);fit();addEventListener("resize",fit);
+    let cur=null,want={mode:"idle",color:"#ffffff"},shakeT=0,faceName="calm";
+    function play(mode){
+      const k=mode==="wait"||mode==="alarm"?"idle":mode in acts?mode:"idle";if(cur===k)return;
+      const next=acts[k];next.reset().fadeIn(0.35).play();if(cur)acts[cur].fadeOut(0.35);cur=k;
+    }
+    function apply(st){
+      want=st;play(st.mode);
+      body.forEach(m=>{m.color.set(st.color);if(m.emissive){m.emissive.set("#ffffff");m.emissiveIntensity=0.32}});
+      const showHolo=st.mode==="work"||st.mode==="think";holoMeshes.forEach(o=>o.visible=showHolo&&!o.userData.floor);
+      faceName=st.mode==="happy"?"happy":st.mode==="alarm"?"surprise":st.mode==="wait"?"calm":null;
+      if(st.mode==="alarm")shakeT=1.2;
+    }
+    const clock=new THREE.Clock();let acc=0;
+    function loop(){
+      requestAnimationFrame(loop);if(document.hidden)return;
+      const dt=Math.min(clock.getDelta(),0.1);acc+=dt;if(acc<1/30)return;
+      mixer.update(reduce?0:acc);face(faceName);
+      if(shakeT>0){shakeT-=acc;root.rotation.z=Math.sin(shakeT*40)*0.06*Math.min(1,shakeT)}else root.rotation.z=0;
+      acc=0;renderer.render(scene,cam);
+    }
+    let last="";
+    window.HXBOT={get state(){return want},cam,root,set(st){const k=st.mode+st.color;if(k===last)return;last=k;apply(st)}};
+    apply(want);loop();
+    document.getElementById("now").classList.add("has3d");document.getElementById("credit3d").classList.add("on");
+    if(window.__botSync)window.__botSync();
+  }catch(e){console.warn("Robot 3D no disponible; sigo con el icono.",e)}
+})();
 </script>
 </body>
 </html>

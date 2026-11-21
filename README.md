@@ -188,6 +188,11 @@ git clone https://github.com/guiller91/harness-SF-v3.git && ./harness-SF-v3/inst
   está trabajando: su encargo, qué hace en este momento («despliega en la org», «escribe
   EmailDomainUtils.cls») y, al terminar, el resumen de su informe. A la derecha, la historia contada en
   lenguaje normal. Haz clic en cualquier agente para ver su ficha.
+- **Un robot 3D protagonista** en la frase de «ahora»: toma el color del departamento de quien trabaja,
+  hace malabares cuando trabaja, piensa cuando lee, pone cara de susto si una guarda lo frena y celebra
+  al cerrar. Modelo «Robot Playground» de Hadrien59 (CC BY 4.0, modificado; ver
+  `harness/viewer/assets/CREDITS.md`). Necesita WebGL e internet para cargar three.js; si no, se ve el
+  icono de siempre.
 
 El enlace que imprime `./hx watch` lleva una clave de sesión: solo ese navegador puede actuar. Para
 poner el logo de tu empresa en el rótulo, copia `logo.png` o `logo.svg` en `.harness/brand/` del

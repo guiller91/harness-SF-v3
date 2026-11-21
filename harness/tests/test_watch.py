@@ -76,6 +76,11 @@ class WatchTest(unittest.TestCase):
         self.assertIn('"propose"', r.read().decode("utf-8"))
         self.assertEqual(r.headers["Cache-Control"], "no-store")
 
+    def test_sirve_el_robot_3d(self):
+        r = self.get("/assets/robot.glb")
+        self.assertEqual(r.headers["Content-Type"], "model/gltf-binary")
+        self.assertEqual(r.read(4), b"glTF")
+
     def test_logo_del_proyecto(self):
         self.assertEqual(self.status(lambda: self.get("/brand/logo")), 404)
         (self.p.root / ".harness/brand").mkdir(parents=True)
