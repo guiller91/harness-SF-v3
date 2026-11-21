@@ -229,6 +229,8 @@ def main() -> None:
     relp = core.rel(file_path, _hx.PROJECT) if file_path else None
     if not relp:
         return
+    core.log_event("edit", base=_hx.PROJECT, role=_hx.role_of(event), file=relp,
+                   tool=event.get("tool_name", ""), feature=_hx._active_id())
     path = _hx.PROJECT / relp
     if not path.is_file() or path.stat().st_size > 400_000:
         return

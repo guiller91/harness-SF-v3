@@ -75,7 +75,7 @@ def flag_value(toks: List[str], *names: str) -> Optional[str]:
 # --------------------------------------------------------------------------- #
 
 HX_CALL = re.compile(r"(?:^|[\s;&|(`])(?:\./|\S*/)?hx\s+([a-z][\w-]*)([^;&|\n]*)")
-ORCHESTRATOR_ONLY = {"propose", "start", "advance", "rework", "reverify", "scope", "block", "unblock", "org"}
+ORCHESTRATOR_ONLY = {"propose", "start", "advance", "rework", "reverify", "scope", "block", "unblock", "org", "watch"}
 HUMAN_GATES = {"approve", "close"}
 
 

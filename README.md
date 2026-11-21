@@ -170,7 +170,15 @@ git clone https://github.com/guiller91/harness-SF-v3.git && ./harness-SF-v3/inst
 ./hx rework <id> --reason …                             ./hx block|unblock <id>
 ./hx metrics           lead time, gates a la primera, rework, bloqueos
 ./hx doctor · ./hx check                                entorno · coherencia interna
+./hx watch             visor animado en el navegador (solo lectura, 127.0.0.1)
 ```
+
+### Verlo en acción
+
+`./hx watch` abre un visor local donde los agentes aparecen, trabajan y entregan al ritmo real de
+`.harness/events.jsonl`: fases, gates en verde/rojo/entorno, revisores en paralelo, guardas que
+bloquean y permisos pedidos al humano. Sin servidor puedes abrir `harness/viewer/index.html`,
+ver el ejemplo o arrastrar un `events.jsonl` para repetir una feature (con scrubber y velocidad).
 
 ## Medirlo
 

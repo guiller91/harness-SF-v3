@@ -16,6 +16,7 @@ solo si las precondiciones se cumplen con evidencia del árbol de fuente actual.
     ./hx verdict <rol> pass|fail [--note ...]
     ./hx rework <id> --reason ...
     ./hx reverify <id> --reason ...   (release > verify sin gastar rework)
+    ./hx watch                        (visor animado en el navegador)
     ./hx block <id> --reason ... | ./hx unblock <id>
     ./hx close <id>        [HUMANO] cierra la feature (done)
     ./hx metrics | doctor | check | tree-hash
@@ -677,6 +678,7 @@ def run_gate(name: str, feat: Optional[Dict[str, Any]], cfg: Dict[str, Any]) -> 
     with open(changed_path, "w", encoding="utf-8", newline="\n") as fh:  # LF siempre: en Windows write_text daría CRLF y bash leería "ruta\r"
         fh.write("\n".join(changed) + ("\n" if changed else ""))
 
+    core.log_event("gate_start", feature=fid, gate=name)
     if feat and not changed and name in ("static", "apex-tests"):
         _, kinds = plan_for(feat, cfg)
         if kinds & {"apex", "apex-test", "lwc", "lwc-test"}:
@@ -929,6 +931,55 @@ def _first_pass(items: List[Dict[str, Any]], key: str) -> Optional[float]:
     if not first:
         return None
     return round(100.0 * sum(1 for s in first.values() if s == "pass") / len(first), 1)
+
+
+def cmd_watch(args: argparse.Namespace) -> int:
+    """Visor animado del harness en http://127.0.0.1:<puerto>. Solo lectura: sirve la página y el log de eventos."""
+    import http.server
+    import threading
+    import webbrowser
+
+    viewer = core.root() / "harness" / "viewer" / "index.html"
+    if not viewer.exists():
+        raise HarnessError("Falta harness/viewer/index.html (reinstala el harness con install.sh --force).")
+    events = core.root() / core.EVENTS_FILE
+
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def _send(self, code: int, body: bytes, ctype: str) -> None:
+            self.send_response(code)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_GET(self) -> None:  # noqa: N802
+            path = self.path.split("?", 1)[0]
+            if path in ("/", "/index.html"):
+                self._send(200, viewer.read_bytes(), "text/html; charset=utf-8")
+            elif path == "/events.jsonl":
+                self._send(200, events.read_bytes() if events.exists() else b"", "text/plain; charset=utf-8")
+            else:
+                self._send(404, b"no encontrado", "text/plain; charset=utf-8")
+
+        def log_message(self, *a: Any) -> None:  # silencio
+            pass
+
+    try:
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
+    except OSError as exc:
+        raise HarnessError(f"No se pudo abrir el puerto {args.port}: {exc}. Prueba con --port <otro>.")
+    url = f"http://127.0.0.1:{server.server_address[1]}/"
+    out(f"{OK} Visor del harness en {url}  (Ctrl+C para cerrar). Solo lectura, solo esta máquina.")
+    if not args.no_open:
+        threading.Timer(0.4, lambda: webbrowser.open(url)).start()
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        out("\nVisor cerrado.")
+    finally:
+        server.server_close()
+    return 0
 
 
 def cmd_metrics(args: argparse.Namespace) -> int:
@@ -1256,6 +1307,11 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("close", help="[HUMANO] cerrar la feature")
     p.add_argument("id")
     p.set_defaults(fn=cmd_close)
+
+    p = sub.add_parser("watch", help="visor animado de los agentes (http://127.0.0.1:8765)")
+    p.add_argument("--port", type=int, default=8765)
+    p.add_argument("--no-open", action="store_true", help="no abrir el navegador")
+    p.set_defaults(fn=cmd_watch)
 
     p = sub.add_parser("metrics", help="métricas por feature")
     p.add_argument("--json", action="store_true")
