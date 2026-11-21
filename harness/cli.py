@@ -347,7 +347,7 @@ def cmd_propose(args: argparse.Namespace) -> int:
     }
     features.append(feat)
     core.save_features(features)
-    core.log_event("propose", feature=fid, size=size, type=ftype)
+    core.log_event("propose", feature=fid, size=size, type=ftype, title=feat["title"][:140])
     render_current(features, core.load_config())
     out(f"{OK} Registrada {fid} como BORRADOR. Enséñasela al humano tal cual:\n")
     out(f"  {fid} - {feat['title']}  [{ftype}, tamaño {size}]")

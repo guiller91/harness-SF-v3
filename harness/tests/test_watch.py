@@ -66,7 +66,7 @@ class WatchTest(unittest.TestCase):
         page = self.get("/")
         self.assertIn("text/html", page.headers["Content-Type"])
         html = page.read().decode("utf-8")
-        self.assertIn("Harness en acción", html)
+        self.assertIn("en acción", html)
         self.assertNotIn(self.token, html)                               # la clave nunca va en el HTML
         self.assertEqual(self.get("/events.jsonl").read(), b"")
         (self.p.root / ".harness").mkdir(exist_ok=True)
