@@ -92,6 +92,27 @@ ruta que termine en `/sf`). Lanzarla saltándose ese nombre —`node …/run.js`
 guardas. En Windows, `bin/sf` (shim del harness, en el PATH de la sesión) elige una CLI que funcione
 desde bash, así que nadie necesita el rodeo.
 
+## Centro de control
+
+`./hx watch` sirve un panel en `127.0.0.1` desde el que el humano aprueba, cierra y habla con el
+orquestador. Es la única vía, además de la terminal, para pasar las puertas humanas, así que:
+
+- **Solo tu navegador actúa.** Al arrancar se genera una clave aleatoria que solo vive en memoria y en
+  el enlace que se imprime (`?k=…`). No va en el HTML, ni a disco, ni al entorno de Claude. Toda
+  llamada a `/api` la exige; sin ella solo se ve el visor.
+- **Ninguna web externa puede usarlo.** Se rechaza cualquier `Host` que no sea `127.0.0.1`/`localhost`
+  con su puerto (DNS rebinding), cualquier `Origin` ajeno, y los POST que no son `application/json`.
+- **Los agentes no pueden.** `./hx watch` lo deniega el guarda para todos los roles (`hx-human`), y
+  cualquier comando que apunte a la API local se bloquea (`console-api`). El orquestador que lanza el
+  panel lleva `HX_CONSOLE=1`: ahí `./hx approve`/`close` se le deniegan y te los pide en el chat.
+- **Mismas reglas que la terminal.** Cada botón ejecuta `./hx` en un proceso propio con una lista
+  cerrada de acciones (`propose`, `approve`, `start`, `close`, `block`, `unblock`, `rework`, `reverify`).
+  Si la CLI dice que no, el panel enseña su mensaje. Queda en `events.jsonl` como `human_action`.
+- **El mensaje al orquestador va por stdin, nunca por argv** (en Windows `claude.cmd` pasa por `cmd.exe`).
+- `git push`, borrar datos u orgs y las credenciales siguen fuera del panel.
+
+No compartas el enlace con clave ni abras el puerto a la red. `--read-only` sirve solo el visor.
+
 ## Secretos
 
 El gate `secrets` busca credenciales literales en los ficheros que cambia la feature (contraseñas y

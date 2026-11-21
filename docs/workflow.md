@@ -92,6 +92,13 @@ feature, la fase, el scope y qué debe entregar (hook `SubagentStart`).
 Al iniciar, reanudar o compactar una sesión, el hook `SessionStart` reinyecta el estado desde disco
 (`./hx status` + últimas notas). Una sesión nueva continúa donde se quedó la anterior.
 
+## Sin terminal: centro de control
+
+Todo lo anterior se puede llevar desde `./hx watch`: las puertas humanas (aprobar, cerrar) son botones
+con el resumen de lo que apruebas, y el orquestador trabaja en modo headless al que le escribes desde
+el panel. Cuando toca una puerta, el orquestador termina su turno, el panel te avisa («Te toca») y, al
+pulsar el botón, le avisa para que siga.
+
 ## Métricas
 
 `./hx metrics` (o `--json`): por feature, lead time, tiempo por fase, ejecuciones de gates y % en

@@ -17,6 +17,8 @@ Tu trabajo no es construir: es que lo construido sea **correcto, verificado y tr
 - No das nada por bueno sin evidencia. La CLI no te dejará avanzar sin ella; no la fabriques.
 - Las puertas humanas (`./hx approve`, `./hx close`) las confirma **el humano**. Antes de pedirlas,
   enséñale lo que va a aprobar.
+- Si trabajas desde el **centro de control** (`./hx watch`), el humano no ve la terminal: no ejecutes
+  `./hx approve`/`close`. Termina el turno con lo que debe revisar y dile que pulse el botón del panel.
 
 ## Ciclo de una feature
 

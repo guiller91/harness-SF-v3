@@ -934,51 +934,27 @@ def _first_pass(items: List[Dict[str, Any]], key: str) -> Optional[float]:
 
 
 def cmd_watch(args: argparse.Namespace) -> int:
-    """Visor animado del harness en http://127.0.0.1:<puerto>. Solo lectura: sirve la página y el log de eventos."""
-    import http.server
+    """Centro de control en http://127.0.0.1:<puerto>: visor animado, acciones humanas y chat con el
+    orquestador. Con --read-only, solo el visor."""
     import threading
     import webbrowser
+    from lib import console
 
-    viewer = core.root() / "harness" / "viewer" / "index.html"
-    if not viewer.exists():
+    if not (core.root() / "harness" / "viewer" / "index.html").exists():
         raise HarnessError("Falta harness/viewer/index.html (reinstala el harness con install.sh --force).")
-    events = core.root() / core.EVENTS_FILE
 
-    class Handler(http.server.BaseHTTPRequestHandler):
-        def _send(self, code: int, body: bytes, ctype: str) -> None:
-            self.send_response(code)
-            self.send_header("Content-Type", ctype)
-            self.send_header("Content-Length", str(len(body)))
-            self.send_header("Cache-Control", "no-store")
-            self.end_headers()
-            self.wfile.write(body)
+    def ready(url: str) -> None:
+        if args.read_only:
+            out(f"{OK} Visor del harness en {url}  (solo lectura · Ctrl+C para cerrar)")
+        else:
+            out(f"{OK} Centro de control en {url}")
+            out("   Ese enlace lleva la clave de esta sesión: no lo compartas. Ctrl+C para cerrar.")
+        sys.stdout.flush()
+        if not args.no_open:
+            threading.Timer(0.4, lambda: webbrowser.open(url)).start()
 
-        def do_GET(self) -> None:  # noqa: N802
-            path = self.path.split("?", 1)[0]
-            if path in ("/", "/index.html"):
-                self._send(200, viewer.read_bytes(), "text/html; charset=utf-8")
-            elif path == "/events.jsonl":
-                self._send(200, events.read_bytes() if events.exists() else b"", "text/plain; charset=utf-8")
-            else:
-                self._send(404, b"no encontrado", "text/plain; charset=utf-8")
-
-        def log_message(self, *a: Any) -> None:  # silencio
-            pass
-
-    try:
-        server = http.server.ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
-    except OSError as exc:
-        raise HarnessError(f"No se pudo abrir el puerto {args.port}: {exc}. Prueba con --port <otro>.")
-    url = f"http://127.0.0.1:{server.server_address[1]}/"
-    out(f"{OK} Visor del harness en {url}  (Ctrl+C para cerrar). Solo lectura, solo esta máquina.")
-    if not args.no_open:
-        threading.Timer(0.4, lambda: webbrowser.open(url)).start()
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        out("\nVisor cerrado.")
-    finally:
-        server.server_close()
+    console.serve(args.port, args.read_only, Path(__file__).resolve(), plan_for, next_step, ready)
+    out("\nCentro de control cerrado.")
     return 0
 
 
@@ -1308,8 +1284,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("id")
     p.set_defaults(fn=cmd_close)
 
-    p = sub.add_parser("watch", help="visor animado de los agentes (http://127.0.0.1:8765)")
+    p = sub.add_parser("watch", help="[HUMANO] centro de control en el navegador (http://127.0.0.1:8765)")
     p.add_argument("--port", type=int, default=8765)
+    p.add_argument("--read-only", action="store_true", help="solo el visor, sin acciones ni orquestador")
     p.add_argument("--no-open", action="store_true", help="no abrir el navegador")
     p.set_defaults(fn=cmd_watch)
 

@@ -13,6 +13,7 @@ MENCIONA un comando), usa Write/Edit para ese fichero o reformula.
 """
 from __future__ import annotations
 
+import os
 import re
 import shlex
 from typing import Dict, List, Optional, Tuple
@@ -75,8 +76,11 @@ def flag_value(toks: List[str], *names: str) -> Optional[str]:
 # --------------------------------------------------------------------------- #
 
 HX_CALL = re.compile(r"(?:^|[\s;&|(`])(?:\./|\S*/)?hx\s+([a-z][\w-]*)([^;&|\n]*)")
-ORCHESTRATOR_ONLY = {"propose", "start", "advance", "rework", "reverify", "scope", "block", "unblock", "org", "watch"}
+ORCHESTRATOR_ONLY = {"propose", "start", "advance", "rework", "reverify", "scope", "block", "unblock", "org"}
 HUMAN_GATES = {"approve", "close"}
+HUMAN_ONLY_HX = {"watch"}
+#: Llamadas a la API local del centro de control (./hx watch): solo desde el navegador del humano.
+CONSOLE_API = re.compile(r"(?:127\.0\.0\.1|localhost|\[::1\]|0\.0\.0\.0)(?::\d+)?/api/", re.I)
 
 
 def guard_hx(cmd: str, role: str, event: Dict) -> Optional[Tuple[str, str]]:
@@ -85,7 +89,12 @@ def guard_hx(cmd: str, role: str, event: Dict) -> Optional[Tuple[str, str]]:
     pending_ask = None
     for match in HX_CALL.finditer(cmd):
         sub, rest = match.group(1), match.group(2)
+        if sub in HUMAN_ONLY_HX:
+            _hx.deny("`./hx watch` es el centro de control del humano: lo abre él, no un agente.", "hx-human", event)
         if sub in HUMAN_GATES:
+            if os.environ.get("HX_CONSOLE") == "1":
+                _hx.deny(f"Estás en el centro de control: `./hx {sub}` lo pulsa el humano en el panel. Termina "
+                         "tu turno resumiéndole qué debe revisar.", "human-gate", event)
             if role != _hx.MAIN_ROLE:
                 _hx.deny(f"`./hx {sub}` es una puerta humana y solo la solicita el orquestador.", "human-gate", event)
             what = "aprobar la feature (o su diseño)" if sub == "approve" else "cerrar la feature como DONE"
@@ -439,6 +448,8 @@ def main() -> None:
     cleaned = strip_quoted_heredocs(strip_commit_messages(cmd))
 
     guard_sf_direct(cleaned, event)
+    if CONSOLE_API.search(cmd):
+        _hx.deny("La API del centro de control es solo para el navegador del humano.", "console-api", event)
     asks = [guard_hx(cleaned, role, event),
             guard_sf(cleaned, role, policy, event),
             guard_git(cleaned, role, policy, event),

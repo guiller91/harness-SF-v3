@@ -157,14 +157,84 @@ footer{border-top:1px solid var(--line);padding:8px 16px;display:grid;grid-templ
 #drop.on{display:grid}
 @media (prefers-reduced-motion:reduce){.tok{transition-duration:.01s}.tok.working .face,.tok.working .eye,.tok.working .ant,.tok.working .arm,.gate.run .fill,.live .dot{animation:none}}
 @media (max-width:1000px){main{grid-template-columns:1fr}aside{display:none}body{overflow:auto}}
+
+/* ---------- centro de control (solo con ./hx watch y su clave) ---------- */
+#btnCtl{border-color:var(--review);color:var(--review)}
+#btnCtl.on{background:var(--review);color:var(--bg)}
+.todo{display:flex;align-items:center;gap:8px;padding:4px 6px 4px 12px;border-radius:999px;background:color-mix(in srgb,var(--build) 16%,var(--panel));border:1px solid var(--build);font-size:12px;animation:slide .3s}
+.todo b{font-weight:600}
+.todo button{padding:3px 10px;border-radius:999px;background:var(--build);color:var(--bg);border:0;font-weight:600}
+.todo.busy{background:color-mix(in srgb,var(--review) 14%,var(--panel));border-color:var(--review)}
+.spin{width:10px;height:10px;border-radius:50%;border:2px solid var(--review);border-right-color:transparent;animation:rot .8s linear infinite;flex:none}
+@keyframes rot{to{transform:rotate(360deg)}}
+.drawer{position:fixed;top:var(--top,52px);right:0;bottom:var(--bot,58px);width:min(470px,100vw);background:var(--panel);border-left:1px solid var(--line);z-index:30;display:grid;grid-template-rows:auto 1fr;box-shadow:-20px 0 40px -20px #000;transform:translateX(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+.drawer.open{transform:none}
+.tabs{display:flex;gap:4px;padding:10px 12px 0;border-bottom:1px solid var(--line)}
+.tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;color:var(--muted);padding:6px 10px}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--review)}
+.tabs .x{margin-left:auto}
+.pane{display:none;min-height:0;overflow:auto;padding:12px}
+.pane.on{display:block}
+#p-orch.on{display:grid;grid-template-rows:auto 1fr auto;gap:8px;overflow:hidden}
+.ostat{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.ostat .sp{flex:1}
+.ostat button{padding:3px 9px;font-size:12px}
+.chat{overflow:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px;min-height:0}
+.msg{max-width:92%;padding:8px 11px;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.45}
+.msg.user{align-self:flex-end;background:color-mix(in srgb,var(--review) 18%,var(--panel2));border:1px solid color-mix(in srgb,var(--review) 40%,transparent)}
+.msg.assistant{align-self:flex-start;background:var(--panel2);border:1px solid var(--line)}
+.msg.assistant code{font:12px var(--mono);background:#0b1016;padding:1px 4px;border-radius:4px}
+.msg.tool,.msg.tool-error,.msg.done,.msg.info{align-self:stretch;padding:2px 4px;font:11.5px var(--mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg.tool-error{color:var(--build)}
+.msg.done{color:var(--ok)}
+.msg.error{align-self:stretch;background:color-mix(in srgb,var(--fail) 14%,var(--panel2));border:1px solid var(--fail);font-size:12px}
+.compose{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+textarea,input[type=text]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;resize:vertical}
+textarea:focus,input[type=text]:focus{outline:2px solid var(--review);outline-offset:0}
+.primary{background:var(--review);color:var(--bg);border-color:var(--review);font-weight:600}
+.danger{border-color:var(--fail);color:var(--fail)}
+.go{background:var(--ok);color:#06120d;border-color:var(--ok);font-weight:600}
+.hint{font-size:12px;color:var(--muted);margin:4px 0 10px}
+.card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:var(--panel2)}
+.card.act{border-color:var(--review)}
+.card h4{margin:0 0 4px;font-size:13px;font-weight:600;display:flex;gap:8px;align-items:center}
+.card h4 .id{font:600 12px var(--mono);color:var(--muted)}
+.fst{font:600 10.5px var(--mono);text-transform:uppercase;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-left:auto}
+.fst.draft,.fst.blocked{color:var(--build);border-color:var(--build)} .fst.done{color:var(--ok);border-color:var(--ok)}
+.fst.design,.fst.build,.fst.verify,.fst.release{color:var(--review);border-color:var(--review)}
+.card p{margin:0 0 8px;color:var(--muted);font-size:12px}
+.card .row{display:flex;gap:6px;flex-wrap:wrap}
+.card .row button{font-size:12px;padding:4px 9px}
+.next{font-size:12px;margin:-2px 0 8px;color:var(--ink)}
+.next code{font:11.5px var(--mono);color:var(--review)}
+.form{display:grid;gap:8px}
+.form label{font-size:12px;color:var(--muted);display:grid;gap:4px}
+.form .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+details summary{cursor:pointer;color:var(--muted);font-size:12px;margin:14px 0 8px}
+#modal{position:fixed;inset:0;background:rgba(5,8,12,.72);display:none;place-items:center;z-index:60}
+#modal.on{display:grid}
+.dlg{width:min(560px,92vw);max-height:84vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:0 30px 60px -20px #000}
+.dlg h3{margin:0 0 4px;font-size:15px}
+.dlg .sub{color:var(--muted);font-size:12px;margin-bottom:12px}
+.dlg ul{margin:6px 0 12px;padding-left:18px}
+.dlg li{margin:3px 0}
+.dlg .k{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-top:10px}
+.dlg .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;align-items:center}
+.dlg .acts label{margin-right:auto;font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.dlg pre{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;font:11.5px/1.5 var(--mono);white-space:pre-wrap;max-height:220px;overflow:auto}
+.dlg pre.bad{border-color:var(--fail)} .dlg pre.good{border-color:var(--ok)}
+.toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 14px;z-index:70;font-size:12.5px;animation:slide .25s}
+.toast.good{border-color:var(--ok)} .toast.bad{border-color:var(--fail)}
 </style>
 </head>
 <body>
 <header>
   <h1>Harness en acción</h1>
   <div class="src" id="src"><span class="dot"></span><span id="srcText">cargando…</span></div>
+  <div id="todo"></div>
   <div class="sp"></div>
   <div class="grp">
+    <button id="btnCtl" hidden title="Pedir features, aprobar, cerrar y hablar con el orquestador">Centro de control</button>
     <label for="feat" class="src">Feature</label><select id="feat" aria-label="Feature"></select>
     <button id="btnDemo" title="Guion de ejemplo basado en una feature S">Ejemplo</button>
     <button id="btnLive" title="Solo con ./hx watch" hidden>En vivo</button>
@@ -190,6 +260,38 @@ footer{border-top:1px solid var(--line);padding:8px 16px;display:grid;grid-templ
     <div class="feed" id="feed" aria-label="Registro de eventos"></div>
   </aside>
 </main>
+
+<div class="drawer" id="ctl" aria-label="Centro de control" aria-hidden="true">
+  <div class="tabs" role="tablist">
+    <button data-tab="orch" class="on">Orquestador</button>
+    <button data-tab="feats">Features</button>
+    <button data-tab="new">Nueva feature</button>
+    <button class="x" id="ctlClose" aria-label="Cerrar panel">✕</button>
+  </div>
+  <section class="pane on" id="p-orch">
+    <div class="ostat"><span id="oStat">—</span><span class="sp"></span><button id="oStop" class="danger" hidden>Detener</button><button id="oReset" title="Empieza una conversación nueva con el orquestador">Nueva conversación</button></div>
+    <div class="chat" id="chat"></div>
+    <div class="compose"><textarea id="oMsg" rows="3" placeholder="Habla con el orquestador: pide una feature, responde a sus preguntas, dile que siga…  (Ctrl+Enter envía)"></textarea><button id="oSend" class="primary">Enviar</button></div>
+  </section>
+  <section class="pane" id="p-feats"><div id="feats"></div></section>
+  <section class="pane" id="p-new">
+    <div class="hint">Lo normal: cuéntaselo al orquestador. Te hará las preguntas que falten, redactará los criterios de aceptación y te la traerá para aprobar.</div>
+    <textarea id="nAsk" rows="6" placeholder="Ej.: Necesito que al crear una Account se valide el dominio del email del contacto principal contra una lista permitida…"></textarea>
+    <div style="display:flex;justify-content:flex-end;margin-top:8px"><button id="nAskBtn" class="primary">Encargar al orquestador</button></div>
+    <details><summary>O regístrala tú directamente (sin orquestador)</summary>
+      <div class="form">
+        <label>Título<input type="text" id="fTitle" maxlength="140"></label>
+        <label>Descripción (qué y para qué)<textarea id="fDesc" rows="3"></textarea></label>
+        <div class="two"><label>Tipo<select id="fType"><option>feature</option><option>bugfix</option><option>refactor</option><option>chore</option></select></label>
+        <label>Tamaño<select id="fSize"><option>S</option><option selected>M</option><option>L</option></select></label></div>
+        <label>Criterios de aceptación (uno por línea)<textarea id="fAc" rows="4"></textarea></label>
+        <label>Fuera de alcance (uno por línea, opcional)<textarea id="fOut" rows="2"></textarea></label>
+        <div style="display:flex;justify-content:flex-end"><button id="fSend" class="primary">Registrar borrador</button></div>
+      </div>
+    </details>
+  </section>
+</div>
+<div id="modal" role="dialog" aria-modal="true"><div class="dlg" id="dlg"></div></div>
 
 <footer>
   <div class="ctl">
@@ -423,6 +525,9 @@ function apply(b,anim){
     if(anim){const t=tok(role),a=centerOf(t),r=rectIn(f),d=el("div","fly");d.style.setProperty("--c",`var(--${info.cls==="review"?"review":info.cls})`);
       d.style.left=a.x+"px";d.style.top=a.y+"px";$("#layer").append(d);requestAnimationFrame(()=>{d.style.transform=`translate(${r.x-a.x}px,${r.y-a.y}px)`;d.style.opacity=".2"});setTimeout(()=>d.remove(),650)}
     feed(b,`${info.label} escribe ${b.file}`);break}
+  case"human_action":{const ok=b.rc===0;P(hum,2200);say(centerHum(),`Tú: ${b.action}${ok?"":" (rechazado)"}`,ok?"good":"bad",anim);
+    feed(b,`Tú, desde el centro de control: ${b.action}${b.feature?" "+b.feature:""}${ok?"":" · la CLI lo rechazó"}`,ok?"good":"bad");break}
+  case"console_message":P(hum,1200);say(centerHum(),"Tú → orquestador","",anim);P(orch,1200);feed(b,"Mensaje del humano al orquestador");break;
   case"autoformat":feed(b,`prettier aplicado a ${b.files} fichero(s)${b.changed?" · había cambios de formato":""}`);say(orch,"prettier","",anim);break;
   case"advance_denied":case"close_denied":say(orch,"Puerta cerrada: faltan requisitos","bad",anim);feed(b,`Puerta cerrada: ${JSON.stringify(rest(b)).slice(0,150)}`,"bad");break;
   default:feed(b,`${e}: ${JSON.stringify(rest(b)).slice(0,150)}`);
@@ -440,7 +545,7 @@ function makeBeats(evs,f){
   const all=evs.filter(e=>e.at&&!isNaN(Date.parse(e.at))).map(e=>({...e,t:Date.parse(e.at)/1000}));
   const mine=all.filter(e=>e.feature===f);if(!mine.length)return[];
   const t0=Math.min(...mine.map(e=>e.t)),t1=Math.max(...mine.map(e=>e.t));
-  const extra=all.filter(e=>!e.feature&&["guard_block","guard_ask","hook_error"].includes(e.event)&&e.t>=t0&&e.t<=t1);
+  const extra=all.filter(e=>!e.feature&&["guard_block","guard_ask","hook_error","console_message"].includes(e.event)&&e.t>=t0&&e.t<=t1);
   const sorted=mine.concat(extra).sort((a,b)=>a.t-b.t),out=[],open=new Set();
   sorted.forEach(b=>{
     if(b.event==="gate_start")open.add(b.gate);
@@ -570,16 +675,171 @@ async function goLive(){
 }
 $("#btnLive").onclick=()=>goLive();
 
+
+/* ---------- centro de control ---------- */
+const CTL={token:null,on:false,state:null,on2:false,orchN:0,orch:{available:false,running:false,session:false},tab:"orch",open:false,timer:null,otimer:null};
+const STLABEL={draft:"borrador",approved:"aprobada",design:"diseño",build:"construcción",verify:"verificación",release:"entrega",done:"hecha",blocked:"bloqueada"};
+function readToken(){
+  const u=new URL(location.href),k=u.searchParams.get("k");
+  if(k){CTL.token=k;try{sessionStorage.setItem("hxk",k)}catch{}u.searchParams.delete("k");history.replaceState(null,"",u.pathname+u.search+u.hash)}
+  else{try{CTL.token=sessionStorage.getItem("hxk")}catch{}}
+}
+async function api(path,body){
+  const h={"X-HX-Token":CTL.token||""};if(body)h["Content-Type"]="application/json";
+  const r=await fetch(path,{method:body?"POST":"GET",headers:h,body:body?JSON.stringify(body):undefined,cache:"no-store"});
+  if(r.status===403)throw new Error("clave");
+  return r.json();
+}
+function toast(text,kind=""){const t=el("div","toast "+kind,esc(text));document.body.append(t);setTimeout(()=>t.remove(),3200)}
+function md(s){return esc(s).replace(/`([^`\n]+)`/g,"<code>$1</code>").replace(/\*\*([^*\n]+)\*\*/g,"<b>$1</b>")}
+function sizeDrawer(){const d=$("#ctl");d.style.setProperty("--top",$("header").offsetHeight+"px");d.style.setProperty("--bot",$("footer").offsetHeight+"px")}
+function openCtl(tab){CTL.open=true;sizeDrawer();$("#ctl").classList.add("open");$("#ctl").setAttribute("aria-hidden","false");$("#btnCtl").classList.add("on");if(tab)showTab(tab);pollOrch()}
+function closeCtl(){CTL.open=false;$("#ctl").classList.remove("open");$("#ctl").setAttribute("aria-hidden","true");$("#btnCtl").classList.remove("on")}
+function showTab(t){CTL.tab=t;document.querySelectorAll(".tabs [data-tab]").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("on",p.id==="p-"+t));if(t==="orch")setTimeout(()=>$("#oMsg").focus(),50)}
+
+/* estado y tareas pendientes */
+async function pollState(){
+  try{CTL.state=await api("/api/state");renderState()}
+  catch(e){if(e.message==="clave"){disableCtl("La clave de esta pestaña ya no vale: abre el enlace que imprimió ./hx watch.")}}
+}
+function renderState(){
+  const s=CTL.state;if(!s)return;
+  const box=$("#todo");box.innerHTML="";
+  if(CTL.orch.running){box.append(el("div","todo busy",`<span class="spin"></span><span>El orquestador está trabajando…</span><button id="tdOrch">Ver</button>`));$("#tdOrch").onclick=()=>openCtl("orch")}
+  else if(s.pending.length){const p=s.pending[0],f=s.features.find(x=>x.id===p.id);
+    box.append(el("div","todo",`<span>Te toca:</span><b>${esc(p.label)}</b>${f?`<span style="color:var(--muted)">· ${esc(f.title.slice(0,46))}</span>`:""}<button id="tdGo">Revisar</button>`));
+    $("#tdGo").onclick=()=>doAction(p.action,p.id,p.kind)}
+  // tarjetas
+  const order={release:0,verify:1,build:2,design:3,blocked:4,draft:5,approved:6,done:9};
+  const fs=[...s.features].sort((a,b)=>(order[a.status]??7)-(order[b.status]??7)||b.id.localeCompare(a.id));
+  const wrap=$("#feats");
+  if(!fs.length){wrap.innerHTML=`<div class="hint">Todavía no hay features. Pídesela al orquestador en «Nueva feature».</div>`;return}
+  wrap.innerHTML=(s.active?`<div class="hint">Proyecto ${esc(s.project||"")} · org <b>${esc(s.org||"")}</b></div>`:"")+fs.map(f=>{
+    const act=f.id===s.active,pend=s.pending.filter(p=>p.id===f.id),btn=[];
+    pend.forEach(p=>btn.push(`<button class="go" data-a="${p.action}" data-id="${f.id}" data-k="${p.kind}">${esc(p.label.replace(" "+f.id,""))}</button>`));
+    if(["verify","release"].includes(f.status))btn.push(`<button data-a="rework" data-id="${f.id}">Rework</button>`);
+    if(f.status==="release")btn.push(`<button data-a="reverify" data-id="${f.id}">Reverify</button>`);
+    if(!["done","blocked"].includes(f.status))btn.push(`<button class="danger" data-a="block" data-id="${f.id}">Bloquear</button>`);
+    return `<div class="card ${act?"act":""}"><h4><span class="id">${esc(f.id)}</span>${esc(f.title)}<span class="fst ${f.status}">${STLABEL[f.status]||f.status}</span></h4>
+      <p>${esc(f.type||"")} · tamaño ${esc(f.size||"")}${f.rework_count?` · ${f.rework_count} rework`:""}${f.blocked_reason?` · <span style="color:var(--build)">${esc(f.blocked_reason)}</span>`:""}</p>
+      ${act&&s.next?`<div class="next">Siguiente: ${md(s.next)}</div>`:""}
+      ${btn.length?`<div class="row">${btn.join("")}</div>`:""}</div>`}).join("");
+  wrap.querySelectorAll("button[data-a]").forEach(b=>b.onclick=()=>doAction(b.dataset.a,b.dataset.id,b.dataset.k));
+}
+
+/* acciones humanas */
+const VERB={approve:"Aprobar",start:"Arrancar",close:"Cerrar como DONE",unblock:"Desbloquear",block:"Bloquear",rework:"Devolver a construcción (rework)",reverify:"Repetir verificación (reverify)"};
+function doAction(action,id,kind){
+  const s=CTL.state||{features:[]},f=s.features.find(x=>x.id===id)||{id,title:""};
+  const reason=["block","rework","reverify"].includes(action);
+  const gate=["approve","close"].includes(action);
+  const title=action==="approve"&&kind==="design"?`Aprobar el diseño de ${id}`:`${VERB[action]} ${id}`;
+  let body=`<h3>${esc(title)}</h3><div class="sub">${esc(f.title)} · ${esc(f.type||"")} · tamaño ${esc(f.size||"")} · ${STLABEL[f.status]||f.status||""}</div>`;
+  if(gate||action==="start"){
+    if(f.description)body+=`<div class="k">Qué y para qué</div><div>${md(f.description)}</div>`;
+    if(f.acceptance_criteria?.length)body+=`<div class="k">Criterios de aceptación</div><ul>${f.acceptance_criteria.map(a=>`<li><b class="mono">${esc(a.id)}</b> ${md(a.text)}</li>`).join("")}</ul>`;
+    if(f.out_of_scope?.length)body+=`<div class="k">Fuera de alcance</div><ul>${f.out_of_scope.map(x=>`<li>${md(x)}</li>`).join("")}</ul>`;
+    if(kind==="design")body+=`<div class="hint">Revisa <code>docs/specs/${esc(id)}/design.md</code> antes de aprobar: el orquestador te lo ha resumido en el chat.</div>`;
+    if(action==="close")body+=`<div class="hint">Todos los gates y revisiones están en verde para el código actual. El plan de entrega está en <code>docs/specs/${esc(id)}/release.md</code> y el manifest en <code>manifest/${esc(id)}/</code>. Cerrar no despliega a ningún entorno superior.</div>`;
+  }
+  if(reason)body+=`<div class="k">Motivo</div><textarea id="mReason" rows="3" placeholder="Por qué"></textarea>`;
+  if(action==="unblock")body+=`<label style="display:flex;gap:6px;margin-top:10px;font-size:12px;color:var(--muted)"><input type="checkbox" id="mReset"> Poner a cero los ciclos de rework</label>`;
+  const notify=CTL.orch.available&&CTL.orch.session;
+  body+=`<div id="mOut"></div><div class="acts">${notify?`<label><input type="checkbox" id="mNotify" checked> Avisar al orquestador para que siga</label>`:""}<button id="mCancel">Cancelar</button><button id="mGo" class="${action==="block"?"danger":"go"}">${gate?"Confirmo: ":""}${esc(VERB[action])}</button></div>`;
+  $("#dlg").innerHTML=body;$("#modal").classList.add("on");
+  $("#mCancel").onclick=()=>$("#modal").classList.remove("on");
+  $("#mGo").onclick=async()=>{
+    const payload={action,id};
+    if(reason){payload.reason=$("#mReason").value.trim();if(!payload.reason){$("#mReason").focus();return}}
+    if(action==="unblock")payload.reset_rework=$("#mReset").checked;
+    const tell=$("#mNotify")?.checked;
+    $("#mGo").disabled=true;$("#mGo").textContent="…";
+    let r;try{r=await api("/api/action",payload)}catch(e){r={rc:9,output:String(e)}}
+    $("#mOut").innerHTML=`<pre class="${r.rc===0?"good":"bad"}">${esc(r.output||"")}</pre>`;
+    $("#mGo").disabled=false;$("#mGo").textContent="Reintentar";
+    pollState();
+    if(r.rc===0){
+      toast(`${title}: hecho`,"good");
+      if(tell&&!CTL.orch.running){const extra=payload.reason?` Motivo: ${payload.reason}`:"";await sendOrch(`He pulsado «${title}» en el centro de control y ha ido bien.${extra} Continúa con ./hx status.`,false)}
+      setTimeout(()=>$("#modal").classList.remove("on"),r.output?900:0);
+    }
+  };
+  setTimeout(()=>($("#mReason")||$("#mGo")).focus(),30);
+}
+
+/* orquestador */
+function renderItems(items){
+  $("#chatHint")?.remove();const chat=$("#chat"),stick=chat.scrollHeight-chat.scrollTop-chat.clientHeight<60;
+  items.forEach(it=>{const k=it.kind;const d=el("div","msg "+k);
+    if(k==="assistant")d.innerHTML=md(it.text);else d.textContent=it.text;
+    if(k==="tool"||k==="tool-error")d.title=it.text;chat.append(d)});
+  if(stick||items.some(i=>i.kind==="user"))chat.scrollTop=chat.scrollHeight;
+}
+async function pollOrch(){
+  try{
+    const o=await api(`/api/orch?since=${CTL.orchN}`);
+    const was=CTL.orch.running;CTL.orch=o;
+    if(o.total<CTL.orchN){$("#chat").innerHTML="";CTL.orchN=0;return pollOrch()}
+    if(o.items.length){renderItems(o.items);CTL.orchN=o.total}
+    if(!o.available){$("#oStat").innerHTML=`<span style="color:var(--build)">No encuentro <code>claude</code> en esta máquina.</span> Instala Claude Code para hablar con el orquestador desde aquí; las aprobaciones funcionan igual.`;$("#oSend").disabled=true}
+    else $("#oStat").innerHTML=o.running?`<span class="spin"></span>&nbsp;Trabajando…`:o.session?"Esperando tu mensaje":"Sin conversación todavía";
+    $("#oStop").hidden=!o.running;$("#oSend").disabled=!o.available||o.running;$("#oReset").disabled=o.running;
+    if(was!==o.running){renderState();if(!o.running&&was)pollState()}
+    if(!CTL.orchN&&!o.items.length&&!o.running&&!$("#chat").children.length)$("#chat").innerHTML=`<div class="hint" id="chatHint">Escribe lo que necesitas. El orquestador trabaja en tu carpeta con los mismos guardas que en la terminal; cuando toque aprobar o cerrar, te avisará y lo pulsas tú aquí.</div>`;
+  }catch(e){if(e.message==="clave")disableCtl("La clave de esta pestaña ya no vale.")}
+}
+async function sendOrch(text,switchTab=true){
+  text=(text||"").trim();if(!text)return false;
+  if(switchTab)openCtl("orch");
+  $("#chatHint")?.remove();
+  let r;try{r=await api("/api/orch/send",{message:text})}catch(e){r={rc:9,output:String(e)}}
+  if(r.rc!==0){toast(r.output,"bad");return false}
+  CTL.orch.running=true;renderState();pollOrch();return true;
+}
+function disableCtl(msg){CTL.on=false;clearInterval(CTL.timer);clearInterval(CTL.otimer);$("#btnCtl").hidden=true;$("#todo").innerHTML="";closeCtl();if(msg)toast(msg,"bad");try{sessionStorage.removeItem("hxk")}catch{}}
+
+async function initCtl(){
+  readToken();if(!CTL.token)return false;
+  try{CTL.state=await api("/api/state")}catch{disableCtl(location.search?"":"");return false}
+  CTL.on=true;$("#btnCtl").hidden=false;renderState();
+  $("#btnCtl").onclick=()=>CTL.open?closeCtl():openCtl();
+  $("#ctlClose").onclick=closeCtl;
+  document.querySelectorAll(".tabs [data-tab]").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+  $("#oSend").onclick=async()=>{if(await sendOrch($("#oMsg").value))$("#oMsg").value=""};
+  $("#oMsg").onkeydown=e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("#oSend").click()}};
+  $("#oStop").onclick=async()=>{await api("/api/orch/stop",{});pollOrch()};
+  $("#oReset").onclick=async()=>{const r=await api("/api/orch/reset",{});if(r.rc){toast(r.output,"bad");return}$("#chat").innerHTML="";CTL.orchN=0;pollOrch()};
+  $("#nAskBtn").onclick=async()=>{const t=$("#nAsk").value.trim();if(!t){$("#nAsk").focus();return}
+    if(await sendOrch(`Quiero una feature nueva. Hazme solo las preguntas imprescindibles, registra el borrador con ./hx propose y enséñamelo para que lo apruebe en el panel.\n\n${t}`))$("#nAsk").value=""};
+  $("#fSend").onclick=async()=>{
+    const lines=id=>$(id).value.split("\n").map(x=>x.trim()).filter(Boolean);
+    const draft={title:$("#fTitle").value.trim(),description:$("#fDesc").value.trim(),type:$("#fType").value,size:$("#fSize").value,acceptance_criteria:lines("#fAc"),out_of_scope:lines("#fOut")};
+    let r;try{r=await api("/api/action",{action:"propose",draft})}catch(e){r={rc:9,output:String(e)}}
+    if(r.rc===0){toast("Borrador registrado","good");["#fTitle","#fDesc","#fAc","#fOut"].forEach(x=>$(x).value="");await pollState();showTab("feats")}
+    else{$("#dlg").innerHTML=`<h3>No se pudo registrar</h3><pre class="bad">${esc(r.output)}</pre><div class="acts"><button id="mCancel">Cerrar</button></div>`;$("#modal").classList.add("on");$("#mCancel").onclick=()=>$("#modal").classList.remove("on")}
+  };
+  addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#modal").classList.contains("on"))$("#modal").classList.remove("on");else if(CTL.open)closeCtl()}});
+  addEventListener("resize",sizeDrawer);
+  CTL.timer=setInterval(pollState,2000);
+  CTL.otimer=setInterval(()=>{if(CTL.open||CTL.orch.running)pollOrch()},1000);
+  pollOrch();
+  return true;
+}
+
 /* ---------- arranque ---------- */
 buildStage();resetState();layoutAll(false);
 (async()=>{
   let live=false;
   const local=/^(127\.0\.0\.1|localhost|\[::1\])$/.test(location.hostname)&&/^https?:$/.test(location.protocol);
+  if(local)await initCtl();
   if(local)try{const t=await fetchEvents();live=true;$("#btnLive").hidden=false;if(parseJsonl(t).length){await goLive();return}}catch{}
   setEvents(demoEvents(),"demo");layoutAll(false);
-  if(live)$("#srcText").textContent="Sin eventos todavía · mostrando el ejemplo. Pulsa «En vivo» cuando empiece una feature.";
+  if(live)$("#srcText").textContent=CTL.on?"Sin eventos todavía · mostrando el ejemplo. Abre el centro de control y pide tu primera feature.":"Sin eventos todavía · mostrando el ejemplo. Pulsa «En vivo» cuando empiece una feature.";
   window.__hx={seek,play,pause,get beats(){return beats},apply,get S(){return S},setSpeed:v=>{speed=v}};
   seek(-1);setTimeout(play,700);
+  // Con el centro de control abierto, en cuanto haya eventos reales pasamos a directo solos.
+  if(live&&CTL.on){const w=setInterval(async()=>{if(source==="live"){clearInterval(w);return}
+    try{const t=await fetchEvents();if(parseJsonl(t).length&&source==="demo"){clearInterval(w);await goLive()}}catch{}},2000)}
 })();
 window.__hx=window.__hx||{};
 </script>

@@ -170,15 +170,25 @@ git clone https://github.com/guiller91/harness-SF-v3.git && ./harness-SF-v3/inst
 ./hx rework <id> --reason …                             ./hx block|unblock <id>
 ./hx metrics           lead time, gates a la primera, rework, bloqueos
 ./hx doctor · ./hx check                                entorno · coherencia interna
-./hx watch             visor animado en el navegador (solo lectura, 127.0.0.1)
+./hx watch             centro de control en el navegador (127.0.0.1; --read-only = solo visor)
 ```
 
-### Verlo en acción
+### Centro de control: sin terminal
 
-`./hx watch` abre un visor local donde los agentes aparecen, trabajan y entregan al ritmo real de
-`.harness/events.jsonl`: fases, gates en verde/rojo/entorno, revisores en paralelo, guardas que
-bloquean y permisos pedidos al humano. Sin servidor puedes abrir `harness/viewer/index.html`,
-ver el ejemplo o arrastrar un `events.jsonl` para repetir una feature (con scrubber y velocidad).
+`./hx watch` abre en tu navegador un panel desde el que llevas todo el ciclo:
+
+- **Pides la feature** contándosela al orquestador (te pregunta lo que falte y redacta los criterios) o
+  rellenando tú el borrador.
+- **Hablas con el orquestador**: el panel lanza Claude Code en modo headless en tu carpeta, con los
+  mismos agentes y guardas, y reanuda la conversación en cada mensaje.
+- **Apruebas, cierras, desbloqueas, haces rework o reverify** con un botón. «Te toca» te avisa cuando una
+  feature espera por ti, y antes de aprobar ves la descripción y los criterios de aceptación.
+- **Lo ves en directo**: los agentes trabajan como robots animados, con gates, revisores, bloqueos de
+  guardas y permisos.
+
+El enlace que imprime `./hx watch` lleva una clave de sesión: solo ese navegador puede actuar. Sin
+servidor puedes abrir `harness/viewer/index.html`, ver el ejemplo o arrastrar un `events.jsonl` para
+repetir una feature. Detalles de seguridad en [`docs/security-model.md`](docs/security-model.md#centro-de-control).
 
 ## Medirlo
 
