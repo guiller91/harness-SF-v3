@@ -183,10 +183,16 @@ git clone https://github.com/guiller91/harness-SF-v3.git && ./harness-SF-v3/inst
   mismos agentes y guardas, y reanuda la conversación en cada mensaje.
 - **Apruebas, cierras, desbloqueas, haces rework o reverify** con un botón. «Te toca» te avisa cuando una
   feature espera por ti, y antes de aprobar ves la descripción y los criterios de aceptación.
-- **Lo ves en directo**: los agentes trabajan como robots animados, con gates, revisores, bloqueos de
-  guardas y permisos.
+- **Lo ves en directo, como una oficina**: cada agente tiene su mesa en su departamento (Análisis,
+  Desarrollo, Calidad, Entrega). El orquestador va a su mesa con el encargo, el agente trabaja (en su
+  pantalla ves qué hace: «lee design.md», «despliega en la org»…), baja a la sala de servidores cuando
+  toca la org, los revisores se reúnen en la sala de revisión y, al terminar, cada uno entrega su
+  informe en dirección con un resumen. Haz clic en un robot para ver su ficha: encargo, informe,
+  ficheros e historial.
 
-El enlace que imprime `./hx watch` lleva una clave de sesión: solo ese navegador puede actuar. Sin
+El enlace que imprime `./hx watch` lleva una clave de sesión: solo ese navegador puede actuar. Para
+poner el logo de tu empresa en el rótulo, copia `logo.png` o `logo.svg` en `.harness/brand/` del
+proyecto (no viaja con el harness). Sin
 servidor puedes abrir `harness/viewer/index.html`, ver el ejemplo o arrastrar un `events.jsonl` para
 repetir una feature. Detalles de seguridad en [`docs/security-model.md`](docs/security-model.md#centro-de-control).
 

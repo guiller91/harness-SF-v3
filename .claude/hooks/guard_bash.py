@@ -457,6 +457,19 @@ def main() -> None:
     for pending in asks:
         if pending:
             _hx.ask(pending[0], pending[1], event)
+    log_activity(cmd, role, event)
+
+
+def log_activity(cmd: str, role: str, event: Dict) -> None:
+    """El comando pasa: lo contamos al visor (solo un resumen seguro, nunca sus argumentos)."""
+    try:
+        from activity_lib import describe_bash
+        found = describe_bash(cmd)
+        if found:
+            core.log_event("activity", base=_hx.PROJECT, role=role, feature=_hx._active_id(),
+                           verb=found[0], place=found[1], tool=event.get("tool_name", "Bash"))
+    except Exception:  # noqa: BLE001 - el registro nunca bloquea
+        pass
 
 
 if __name__ == "__main__":

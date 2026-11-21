@@ -106,6 +106,16 @@
             "timeout": 15
           }
         ]
+      },
+      {
+        "matcher": "Read|Grep|Glob|Task|Agent|WebFetch|WebSearch|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/run\" activity.py",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "PostToolUse": [

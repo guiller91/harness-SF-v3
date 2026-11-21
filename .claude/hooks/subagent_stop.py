@@ -4,6 +4,7 @@ disco su entregable (y, si es revisor, su veredicto registrado). Lo que no está
 disco no existe para el siguiente agente."""
 from __future__ import annotations
 
+import re
 import sys
 import time
 
@@ -11,6 +12,44 @@ import _hx
 from _hx import core
 
 MAX_BLOCKS = 2
+
+
+NOTHING = re.compile(r"^(ninguno|ninguna|nada|n/?a|-+|—|sin pendientes|no hay\b.*)\.?$", re.I)
+
+
+def _clean(line: str) -> str:
+    line = re.sub(r"^\s*(?:[-*+]|\d+[.)])\s+", "", line)
+    line = re.sub(r"[*_`#>]+", "", line)
+    return " ".join(line.split())[:180]
+
+
+def report_digest(path) -> tuple:
+    """Primera línea útil del resumen y primer pendiente/pregunta del informe, para el visor."""
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return "", ""
+    sections: dict = {}
+    current = None
+    for line in text.splitlines():
+        m = re.match(r"^#{1,6}\s+(.+?)\s*$", line)
+        if m:
+            current = m.group(1).strip().lower()
+            sections.setdefault(current, [])
+        elif current is not None and line.strip():
+            sections[current].append(line)
+
+    def first(*names: str) -> str:
+        for key, lines in sections.items():
+            if any(key.startswith(n) for n in names):
+                for line in lines:
+                    c = _clean(line)
+                    if c:
+                        return c
+        return ""
+
+    pending = first("pendiente", "preguntas abiertas")
+    return first("resumen", "veredicto"), ("" if NOTHING.match(pending) else pending)
 
 
 def main() -> None:
@@ -64,8 +103,12 @@ def main() -> None:
             problems.append(f"no has registrado tu veredicto: `./hx verdict {role} pass|fail --note \"...\"`")
 
     if not problems:
+        report = (_hx.PROJECT / art["path"].replace("{fid}", fid)) if art and spec["class"] == "design" \
+            else core.report_path(fid, role, _hx.PROJECT)
+        summary, pending = report_digest(report)
         core.log_event("subagent_stop", base=_hx.PROJECT, role=role, feature=fid,
-                       duration_s=round(time.time() - float(run.get("started") or time.time()), 1))
+                       duration_s=round(time.time() - float(run.get("started") or time.time()), 1),
+                       report=report.relative_to(_hx.PROJECT).as_posix(), summary=summary, pending=pending)
         return
     blocks = int(run.get("blocks") or 0)
     if blocks >= MAX_BLOCKS:

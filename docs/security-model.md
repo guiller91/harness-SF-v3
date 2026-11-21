@@ -113,6 +113,15 @@ orquestador. Es la única vía, además de la terminal, para pasar las puertas h
 
 No compartas el enlace con clave ni abras el puerto a la red. `--read-only` sirve solo el visor.
 
+### Qué ve el visor de cada agente
+
+Para la oficina del visor, `activity.py` (lecturas, búsquedas, delegaciones, web y conectores) y
+`guard_bash.py` (solo si el comando pasa) registran **un resumen seguro**: un verbo («despliega en la
+org»), el sitio y como mucho un nombre de fichero o de gate. Nunca argumentos de comandos, contenido,
+prompts ni patrones de búsqueda: un comando con un token queda como «ejecuta curl». Del encargo del
+orquestador se guarda solo su `description` corta, y del informe del agente, la primera línea de
+*Resumen* y de *Pendiente*. Este hook no decide nada y nunca bloquea.
+
 ## Secretos
 
 El gate `secrets` busca credenciales literales en los ficheros que cambia la feature (contraseñas y

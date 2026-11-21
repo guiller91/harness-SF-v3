@@ -76,6 +76,14 @@ class WatchTest(unittest.TestCase):
         self.assertIn('"propose"', r.read().decode("utf-8"))
         self.assertEqual(r.headers["Cache-Control"], "no-store")
 
+    def test_logo_del_proyecto(self):
+        self.assertEqual(self.status(lambda: self.get("/brand/logo")), 404)
+        (self.p.root / ".harness/brand").mkdir(parents=True)
+        (self.p.root / ".harness/brand/logo.png").write_bytes(b"\x89PNG\r\n\x1a\nfake")
+        r = self.get("/brand/logo")
+        self.assertEqual(r.headers["Content-Type"], "image/png")
+        self.assertTrue(r.read().startswith(b"\x89PNG"))
+
     def test_solo_dos_rutas_publicas(self):
         for path in ("/harness.config.json", "/../feature_list.json", "/.harness/events.jsonl", "/etc/passwd"):
             self.assertEqual(self.status(lambda: self.get(path)), 404, path)

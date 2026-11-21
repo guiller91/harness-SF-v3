@@ -336,6 +336,21 @@ class Orchestrator:
 
 
 # --------------------------------------------------------------------------- #
+# Marca: el logo lo pone cada proyecto en .harness/brand/ (no viaja en el repo del harness)
+# --------------------------------------------------------------------------- #
+
+LOGO_TYPES = {".svg": "image/svg+xml", ".png": "image/png", ".webp": "image/webp", ".jpg": "image/jpeg"}
+
+
+def brand_logo(base: Path) -> Optional[Tuple[Path, str]]:
+    for ext, ctype in LOGO_TYPES.items():
+        path = base / ".harness" / "brand" / f"logo{ext}"
+        if path.is_file() and path.stat().st_size < 2 * 1024 * 1024:
+            return path, ctype
+    return None
+
+
+# --------------------------------------------------------------------------- #
 # Servidor
 # --------------------------------------------------------------------------- #
 
@@ -384,6 +399,11 @@ def serve(port: int, read_only: bool, cli_path: Path, plan_for: Callable, next_s
             path, _, query = self.path.partition("?")
             if path in ("/", "/index.html"):
                 return self._send(200, viewer.read_bytes(), "text/html; charset=utf-8")
+            if path == "/brand/logo":
+                found = brand_logo(base)
+                if found:
+                    return self._send(200, found[0].read_bytes(), found[1])
+                return self._send(404, b"sin logo", "text/plain; charset=utf-8")
             if path == "/events.jsonl":
                 return self._send(200, events.read_bytes() if events.exists() else b"", "text/plain; charset=utf-8")
             if path.startswith("/api/"):
