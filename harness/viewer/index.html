@@ -98,17 +98,31 @@ aside{border-left:1px solid var(--line);display:grid;grid-template-rows:auto 1fr
 #layer{position:absolute;inset:0;pointer-events:none;z-index:5}
 .tok{position:absolute;left:0;top:0;width:56px;height:62px;display:grid;justify-items:center;align-content:start;transition:transform .85s cubic-bezier(.2,.8,.2,1);will-change:transform}
 .tok.still{transition:none}
-.tok .face{position:relative;width:42px;height:42px;border-radius:50%;background:var(--panel2);border:2px solid var(--c);display:grid;place-items:center;font:600 12px var(--mono);color:var(--c);transition:box-shadow .3s}
-.tok.idle .face{opacity:.62}
-.tok.working .face{opacity:1;animation:work 1.3s ease-in-out infinite;background:color-mix(in srgb,var(--c) 18%,var(--panel2))}
-.tok.working .face::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:2px dashed var(--c);opacity:.8;animation:spin 3.2s linear infinite}
-@keyframes work{50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--c) 22%,transparent),0 0 20px color-mix(in srgb,var(--c) 55%,transparent)}}
-@keyframes spin{to{transform:rotate(360deg)}}
+.tok .face{position:relative;width:46px;height:46px;color:var(--c);transition:filter .3s}
+.tok .face svg{width:100%;height:100%;overflow:visible;display:block}
+.tok .bot{fill:var(--panel2);stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.tok .ink{fill:currentColor;stroke:none}
+.tok .ln{stroke:currentColor;stroke-width:1.8;stroke-linecap:round;fill:none}
+.tok .ab{font:700 7.5px var(--mono);fill:currentColor;text-anchor:middle}
+.tok.idle .face{opacity:.55;filter:saturate(.6)}
+.tok.idle .eye{transform:scaleY(.15)}
+.tok .eye,.tok .ant,.tok .arm{transform-box:fill-box;transform-origin:center}
+.tok.working .face{opacity:1;animation:hop 1s ease-in-out infinite}
+.tok.working .bot{fill:color-mix(in srgb,var(--c) 16%,var(--panel2))}
+.tok.working .eye{animation:blinkeye 2.4s infinite}
+.tok.working .ant{animation:antglow .8s ease-in-out infinite}
+.tok.working .arm.l{transform-origin:100% 0;animation:armw .45s ease-in-out infinite alternate}
+.tok.working .arm.r{transform-origin:0 0;animation:armw .45s ease-in-out .22s infinite alternate-reverse}
+@keyframes hop{50%{transform:translateY(-3px);filter:drop-shadow(0 6px 8px color-mix(in srgb,var(--c) 55%,transparent))}}
+@keyframes blinkeye{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes antglow{50%{transform:scale(1.7);filter:drop-shadow(0 0 4px currentColor)}}
+@keyframes armw{from{transform:rotate(-18deg)}to{transform:rotate(22deg)}}
 .tok .badge{position:absolute;top:-4px;right:2px;min-width:18px;height:18px;border-radius:9px;font:600 9px/18px var(--mono);text-align:center;padding:0 4px;display:none;color:#06120d}
 .tok.ok .badge{display:block;background:var(--ok)} .tok.ko .badge{display:block;background:var(--fail);color:#fff}
 .tok.shake .face{animation:shake .5s,flashred .9s}
+.tok.shake .bot{stroke:var(--fail)}
 @keyframes shake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
-@keyframes flashred{30%{box-shadow:0 0 0 8px rgba(255,93,108,.35),0 0 24px var(--fail);border-color:var(--fail)}}
+@keyframes flashred{30%{filter:drop-shadow(0 0 8px var(--fail))}}
 .c-orch{--c:var(--orch)} .c-design{--c:var(--design)} .c-build{--c:var(--build)} .c-review{--c:var(--review)} .c-release{--c:var(--release)} .c-other{--c:var(--muted)}
 
 /* globos y rayos */
@@ -141,7 +155,7 @@ footer{border-top:1px solid var(--line);padding:8px 16px;display:grid;grid-templ
 .pos{font:12px var(--mono);color:var(--muted);min-width:210px;text-align:right}
 #drop{position:fixed;inset:0;background:rgba(13,18,24,.88);display:none;place-items:center;font-size:20px;z-index:50;border:3px dashed var(--review)}
 #drop.on{display:grid}
-@media (prefers-reduced-motion:reduce){.tok{transition-duration:.01s}.tok.working .face,.tok.working .face::after,.gate.run .fill,.live .dot{animation:none}}
+@media (prefers-reduced-motion:reduce){.tok{transition-duration:.01s}.tok.working .face,.tok.working .eye,.tok.working .ant,.tok.working .arm,.gate.run .fill,.live .dot{animation:none}}
 @media (max-width:1000px){main{grid-template-columns:1fr}aside{display:none}body{overflow:auto}}
 </style>
 </head>
@@ -236,8 +250,23 @@ function buildStage(){
   const layer=$("#layer");layer.innerHTML="";
   [ORCH,...ROLES].forEach(r=>makeToken(r));
 }
+function robot(r){
+  const k=r.cls,ab=esc(r.ab);
+  const top=k==="orch"?'<path class="ln" d="M13 9 L15 2 L22 6 L29 2 L31 9"/>'
+    :k==="build"?'<path class="ln" d="M15 9V4M29 9V4"/><circle class="ink ant" cx="15" cy="3.5" r="2"/><circle class="ink ant" cx="29" cy="3.5" r="2"/>'
+    :k==="release"?'<path class="ln" d="M22 9V2"/><path class="ink" d="M22 2l8 2.5-8 2.5z"/>'
+    :'<path class="ln" d="M22 9V4"/><circle class="ink ant" cx="22" cy="3.2" r="2.4"/>';
+  const eyes=k==="review"?'<rect class="ink eye" x="12" y="14.5" width="20" height="4.6" rx="2.3"/>'
+    :k==="design"?'<circle class="ink eye" cx="16.5" cy="17" r="2.8"/><circle class="ink eye" cx="27.5" cy="17" r="2.8"/>'
+    :'<rect class="ink eye" x="13.5" y="14.5" width="5.5" height="5.5" rx="1.6"/><rect class="ink eye" x="25" y="14.5" width="5.5" height="5.5" rx="1.6"/>';
+  return `<svg viewBox="0 0 44 44" aria-hidden="true">${top}
+  <rect class="bot" x="8" y="9" width="28" height="18" rx="5.5"/><rect class="bot" x="4" y="14" width="3.5" height="8" rx="1.5"/><rect class="bot" x="36.5" y="14" width="3.5" height="8" rx="1.5"/>
+  ${eyes}<path class="ln" d="M17.5 23.2h9"/>
+  <rect class="bot" x="12" y="29" width="20" height="12" rx="3.5"/><text class="ab" x="22" y="37.6">${ab}</text>
+  <path class="ln arm l" d="M12 31.5L6.5 37"/><path class="ln arm r" d="M32 31.5L37.5 37"/></svg>`;
+}
 function makeToken(r){
-  const t=el("div",`tok idle c-${r.cls} still`,`<div class="face">${esc(r.ab)}</div><div class="badge"></div><div class="lbl">${esc(r.label)}</div>`);
+  const t=el("div",`tok idle c-${r.cls} still`,`<div class="face">${robot(r)}</div><div class="badge"></div><div class="lbl">${esc(r.label)}</div>`);
   t.dataset.role=r.id;$("#layer").append(t);tokens[r.id]=t;
   if(!homes[r.id]){const h=el("div","home");$("#bench").lastElementChild.querySelector(".homes").append(h);homes[r.id]=h}
   return t;
