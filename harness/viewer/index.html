@@ -951,7 +951,9 @@ window.__hx=window.__hx||{};
     const scene=new THREE.Scene();scene.add(new THREE.HemisphereLight(0xffffff,0xb8b4ae,2.3));
     const key=new THREE.DirectionalLight(0xffffff,2.2);key.position.set(2.5,5,4);scene.add(key);
     const cam=new THREE.PerspectiveCamera(26,1,0.05,100);
-    const gltf=await new GLTFLoader().loadAsync(window.HX_ROBOT_URL||"assets/robot.glb");
+    const url=window.HX_ROBOT_URL||"assets/robot.glb",loader=new GLTFLoader();
+    // En hostings que no sirven .glb el modelo viaja como JSON {glb:"<base64>"} y se decodifica aquí.
+    const gltf=url.endsWith(".json")?await (async()=>{const j=await (await fetch(url)).json();const bin=Uint8Array.from(atob(j.glb),c=>c.charCodeAt(0));return loader.parseAsync(bin.buffer,"")})():await loader.loadAsync(url);
     const root=gltf.scene;scene.add(root);root.rotation.y=0;
     const body=[],holo=[];
     root.traverse(o=>{if(o.isMesh){o.frustumCulled=false;const m=o.material;if(!m)return;
