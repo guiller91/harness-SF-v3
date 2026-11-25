@@ -1089,7 +1089,9 @@ $("#btnRestart").onclick=()=>{seek(-1)};
 $("#btnStep").onclick=()=>{pause();const n=idx+1;if(n<beats.length){apply(beats[n],true);idx=n;ui()}};
 $("#speed").onchange=e=>{speed=parseFloat(e.target.value)};
 $("#scrub").oninput=e=>{seek(parseInt(e.target.value,10))};
-addEventListener("keydown",e=>{if(/INPUT|SELECT/.test(e.target.tagName))return;if(e.code==="Space"){e.preventDefault();playing?pause():play()}if(e.code==="ArrowRight")$("#btnStep").click();if(e.code==="ArrowLeft")seek(Math.max(-1,idx-1))});
+// Atajos del visor (espacio, flechas): solo en «En directo» y nunca mientras se escribe en un campo.
+function typing(t){return !!t&&(/^(INPUT|SELECT|TEXTAREA|BUTTON|OPTION)$/.test(t.tagName)||t.isContentEditable)}
+addEventListener("keydown",e=>{if(typing(e.target)||e.ctrlKey||e.metaKey||e.altKey)return;if(typeof CTL!=="undefined"&&CTL.on&&CTL.page!=="live")return;if($("#modal").classList.contains("on"))return;if(e.code==="Space"){e.preventDefault();playing?pause():play()}if(e.code==="ArrowRight")$("#btnStep").click();if(e.code==="ArrowLeft")seek(Math.max(-1,idx-1))});
 addEventListener("resize",()=>{layoutAll(false);drawTicks()});
 
 /* ---------- en vivo (solo si lo sirve ./hx watch) ---------- */
